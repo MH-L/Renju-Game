@@ -203,9 +203,10 @@ public class Board {
 
 	/**
 	 * The function updates the board given the location and the player.
-	 * Return false if did not succeed, true if succeeded.
 	 * @param loc Indicates the board location to place the chess
 	 * @param player True means it is player's chess, otherwise it is computer's chess.
+	 * @return
+	 * 		false if it did not succed. true if succeeeded
 	 */
 	public boolean updateBoard(BoardLocation loc, boolean player) {
 		int col_num = loc.getXPos();

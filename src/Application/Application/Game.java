@@ -5,6 +5,9 @@ import Model.Board;
 import Model.BoardLocation;
 
 public class Game {
+	public static final int MULTIPLAYER_GAME_MODE = 1;
+	public static final int SINGLEPLAYER_GAME_MODE = 2;
+
 	private int mode;
 	private static Game instance = null;
 	private IPlayer player2;

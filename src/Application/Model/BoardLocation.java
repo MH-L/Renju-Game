@@ -33,6 +33,7 @@ public class BoardLocation {
 	 * @return true if the location is reacheable and false otherwise.
 	 */
 	public boolean isReachable() {
+		// TODO abstract this out of BoardLocation. This should be part of the Board
 		return x_pos < 16 && x_pos > -1 && y_pos < 16 && y_pos > -1;
 	}
 

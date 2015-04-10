@@ -1,11 +1,10 @@
 package Application;
 
-import java.io.ObjectInputStream.GetField;
-import java.util.Scanner;
-
 import Exceptions.WithdrawException;
 import Model.Board;
 import Model.BoardLocation;
+
+import java.util.Scanner;
 
 public class Main {
 	// TODO make changes to make this final
@@ -13,10 +12,13 @@ public class Main {
 
 	public static void main(String[] args) {
 		Scanner reader = new Scanner(System.in);
-		System.out.println(" Welcome to the Renju Game!\n Please enter 1 for multiplayer mode,\n and 2 for single player mode.");
+		System.out.println(" Welcome to the Renju Game!\n Select a game mode:\n " +
+				" (" + Game.MULTIPLAYER_GAME_MODE + ") multiplayer\n " +
+				" (" + Game.SINGLEPLAYER_GAME_MODE + ") singleplayer");
 		String inputStream = reader.next();
-		while (!inputStream.equals("1") && !inputStream.equals("2")) {
-			System.out.println("Invalid input detected. Please re-enter your choice.");
+		while (!inputStream.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
+				!inputStream.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
+			System.out.println("Invalid input. Please re-enter your choice.");
 			inputStream = reader.next();
 		}
 		// TODO get difficulty from the user
@@ -49,7 +51,7 @@ public class Main {
 					game.getPlayer1().withdraw();
 				} catch (WithdrawException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					System.out.println(e.getMessage());
 				}
 			}
 			if (inputStream.contains(",")) {
@@ -59,6 +61,7 @@ public class Main {
 					int x_coord = translate(inputs[0]);
 					int y_coord = Integer.parseInt(inputs[1]);
 					BoardLocation toPlace = new BoardLocation(y_coord - 1, x_coord - 1);
+					// TODO handle isReachable by exception
 					if (!toPlace.isReachable()) {
 						System.out.println("The input you entered is not valid.\n All coordinates"
 								+ " must be between 1 and 16.");
