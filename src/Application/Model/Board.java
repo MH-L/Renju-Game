@@ -2,6 +2,8 @@ package Model;
 
 import java.util.ArrayList;
 
+import Exceptions.InvalidIndexException;
+
 /**
  * A class for the board. A board
  * is always 16*16. It contains
@@ -76,6 +78,54 @@ public class Board {
 		return this.locations;
 	}
 
+	public int[] getColumnByIndex(int index) {
+		if (index < 0 || index > WIDTH)
+			try {
+				throw new InvalidIndexException("The column index is out of bounds.");
+			} catch (InvalidIndexException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		return this.getColumns().get(index);
+	}
+
+	public int[] getRowByIndex(int index) {
+		if (index < 0 || index > HEIGHT) {
+			try {
+				throw new InvalidIndexException("The row index is out of bounds.");
+			} catch (InvalidIndexException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return this.getRows().get(index);
+	}
+
+	public int[] getULDiagByIndex(int index) {
+		if (index < 0 || index > DIAG) {
+			try {
+				throw new InvalidIndexException("The diagonal index is out of bounds.");
+			} catch (InvalidIndexException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return this.getULDiagByIndex(index);
+	}
+
+	public int[] getURDiagByIndex(int index) {
+		if (index < 0 || index > DIAG) {
+			try {
+				throw new InvalidIndexException("The diagonal index is out of bounds.");
+			} catch (InvalidIndexException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return this.getURDiagByIndex(index);
+	}
+
 	/**
 	 * Initialize the grid of the board.
 	 * The grid is always 16*16.
@@ -130,8 +180,8 @@ public class Board {
 	}
 
 	public boolean checkrow() {
-		int consectCount = 0; // This counts the number of consecutive chesses for one player.
-		int prev = 0; // This is the last chess. 0 denotes that there is no last chess.
+		int consectCount = 0; // This counts the number of consecutive stones for one player.
+		int prev = 0; // This is the last stone. 0 denotes that there is no last stone.
 		for (int[] array : this.rows) {
 			for (int i = 0; i < array.length; i++) {
 				if (prev == array[i] && array[i] != 0)
@@ -203,12 +253,15 @@ public class Board {
 
 	/**
 	 * The function updates the board given the location and the player.
-	 * @param loc Indicates the board location to place the chess
-	 * @param player True means it is player's chess, otherwise it is computer's chess.
+	 * @param loc Indicates the board location to place the stone
+	 * @param player True means it is player's stone, otherwise it is computer's stone.
 	 * @return
-	 * 		false if it did not succed. true if succeeeded
+	 * 		false if it did not succeed. true if succeeded
+	 * @throws InvalidIndexException
 	 */
-	public boolean updateBoard(BoardLocation loc, boolean player) {
+	public boolean updateBoard(BoardLocation loc, boolean player) throws InvalidIndexException {
+		if (!isReachable(loc))
+			throw new InvalidIndexException("The location indexes is out of bound!");
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
@@ -322,7 +375,7 @@ public class Board {
 	}
 
 	public int getGridVal(BoardLocation grid) {
-		if (!grid.isReachable())
+		if (!isReachable(grid))
 			return -1;
 		int x_coord = grid.getXPos();
 		int y_coord = grid.getYPos();
@@ -360,5 +413,16 @@ public class Board {
 
 	public static BoardLocation getInvalidBoardLocation(){
 		return new BoardLocation(HEIGHT, WIDTH);
+	}
+
+	/**
+	 * Determines whether the location is reacheable.
+	 * A location is reacheable if its x-coordinate and y-coordinate
+	 * are both in the range from 0 to 15. (Since the board is 16*16)
+	 * @return true if the location is reacheable and false otherwise.
+	 */
+	public static boolean isReachable(BoardLocation location) {
+		return location.getXPos() < WIDTH && location.getXPos() > -1
+				&& location.getYPos() < HEIGHT && location.getYPos() > -1;
 	}
 }

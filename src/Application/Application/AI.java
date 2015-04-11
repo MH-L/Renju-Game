@@ -1,6 +1,8 @@
 package Application;
 
+import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
+import Model.Board;
 import Model.BoardLocation;
 
 /**
@@ -10,24 +12,41 @@ import Model.BoardLocation;
  *
  */
 public class AI implements IPlayer{
-// Please do not forget to add a difficulty level field.
 
-	private int difficulty;
 	private static AI instance = null;
+	private static int difficulty;
+	private static Board board;
+	private BoardLocation lastMove;
 
-	private AI(int difficulty) {
+	private AI(int difficulty, Board board) {
+		this.lastMove = Model.Board.getInvalidBoardLocation();
 		this.difficulty = difficulty;
+		this.board = board;
 	}
 
-	public static AI getInstance(int difficulty) {
+	public static AI getInstance(int difficulty, Board board) {
 		if (instance == null)
-			instance = new AI(difficulty);
+			instance = new AI(difficulty, board);
 		return instance;
 	}
 
 	@Override
 	public void makeMove(BoardLocation location) {
+		this.lastMove = location;
+	}
 
+	public void makeMove(Board board) {
+		this.lastMove = AI.getNextMove(board);
+		try {
+			board.updateBoard(lastMove, false);
+		} catch (InvalidIndexException e) {
+			System.out.println("The system needs maintenance.");
+		}
+	}
+
+	private static BoardLocation getNextMove(Board board) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -40,5 +59,17 @@ public class AI implements IPlayer{
 	public void forceWithdraw() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public BoardLocation makeMove() {
+		BoardLocation nextMove = AI.getNextMove(board);
+		try {
+			board.updateBoard(nextMove, false);
+			lastMove = nextMove;
+		} catch (InvalidIndexException e) {
+			System.out.println("The system needs maintenance.");
+		}
+		return nextMove;
 	}
 }

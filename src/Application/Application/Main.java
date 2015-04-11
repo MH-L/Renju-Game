@@ -1,5 +1,6 @@
 package Application;
 
+import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
 import Model.BoardLocation;
@@ -12,12 +13,15 @@ public class Main {
 
 	public static void main(String[] args) {
 		Scanner reader = new Scanner(System.in);
-		System.out.println(" Welcome to the Renju Game!\n Select a game mode:\n " +
-				" (" + Game.MULTIPLAYER_GAME_MODE + ") multiplayer\n " +
-				" (" + Game.SINGLEPLAYER_GAME_MODE + ") singleplayer");
+		System.out
+				.println(" Welcome to the Renju Game!\n Select a game mode:\n "
+						+ " (" + Game.MULTIPLAYER_GAME_MODE
+						+ ") multiplayer\n " + " ("
+						+ Game.SINGLEPLAYER_GAME_MODE + ") singleplayer");
 		String inputStream = reader.next();
-		while (!inputStream.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
-				!inputStream.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
+		while (!inputStream.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE))
+				&& !inputStream.equals(String
+						.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			inputStream = reader.next();
 		}
@@ -35,12 +39,14 @@ public class Main {
 			else
 				dispStr = "Second player, ";
 
-			System.out.println(dispStr + "now it is your turn to enter the place you want to\n insert the"
-					+ " peg, use two numbers ranging from 1 to 16,\n and separate them using"
-					+ " a comma.\n Note that the first one is the x-coordinate,\n and the"
-					+ " second one is the y-coordinate. If you want to withdraw\n"
-					+ " your last choice, enter w. If you want to exit the game,"
-					+ " enter x.");
+			System.out
+					.println(dispStr
+							+ "now it is your turn to enter the place you want to\n insert the"
+							+ " peg, use two numbers ranging from 1 to 16,\n and separate them using"
+							+ " a comma.\n Note that the first one is the x-coordinate,\n and the"
+							+ " second one is the y-coordinate. If you want to withdraw\n"
+							+ " your last choice, enter w. If you want to exit the game,"
+							+ " enter x.");
 			inputStream = reader.next();
 			if (inputStream.equals("x")) {
 				System.out.println("Game Over!");
@@ -60,27 +66,26 @@ public class Main {
 				if (inputs.length == 2) {
 					int x_coord = translate(inputs[0]);
 					int y_coord = Integer.parseInt(inputs[1]);
-					BoardLocation toPlace = new BoardLocation(y_coord - 1, x_coord - 1);
+					BoardLocation toPlace = new BoardLocation(y_coord - 1,
+							x_coord - 1);
 					// TODO handle isReachable by exception
-					if (!toPlace.isReachable()) {
-						System.out.println("The input you entered is not valid.\n All coordinates"
-								+ " must be between 1 and 16.");
+					boolean success = false;
+					try {
+						success = game.getBoard().updateBoard(toPlace, counter);
+					} catch (InvalidIndexException e) {
+						System.out
+								.println("The input you entered is not valid.\n All coordinates"
+										+ " must be between 1 and 16.");
+					}
+					if (!success) {
+						System.out
+								.println("The move is invalid. Please try another.");
 						continue;
 					} else {
-						boolean success;
-						if (counter)
-							success = game.getBoard().updateBoard(toPlace, true);
-						else
-							success = game.getBoard().updateBoard(toPlace, false);
-						if (!success) {
-							System.out.println("The move is invalid. Please try another.");
-							continue;
-						} else {
-							// Succeeded.
-							game.getBoard().renderBoard();
-						}
-
+						// Succeeded.
+						game.getBoard().renderBoard();
 					}
+
 				} else {
 					System.out.println("The input you entered is invalid!");
 					continue;
@@ -88,22 +93,10 @@ public class Main {
 			}
 			counter = !counter;
 		}
-		if (isWinning(game.getBoard())){
+		if (isWinning(game.getBoard())) {
 			System.out.println("You won!");
 		}
 		reader.close();
-	}
-
-	public static void showboard() {
-		System.out.println("Here is the initial board.");
-		// Prints out the initial board.
-		// Note that player's pegs are denoted by an blank circle;
-		// while the AI's pegs are denoted by a solid circle.
-		// Board locations which are unoccupied are denoted by
-		// a empty square.
-		for (int i = 0; i < 16; i++)
-			System.out.println("\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1"
-					+ "\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1\u25A1");
 	}
 
 	public static boolean isWinning(Board board) {
