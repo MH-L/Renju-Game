@@ -26,16 +26,7 @@ public class BoardLocation {
 		return y_pos;
 	}
 
-	/**
-	 * Determines whether the location is reacheable.
-	 * A location is reacheable if its x-coordinate and y-coordinate
-	 * are both in the range from 0 to 15. (Since the board is 16*16)
-	 * @return true if the location is reacheable and false otherwise.
-	 */
-	public boolean isReachable() {
-		// TODO abstract this out of BoardLocation. This should be part of the Board
-		return x_pos < 16 && x_pos > -1 && y_pos < 16 && y_pos > -1;
-	}
+
 
 	public boolean occupied() {
 		return this.value != 0;

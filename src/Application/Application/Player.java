@@ -1,6 +1,7 @@
 package Application;
 
 import Exceptions.MultipleWithdrawException;
+import Exceptions.NothingToWithdrawException;
 import Exceptions.OverWithdrawException;
 import Exceptions.WithdrawException;
 import Model.Board;
@@ -20,20 +21,22 @@ public class Player implements IPlayer{
 	public Player() {
 		this.num_hints = 3;
 		this.num_regrets = 3;
-		this.lastMove = Model.Board.getInvalidBoardLocation();
+		this.lastMove = null;
 		this.first = false;
 	}
 
 	public Player(boolean first) {
 		this.num_hints = 3;
 		this.num_regrets = 3;
-		this.lastMove = Model.Board.getInvalidBoardLocation();
+		this.lastMove = null;
 		this.first = first;
 	}
 
 	@Override
 	public boolean withdraw() throws WithdrawException {
-		if (this.lastMove.isReachable()) {
+		if (this.lastMove == null)
+			throw new NothingToWithdrawException("It is your first turn! You have nothing to withdraw!");
+		else if (Model.Board.isReachable(lastMove)) {
 			if (this.num_regrets > 0) {
 				num_regrets --;
 				// TODO refactor
@@ -54,6 +57,20 @@ public class Player implements IPlayer{
 	@Override
 	public void forceWithdraw() {
 		lastMove = Model.Board.getInvalidBoardLocation();
+	}
+
+	public int getRegrets() {
+		return num_regrets;
+	}
+
+	public int getNumHints() {
+		return num_hints;
+	}
+
+	@Override
+	public BoardLocation makeMove() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

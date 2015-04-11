@@ -1,5 +1,6 @@
 package Application;
 
+import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
 import Model.BoardLocation;
@@ -14,11 +15,12 @@ public class Game {
 	private IPlayer player1;
 	private int difficulty;
 	private Board board;
+	private boolean activePlayer;
 
 	private Game(int mode, int difficulty) {
 		this.mode = mode;
 		if (mode == 1) {
-			player2 = Application.AI.getInstance(difficulty);
+			player2 = Application.AI.getInstance(difficulty, board);
 			player1 = new Player();
 			this.difficulty = difficulty;
 			this.board = new Board();
@@ -52,14 +54,19 @@ public class Game {
 			}
 	}
 
-	public void makeMove(boolean first, BoardLocation location){
-		if (first) {
-			player1.makeMove(location);
+	public void makeMove(){
+		BoardLocation loc;
+		if (activePlayer) {
+			loc = player1.makeMove();
 		} else {
-			player2.makeMove(location);
+			loc = player2.makeMove();
 		}
 
-		board.updateBoard(location, first);
+		try {
+			board.updateBoard(loc, activePlayer);
+		} catch (InvalidIndexException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Board getBoard(){
@@ -72,6 +79,14 @@ public class Game {
 
 	public IPlayer getPlayer1() {
 		return player1;
+	}
+
+	public boolean getActivePlayer() {
+		return activePlayer;
+	}
+
+	public void setActivePlayer(boolean active) {
+		this.activePlayer = active;
 	}
 
 

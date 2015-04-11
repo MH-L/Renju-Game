@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import Exceptions.InvalidIndexException;
 import Model.Board;
 import Model.BoardLocation;
 
@@ -26,19 +27,19 @@ public class BoardTest {
 	@Test
 	public void testIsValid() {
 		BoardLocation bdloc = new BoardLocation(16,16);
-		assertFalse(bdloc.isReachable());
+		assertFalse(Board.isReachable(bdloc));
 		bdloc = new BoardLocation(0,0);
-		assertTrue(bdloc.isReachable());
+		assertTrue(Board.isReachable(bdloc));
 		bdloc = new BoardLocation(-1,-1);
-		assertFalse(bdloc.isReachable());
+		assertFalse(Board.isReachable(bdloc));
 		bdloc = new BoardLocation(1,-1);
-		assertFalse(bdloc.isReachable());
+		assertFalse(Board.isReachable(bdloc));
 		bdloc = new BoardLocation(17,2);
-		assertFalse(bdloc.isReachable());
+		assertFalse(Board.isReachable(bdloc));
 	}
 
 	@Test
-	public void testUpdate() {
+	public void testUpdate() throws InvalidIndexException {
 		BoardLocation toPlace = new BoardLocation(0,0);
 		BoardLocation player = new BoardLocation(1,0);
 		bd.updateBoard(player, true);
@@ -77,7 +78,7 @@ public class BoardTest {
 	}
 
 	@Test
-	public void testCheckRows() {
+	public void testCheckRows() throws InvalidIndexException {
 		bd.updateBoard(new BoardLocation(7,9), false);
 		bd.updateBoard(new BoardLocation(7,8), false);
 		bd.updateBoard(new BoardLocation(7,10), false);
@@ -89,7 +90,7 @@ public class BoardTest {
 	}
 
 	@Test
-	public void testCheckCols() {
+	public void testCheckCols() throws InvalidIndexException {
 		bd.updateBoard(new BoardLocation(7,9), false);
 		bd.updateBoard(new BoardLocation(8,9), false);
 		bd.updateBoard(new BoardLocation(9,9), false);
@@ -101,7 +102,7 @@ public class BoardTest {
 	}
 
 	@Test
-	public void testCheckDiags() {
+	public void testCheckDiags() throws InvalidIndexException {
 		bd.updateBoard(new BoardLocation(7,9), false);
 		bd.updateBoard(new BoardLocation(6,8), false);
 		bd.updateBoard(new BoardLocation(8,10), false);
@@ -113,7 +114,7 @@ public class BoardTest {
 	}
 
 	@Test
-	public void testWithdrawAndReset() {
+	public void testWithdrawAndReset() throws InvalidIndexException {
 		bd.updateBoard(new BoardLocation(2,0), true);
 		bd.updateBoard(new BoardLocation(2,1), true);
 		assertEquals(bd.getGridVal(new BoardLocation(2,0)), 1);

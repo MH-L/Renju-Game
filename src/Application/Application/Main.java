@@ -1,5 +1,6 @@
 package Application;
 
+import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
 import Model.BoardLocation;
@@ -55,24 +56,24 @@ public class Main {
 				}
 				int x_coord = translate(inputs[0]);
 				int y_coord = Integer.parseInt(inputs[1]);
-				BoardLocation toPlace = new BoardLocation(y_coord - 1, x_coord - 1);
-				// TODO handle isReachable by exception
-				if (!toPlace.isReachable()) {
-					System.out.println("The input you entered is not valid.\n All coordinates"
-							+ " must be between 1 and 16.");
-					continue;
-				};
-				boolean success = game.getBoard().updateBoard(toPlace, isPlayer1);
-				if (!success) {
+				BoardLocation toPlace = new BoardLocation(y_coord - 1,
+						x_coord - 1);
+//				if (!Board.isReachable(toPlace)) {
+//					System.out.println("The input you entered is not valid.\n All coordinates"
+//							+ " must be between 1 and 16.");
+//					continue;
+//				};
+				try {
+					game.getBoard().updateBoard(toPlace, isPlayer1);
+					game.getBoard().renderBoard();
+				} catch (InvalidIndexException e) {
 					System.out.println("The move is invalid. Please try another.");
 					continue;
-				} else {
-					game.getBoard().renderBoard();
 				}
 			}
 			isPlayer1 = !isPlayer1;
 		}
-		if (isWinning(game.getBoard())){
+		if (isWinning(game.getBoard())) {
 			System.out.println("You won!");
 		}
 		reader.close();
