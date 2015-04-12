@@ -7,12 +7,21 @@ import Model.Board;
 public class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
 	public static final int SINGLEPLAYER_GAME_MODE = 2;
+	public static final int NOVICE_DIFFICULTY = 1;
+	public static final int INTERMEDIATE_DIFFICULTY = 2;
+	public static final int ADVANCED_DIFFICULTY = 3;
+	public static final int ULTIMATE_DIFFICULTY = 4;
 
 	private int mode;
 	private static Game instance = null;
 	private IPlayer player2;
 	private IPlayer player1;
 	private int difficulty;
+
+	public int getMode() {
+		return mode;
+	}
+
 	private Board board;
 	private IPlayer activePlayer;
 

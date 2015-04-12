@@ -5,24 +5,50 @@ import Exceptions.WithdrawException;
 import Model.Board;
 
 import java.util.Scanner;
-
+/**
+ * The start point of the application.
+ * @author Minghao Liu
+ * @ModifiedBy Kelvin Yip
+ *
+ */
 public class Main {
 	private static Game game;
 	private static Scanner reader;
 
 	public static void main(String[] args) {
 		reader = new Scanner(System.in);
-		String inputStream = getGameMode(reader);
-		// TODO get difficulty from the user
-		game = Game.getInstance(Integer.parseInt(inputStream), 4);
+		String inputStream = getGameMode();
+		String dispMode = getDisplayMode();
 		printInstruction();
-		game.getBoard().renderBoard();
+		if (Integer.parseInt(inputStream) == 2) {
+			String difficulty = getDifficulty();
+			switch(Integer.parseInt(difficulty)) {
+				case 1:
+					game = Game.getInstance(2, 1);
+					break;
+				case 2:
+					game = Game.getInstance(2, 2);
+					break;
+				case 3:
+					game = Game.getInstance(2, 3);
+					break;
+				case 4:
+					game = Game.getInstance(2, 4);
+					break;
+				default:
+					System.out.println("Internal Error!");
+					return;
+			}
+		}
+		game = Game.getInstance(Integer.parseInt(inputStream), 4);
+		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
+		game.getBoard().renderBoard(Integer.parseInt(dispMode));
 
 		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
 			System.out.println("Player " + game.getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
-				game.getBoard().renderBoard();
+				game.getBoard().renderBoard(Integer.parseInt(dispMode));
 			} catch (InvalidIndexException e) {
 				switch (e.getMessage()){
 					case "x":
@@ -49,6 +75,7 @@ public class Main {
 		} else if (boardFull(game.getBoard())) {
 			System.out.println("There are no more moves left. You both lose!");
 		}
+
 		reader.close();
 	}
 
@@ -88,7 +115,7 @@ public class Main {
 		return board.boardFull();
 	}
 
-	private static String getGameMode(Scanner reader) {
+	private static String getGameMode() {
 		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
 				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
 				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
@@ -100,4 +127,78 @@ public class Main {
 		}
 		return gameMode;
 	}
+
+	private static String getDisplayMode() {
+		System.out.println(" Please enter your display mode:\n"
+				+ " (" + Board.CLASSIC_MODE + ") Classic mode\n"
+				+ " (" + Board.FANCY_MODE + ") Fancy mode\n"
+				+ " (Note that the fancy mode may require unicode plugin for your cmd.)");
+		String displayMode = reader.next();
+		while (!displayMode.equals(String.valueOf(Board.CLASSIC_MODE)) &&
+				!displayMode.equals(String.valueOf(Board.FANCY_MODE))) {
+			System.out.println("Invalid input. Please re-enter your choice.");
+			displayMode = reader.next();
+		}
+		return displayMode;
+	}
+
+//	private static void singlePlayerGameStart(Scanner reader, String inputStream, String dispMode) {
+//		boolean isPlayer1 = true;
+//		String dispStr;
+//		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
+//			if (isPlayer1)
+//				dispStr = "one";
+//			else
+//				dispStr = "two";
+//
+//			System.out.println("Player " + dispStr + ", it is your turn.");
+//			inputStream = reader.next();
+//			switch (inputStream){
+//				case "x":
+//					actionGameOver(reader);
+//					return;
+//				case "w":
+//					try {
+//						game.getPlayer1().withdraw();
+//					} catch (WithdrawException e) {
+//						System.out.println(e.getMessage());
+//						continue;
+//					}
+//					break;
+//				case "i":
+//					printInstruction();
+//					break;
+//			}
+//			if (!sanitiseAndPrint(inputStream, isPlayer1, dispMode))
+//				continue;
+//			isPlayer1 = !isPlayer1;
+//		}
+//		if (isWinning(game.getBoard())) {
+//			System.out.println("You won!");
+//		}
+//	}
+
+	private static String getDifficulty() {
+		System.out.println(" Please enter the AI difficulty:\n"
+				+ " (" + Game.NOVICE_DIFFICULTY + ") Novice\n"
+				+ " (" + Game.INTERMEDIATE_DIFFICULTY + ") Intermediate\n"
+				+ " (" + Game.ADVANCED_DIFFICULTY + ") Advanced\n"
+				+ " (" + Game.ULTIMATE_DIFFICULTY + ") Ultimate\n");
+		String difficulty = reader.next();
+
+		while (!difficulty.equals(String.valueOf(Game.NOVICE_DIFFICULTY)) &&
+				!difficulty.equals(String.valueOf(Game.INTERMEDIATE_DIFFICULTY)) &&
+				!difficulty.equals(String.valueOf(Game.ADVANCED_DIFFICULTY)) &&
+				!difficulty.equals(String.valueOf(Game.ULTIMATE_DIFFICULTY))) {
+			System.out.println("Invalid difficulty level. Please re-enter your choice.");
+			difficulty = reader.next();
+		}
+		return difficulty;
+	}
+
+	private static void multiPlayerGameStart() {
+
+
+	}
+
 }
