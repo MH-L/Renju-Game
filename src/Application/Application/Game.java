@@ -56,7 +56,7 @@ public class Game {
 					player2.forceWithdraw();
 				} else {
 					player2.withdraw();
-					player1.withdraw();
+					player1.forceWithdraw();
 				}
 			} catch (WithdrawException e){
 				e.printStackTrace(); // TODO

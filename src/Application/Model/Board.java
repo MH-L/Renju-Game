@@ -1,5 +1,6 @@
 package Model;
 
+import Algorithm.Pattern;
 import Exceptions.InvalidIndexException;
 
 import java.util.ArrayList;
@@ -190,8 +191,8 @@ public class Board {
 		// TODO change here.
 		int consectCount = 0; // This counts the number of consecutive stones
 								// for one player.
-		int prev = EMPTY_SPOT; // This is the last stone. 0 denotes that there is no last
-						// stone.
+		int prev = EMPTY_SPOT; // This is the last stone. 0 denotes that there
+								// is no last stone.
 		for (int[] array : this.rows) {
 			for (int i = 0; i < array.length; i++) {
 				if (prev == array[i] && array[i] != EMPTY_SPOT)
@@ -475,15 +476,100 @@ public class Board {
 	}
 
 	/**
-	 * Determines whether the location is reacheable. A location is reacheable
-	 * if its x-coordinate and y-coordinate are both in the range from 0 to 15.
+	 * Determines whether the location is reachable. A location is reachable if
+	 * its x-coordinate and y-coordinate are both in the range from 0 to 15.
 	 * (Since the board is 16*16)
 	 *
-	 * @return true if the location is reacheable and false otherwise.
+	 * @return true if the location is reachable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
 		return location.getXPos() < WIDTH && location.getXPos() > -1
 				&& location != null && location.getYPos() < HEIGHT
 				&& location.getYPos() > -1;
+	}
+
+	public static ArrayList<BoardLocation> findBlockingLocs(
+			ArrayList<BoardLocation> locations, boolean isContiguous, int type) {
+		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
+		switch (type) {
+		case Pattern.ON_ROW:
+			for (int i = 0; i < locations.size(); i++) {
+				BoardLocation candidate = new BoardLocation(locations.get(i)
+						.getYPos(), locations.get(i).getXPos() + 1);
+				BoardLocation anotherCandidate = new BoardLocation(locations
+						.get(i).getYPos(), locations.get(i).getXPos() - 1);
+				if (!locations.contains(candidate) && isReachable(candidate))
+					retLocs.add(candidate);
+				if (!locations.contains(anotherCandidate)
+						&& isReachable(anotherCandidate))
+					retLocs.add(anotherCandidate);
+			}
+			break;
+		case Pattern.ON_COL:
+			for (int i = 0; i < locations.size(); i++) {
+				BoardLocation candidate = new BoardLocation(locations.get(i)
+						.getYPos() + 1, locations.get(i).getXPos());
+				BoardLocation anotherCandidate = new BoardLocation(locations
+						.get(i).getYPos() - 1, locations.get(i).getXPos());
+				if (!locations.contains(candidate) && isReachable(candidate))
+					retLocs.add(candidate);
+				if (!locations.contains(anotherCandidate)
+						&& isReachable(anotherCandidate))
+					retLocs.add(anotherCandidate);
+			}
+			break;
+		case Pattern.ON_ULDIAG:
+			for (int i = 0; i < locations.size(); i++) {
+				BoardLocation candidate = new BoardLocation(locations.get(i)
+						.getYPos() + 1, locations.get(i).getXPos() + 1);
+				BoardLocation anotherCandidate = new BoardLocation(locations
+						.get(i).getYPos() - 1, locations.get(i).getXPos() - 1);
+				if (!locations.contains(candidate) && isReachable(candidate))
+					retLocs.add(candidate);
+				if (!locations.contains(anotherCandidate)
+						&& isReachable(anotherCandidate))
+					retLocs.add(anotherCandidate);
+			}
+			break;
+		case Pattern.ON_URDIAG:
+			for (int i = 0; i < locations.size(); i++) {
+				BoardLocation candidate = new BoardLocation(locations.get(i)
+						.getYPos() + 1, locations.get(i).getXPos() - 1);
+				BoardLocation anotherCandidate = new BoardLocation(locations
+						.get(i).getYPos() - 1, locations.get(i).getXPos() + 1);
+				if (!locations.contains(candidate) && isReachable(candidate))
+					retLocs.add(candidate);
+				if (!locations.contains(anotherCandidate)
+						&& isReachable(anotherCandidate))
+					retLocs.add(anotherCandidate);
+			}
+			break;
+		default:
+			break;
+
+		}
+		return retLocs;
+	}
+
+	public static BoardLocation convertDiagToXY(int diagIndex, int subIndex,
+			boolean isUL) {
+		assert (diagIndex > -1 && diagIndex < DIAG && subIndex > -1 && subIndex < (diagIndex > (DIAG - 1) / 2 ? DIAG
+				- diagIndex
+				: diagIndex + 1));
+		if (isUL)
+			if (diagIndex < HEIGHT)
+				return new BoardLocation(subIndex, subIndex - diagIndex + WIDTH
+						- 1);
+			else
+				return new BoardLocation(diagIndex + subIndex - WIDTH + 1,
+						subIndex);
+		else {
+			if (diagIndex < HEIGHT)
+				return new BoardLocation(subIndex, diagIndex - subIndex);
+			else
+				return new BoardLocation(WIDTH - 1 - diagIndex - subIndex, 2
+						* diagIndex + subIndex - WIDTH + 1);
+		}
+
 	}
 }

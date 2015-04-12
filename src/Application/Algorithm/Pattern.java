@@ -2,6 +2,7 @@ package Algorithm;
 
 import java.util.ArrayList;
 
+import Model.Board;
 import Model.BoardLocation;
 
 /**
@@ -12,9 +13,18 @@ import Model.BoardLocation;
  */
 public class Pattern {
 	private ArrayList<BoardLocation> constituent;
+	private boolean isContiguous;
+	private ArrayList<BoardLocation> blockingLocs;
+	private int type;
+	public static final int ON_ROW = 1;
+	public static final int ON_COL = 2;
+	public static final int ON_ULDIAG = 3;
+	public static final int ON_URDIAG = 4;
 
-	public Pattern(ArrayList<BoardLocation> locations) {
+	public Pattern(ArrayList<BoardLocation> locations, boolean isContiguous, int type) {
 		this.constituent = locations;
+		this.isContiguous = isContiguous;
+		this.blockingLocs = Board.findBlockingLocs(locations, isContiguous, type);
 	}
 
 	public int getNumLocs() {
