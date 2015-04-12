@@ -58,8 +58,12 @@ public class Main {
 						actionGameOver();
 						return;
 					case "w":
-						if (actionWithdraw())
+						try {
+							actionWithdraw();
+						} catch (WithdrawException e1) {
+							// Redo this turn since the player is out of withdrawals
 							continue;
+						}
 					case "i":
 						printInstruction();
 						break;
@@ -82,14 +86,8 @@ public class Main {
 		reader.close();
 	}
 
-	private static boolean actionWithdraw() {
-		try {
-            game.getPlayer1().withdraw();
-        } catch (WithdrawException e) {
-            System.out.println(e.getMessage());
-			return true;
-        }
-		return false;
+	private static void actionWithdraw() throws WithdrawException {
+		game.withdraw();
 	}
 
 	private static void actionGameOver() {

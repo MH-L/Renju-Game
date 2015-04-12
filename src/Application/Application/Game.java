@@ -23,6 +23,10 @@ public class Game {
 	private IPlayer activePlayer;
 
 	private Game() {
+		init();
+	}
+
+	private void init(){
 		this.board = new Board();
 	}
 
@@ -31,7 +35,7 @@ public class Game {
 	 */
 	public void initMultiplayer(){
 		this.mode = MULTIPLAYER_GAME_MODE;
-		this.board = new Board();
+		init();
 		player1 = new Player();
 		player2 = new Player();
 		activePlayer = player1;
@@ -44,7 +48,7 @@ public class Game {
 	 */
 	public void initSinglePlayer(int difficulty){
 		this.mode = SINGLEPLAYER_GAME_MODE;
-		this.board = new Board();
+		init();
 		player1 = new Player();
 		player2 = Application.AI.getInstance();
 		AI.initAI(difficulty, board);
@@ -54,19 +58,15 @@ public class Game {
 	public static Game getInstance() {
 		if (instance == null) {
 			instance = new Game();
+			// Default game instance is multiplayer
 			instance.initMultiplayer();
 		}
 		return instance;
 	}
 
-	public void withdraw() {
-		try {
-			getActivePlayer().withdraw();
-			getInactivePlayer().forceWithdraw();
-		} catch (WithdrawException e) {
-			// TODO
-			e.printStackTrace();
-		}
+	public void withdraw() throws WithdrawException{
+		getActivePlayer().withdraw();
+		getInactivePlayer().forceWithdraw();
 	}
 
 	public int getMode() {
@@ -81,12 +81,12 @@ public class Game {
 		return board;
 	}
 
-	public IPlayer getPlayer2() {
-		return player2;
-	}
-
 	public IPlayer getPlayer1() {
 		return player1;
+	}
+
+	public IPlayer getPlayer2() {
+		return player2;
 	}
 
 	public IPlayer getActivePlayer() {
