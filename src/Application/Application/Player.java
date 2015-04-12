@@ -53,9 +53,6 @@ public class Player implements IPlayer{
 
 	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
-		// note that the y-coord is the first, and the x-coord is the second;
-		// to comply with the indices of the grid.
-		// also notice that the location is always 1-based (user-friendly).enerated method stub
 		Scanner input = new Scanner(System.in);
 		String move = input.nextLine();
 		if (!move.contains(",")) {

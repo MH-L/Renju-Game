@@ -70,14 +70,14 @@ public class Main {
 	private static void printInstruction() {
 		// TODO fix the magic number
 		System.out.println("Game instruction:\nEach player takes turn to place a stone on the board." +
-				"\nThe first one to place 5 consecutive stones in a row wins the game." +
-				"\nTo place a stone, select the x-position then y-position delimited by a comma." +
-				"\n  For example: A,1 or B,3." +
+				"\nYour goal is to place 5 consecutive stones in a row. The first one to do so wins!" +
+				"\nTo place a stone, enter the letter and number corresponding to the column and row respectively." +
+				"\nSeparate the two by a comma." +
+				"\n  For example: A,1 or 3,B." +
 				"\n\nYou are allowed to undo your last move up to 3 times." +
-				"Enter \"w\" to withdraw when it is your turn." +
-				"\nTo exit the game, enter \"x\". " +
-				"\nTo reshow the instruction, enter \"i\"\n");
-
+				"\nEnter \"w\" to withdraw when it is your turn." +
+				"\nTo quit the game, enter \"x\". " +
+				"\nTo see the instructions again, enter \"i\"\n");
 	}
 
 	public static boolean isWinning(Board board) {
@@ -89,9 +89,9 @@ public class Main {
 	}
 
 	private static String getGameMode(Scanner reader) {
-		System.out.println(" Welcome to the Renju Game!\n Select a game mode:\n " +
-				" (" + Game.MULTIPLAYER_GAME_MODE + ") multiplayer\n " +
-				" (" + Game.SINGLEPLAYER_GAME_MODE + ") singleplayer");
+		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
+				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
+				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
 		String gameMode = reader.next();
 		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
 				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
