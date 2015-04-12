@@ -14,13 +14,12 @@ import java.util.Scanner;
 public class Main {
 	private static Game game;
 	private static Scanner reader;
-	private static int dispMode = Board.CLASSIC_MODE;
 
 	public static void main(String[] args) {
 		// Get initializations
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
-		dispMode = getDisplayMode();
+		int dispMode = getDisplayMode();
 		game = Game.getInstance();
 		printInstruction();
 
@@ -40,15 +39,17 @@ public class Main {
 			game.initMultiplayer();
 		}
 
-		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
+//		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
+		System.out.println("The match is set as " + getModeAsString() + " in a " +
+				Board.getWidth() + "x" + Board.getHeight() + " board as shown:");
 		game.getBoard().renderBoard(dispMode);
 
 		// Play the game
-		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
+		while (!Game.boardFull() && !Game.isWinning()) {
 			if (game.getActivePlayer() == null){
 				throw new RuntimeException("There is no player!");
 			}
-			System.out.println("Player " + game.getActivePlayerAsString() + ", it is your turn.");
+			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
 				game.getBoard().renderBoard(dispMode);
@@ -75,11 +76,15 @@ public class Main {
 				}
 				continue;
 			}
+
 			game.toggleActivePlayer();
 		}
-		if (isWinning(game.getBoard())) {
-			System.out.println("You won!");
-		} else if (boardFull(game.getBoard())) {
+		if (Game.isWinning()) {
+			// a little convoluted since the current active player is the losing player
+			// at this point
+			game.toggleActivePlayer();
+			System.out.println("Player " + getActivePlayerAsString() + ", You won!");
+		} else if (Game.boardFull()) {
 			System.out.println("There are no more moves left. You both lose!");
 		}
 
@@ -98,7 +103,8 @@ public class Main {
 	private static void printInstruction() {
 		// TODO fix the magic number
 		System.out.println("Game instruction:\nEach player takes turn to place a stone on the board." +
-				"\nYour goal is to place "+Board.NUM_STONES_TO_WIN+" consecutive stones in a row. The first one to do so wins!" +
+				"\nYour goal is to place "+Board.NUM_STONES_TO_WIN+" consecutive stones in a row. " +
+				"The first one to do so wins!" +
 				"\nTo place a stone, enter the letter and number corresponding to the column and row respectively." +
 				"\nSeparate the two by a comma." +
 				"\n  For example: A,1 or 3,B." +
@@ -106,14 +112,6 @@ public class Main {
 				"\nEnter \"w\" to withdraw when it is your turn." +
 				"\nTo quit the game, enter \"x\". " +
 				"\nTo see the instructions again, enter \"i\"\n");
-	}
-
-	public static boolean isWinning(Board board) {
-		return board.checkrow() || board.checkcol() || board.checkdiag();
-	}
-
-	public static boolean boardFull(Board board) {
-		return board.boardFull();
 	}
 
 	private static int getGameMode() {
@@ -202,4 +200,32 @@ public class Main {
 
 	}
 
+
+	/**
+	 * Returns the active player as a string of either "one" if player 1 is active
+	 * and "two" if player two is active
+	 * @return
+	 * 		"one" if player 1 is active.
+	 * 		"two if player 2 is active.
+	 */
+	private static String getActivePlayerAsString(){
+		if (game.isPlayer1Active()){
+			return "one";
+		} else return "two";
+	}
+
+	/**
+	 * Retusn the game mode as a string
+	 *
+	 * @return
+	 * 		"single player" if the mode is SINGLEPLAYER_GAME_MODE
+	 * 		"multi-player" if the mode is MULTIPLAYER_GAME_MODE
+	 */
+	private static String getModeAsString(){
+		if (game.getMode()== Game.SINGLEPLAYER_GAME_MODE){
+			return "single player";
+		} else {
+			return "multiplayer";
+		}
+	}
 }

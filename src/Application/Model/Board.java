@@ -22,11 +22,11 @@ public class Board {
 	/**
 	 * This is the width of the board. It is always 16.
 	 */
-	private static int WIDTH = 16;
+	private static int width = 16;
 	/**
 	 * This is the height of the board. It is always 16.
 	 */
-	private static int HEIGHT = 16;
+	private static int height = 16;
 	private static int DIAG = 31;
 
 	public static final int NUM_STONES_TO_WIN = 5;
@@ -45,8 +45,8 @@ public class Board {
 
 	public Board(int size) {
 		// TODO Change this to let the two diagonals different
-		WIDTH = size;
-		HEIGHT = size;
+		width = size;
+		height = size;
 		DIAG = 2 * size - 1;
 		this.basicGrid = initGrid();
 		this.rows = initRows();
@@ -82,7 +82,7 @@ public class Board {
 	}
 
 	public int[] getColumnByIndex(int index) {
-		if (index < 0 || index > WIDTH)
+		if (index < 0 || index > width)
 			try {
 				throw new InvalidIndexException(
 						"The column index is out of bounds.");
@@ -95,7 +95,7 @@ public class Board {
 	}
 
 	public int[] getRowByIndex(int index) {
-		if (index < 0 || index > HEIGHT) {
+		if (index < 0 || index > height) {
 			try {
 				throw new InvalidIndexException(
 						"The row index is out of bounds.");
@@ -140,7 +140,7 @@ public class Board {
 	 * @return The initial grid.
 	 */
 	private int[][] initGrid() {
-		int[][] grid = new int[HEIGHT][WIDTH];
+		int[][] grid = new int[height][width];
 		for (int i = 0; i < grid.length; i++)
 			for (int j = 0; j < grid.length; j++)
 				grid[i][j] = 0;
@@ -149,8 +149,8 @@ public class Board {
 
 	private ArrayList<int[]> initRows() {
 		ArrayList<int[]> rows = new ArrayList<int[]>();
-		for (int i = 0; i < HEIGHT; i++) {
-			int[] arr = new int[WIDTH];
+		for (int i = 0; i < height; i++) {
+			int[] arr = new int[width];
 			for (int j = 0; j < arr.length; j++) {
 				arr[j] = 0;
 			}
@@ -161,8 +161,8 @@ public class Board {
 
 	private ArrayList<int[]> initCols() {
 		ArrayList<int[]> cols = new ArrayList<int[]>();
-		for (int i = 0; i < WIDTH; i++) {
-			int[] arr = new int[HEIGHT];
+		for (int i = 0; i < width; i++) {
+			int[] arr = new int[height];
 			for (int j = 0; j < arr.length; j++) {
 				arr[j] = 0;
 			}
@@ -175,7 +175,7 @@ public class Board {
 		ArrayList<int[]> diags = new ArrayList<int[]>();
 		for (int i = 0; i < DIAG; i++) {
 			int[] arr;
-			if (i < WIDTH)
+			if (i < width)
 				arr = new int[i + 1];
 			else
 				arr = new int[DIAG - i];
@@ -306,12 +306,12 @@ public class Board {
 			this.getColumns().get(col_num)[row_num] = FIRST_PLAYER;
 			this.getRows().get(row_num)[col_num] = FIRST_PLAYER;
 			int indexURDiag = col_num + row_num;
-			int indexULDiag = row_num - col_num + WIDTH - 1;
-			if (indexURDiag >= WIDTH)
-				this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = FIRST_PLAYER;
+			int indexULDiag = row_num - col_num + width - 1;
+			if (indexURDiag >= width)
+				this.getURDiags().get(indexURDiag)[width - 1 - col_num] = FIRST_PLAYER;
 			else
 				this.getURDiags().get(indexURDiag)[row_num] = FIRST_PLAYER;
-			if (indexULDiag >= WIDTH)
+			if (indexULDiag >= width)
 				this.getULDiags().get(indexULDiag)[col_num] = FIRST_PLAYER;
 			else
 				this.getULDiags().get(indexULDiag)[row_num] = FIRST_PLAYER;
@@ -322,12 +322,12 @@ public class Board {
 			this.getColumns().get(col_num)[row_num] = SECOND_PLAYER;
 			this.getRows().get(row_num)[col_num] = SECOND_PLAYER;
 			int indexURDiag = col_num + row_num;
-			int indexULDiag = row_num - col_num + WIDTH - 1;
-			if (indexURDiag >= WIDTH)
-				this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = SECOND_PLAYER;
+			int indexULDiag = row_num - col_num + width - 1;
+			if (indexURDiag >= width)
+				this.getURDiags().get(indexURDiag)[width - 1 - col_num] = SECOND_PLAYER;
 			else
 				this.getURDiags().get(indexURDiag)[row_num] = SECOND_PLAYER;
-			if (indexULDiag >= WIDTH)
+			if (indexULDiag >= width)
 				this.getULDiags().get(indexULDiag)[col_num] = SECOND_PLAYER;
 			else
 				this.getULDiags().get(indexULDiag)[row_num] = SECOND_PLAYER;
@@ -345,9 +345,9 @@ public class Board {
 
 	public ArrayList<ArrayList<BoardLocation>> initLocs() {
 		ArrayList<ArrayList<BoardLocation>> locations = new ArrayList<ArrayList<BoardLocation>>();
-		for (int i = 0; i < WIDTH; i++) {
+		for (int i = 0; i < width; i++) {
 			ArrayList<BoardLocation> locs = new ArrayList<BoardLocation>();
-			for (int j = 0; j < HEIGHT; j++) {
+			for (int j = 0; j < height; j++) {
 				BoardLocation bdloc = new BoardLocation(i, j);
 				locs.add(j, bdloc);
 			}
@@ -443,10 +443,10 @@ public class Board {
 		}
 		int x_coord = lastMove.getXPos();
 		int y_coord = lastMove.getYPos();
-		int indexUL = y_coord - x_coord + WIDTH - 1;
+		int indexUL = y_coord - x_coord + width - 1;
 		int indexUR = y_coord + x_coord;
-		int ULIndex = indexUL >= WIDTH ? x_coord : y_coord;
-		int URIndex = indexUR >= WIDTH ? WIDTH - 1 - x_coord : y_coord;
+		int ULIndex = indexUL >= width ? x_coord : y_coord;
+		int URIndex = indexUR >= width ? width - 1 - x_coord : y_coord;
 		this.basicGrid[y_coord][x_coord] = 0;
 		this.getColumns().get(x_coord)[y_coord] = EMPTY_SPOT;
 		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
@@ -471,7 +471,7 @@ public class Board {
 	}
 
 	public static BoardLocation getInvalidBoardLocation() {
-		return new BoardLocation(HEIGHT, WIDTH);
+		return new BoardLocation(height, width);
 	}
 
 	/**
@@ -482,8 +482,16 @@ public class Board {
 	 * @return true if the location is reacheable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
-		return location.getXPos() < WIDTH && location.getXPos() > -1
-				&& location != null && location.getYPos() < HEIGHT
+		return location.getXPos() < width && location.getXPos() > -1
+				&& location != null && location.getYPos() < height
 				&& location.getYPos() > -1;
+	}
+
+	public static int getWidth() {
+		return width;
+	}
+
+	public static int getHeight() {
+		return height;
 	}
 }

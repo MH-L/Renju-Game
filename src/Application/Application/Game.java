@@ -17,17 +17,14 @@ public class Game {
 	private static Game instance = null;
 	private IPlayer player2;
 	private IPlayer player1;
-	// possibly also include win status
 
-	private Board board;
+	private static Board board;
 	private IPlayer activePlayer;
 
 	private Game() {
-		init();
-	}
-
-	private void init(){
-		this.board = new Board();
+		board = new Board();
+		// initialize as multiplayer by default
+		initMultiplayer();
 	}
 
 	/**
@@ -35,7 +32,7 @@ public class Game {
 	 */
 	public void initMultiplayer(){
 		this.mode = MULTIPLAYER_GAME_MODE;
-		init();
+		board = new Board();
 		player1 = new Player();
 		player2 = new Player();
 		activePlayer = player1;
@@ -48,7 +45,7 @@ public class Game {
 	 */
 	public void initSinglePlayer(int difficulty){
 		this.mode = SINGLEPLAYER_GAME_MODE;
-		init();
+		board = new Board();
 		player1 = new Player();
 		player2 = Application.AI.getInstance();
 		AI.initAI(difficulty, board);
@@ -58,8 +55,6 @@ public class Game {
 	public static Game getInstance() {
 		if (instance == null) {
 			instance = new Game();
-			// Default game instance is multiplayer
-			instance.initMultiplayer();
 		}
 		return instance;
 	}
@@ -73,6 +68,12 @@ public class Game {
 		return mode;
 	}
 
+	/**
+	 * Prompts the player to make their next move
+	 *
+	 * @throws InvalidIndexException
+	 * 		Thrown if the chosen move is invalid
+	 */
 	public void makeMove() throws InvalidIndexException {
 		board.updateBoard(activePlayer.makeMove(), isPlayer1Active());
 	}
@@ -112,17 +113,11 @@ public class Game {
 		return activePlayer;
 	}
 
-	/**
-	 * Returns the active player as a string of either "one" if player 1 is active
-	 * and "two" if player two is active
-	 * @return
-	 * 		"one" if player 1 is active.
-	 * 		"two if player 2 is active.
-	 */
-	public String getActivePlayerAsString(){
-		if (isPlayer1Active()){
-			return "one";
-		} else return "two";
+	public static boolean isWinning() {
+		return board.checkrow() || board.checkcol() || board.checkdiag();
 	}
 
+	public static boolean boardFull(){
+		return board.boardFull();
+	}
 }
