@@ -7,11 +7,11 @@ import Model.Board;
 import java.util.Scanner;
 
 public class Main {
-	// TODO make changes to make this final
 	private static Game game;
+	private static Scanner reader;
 
 	public static void main(String[] args) {
-		Scanner reader = new Scanner(System.in);
+		reader = new Scanner(System.in);
 		String inputStream = getGameMode(reader);
 		// TODO get difficulty from the user
 		game = Game.getInstance(Integer.parseInt(inputStream), 4);
@@ -26,7 +26,7 @@ public class Main {
 			} catch (InvalidIndexException e) {
 				switch (e.getMessage()){
 					case "x":
-						actionGameOver(reader);
+						actionGameOver();
 						return;
 					case "w":
 						if (actionWithdraw())
@@ -36,7 +36,9 @@ public class Main {
 						printInstruction();
 						break;
 					default:
-						System.out.println("The move is invalid. Please try another.");
+						// TODO fix this since Board also throws the exception which doesn't
+						// return the command issued as the message
+						System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
 				}
 				continue;
 			}
@@ -44,6 +46,8 @@ public class Main {
 		}
 		if (isWinning(game.getBoard())) {
 			System.out.println("You won!");
+		} else if (boardFull(game.getBoard())) {
+			System.out.println("There are no more moves left. You both lose!");
 		}
 		reader.close();
 	}
@@ -58,7 +62,7 @@ public class Main {
 		return false;
 	}
 
-	private static void actionGameOver(Scanner reader) {
+	private static void actionGameOver() {
 		System.out.println("Game Over!");
 		reader.close();
 	}

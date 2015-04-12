@@ -61,12 +61,20 @@ public class Player implements IPlayer{
 		if (!move.contains(",")) {
 			throw new InvalidIndexException(move);
 		}
-		String[] inputs = move.split(",");
+		String[] inputs = move.trim().split("\\s*,\\s*");
 		if (inputs.length != 2) {
-			throw new InvalidIndexException("The input you entered is invalid!");
+			throw new InvalidIndexException(move);
 		}
-		int x_coord = translateLetter(inputs[0]);
-		int y_coord = Integer.parseInt(inputs[1]);
+		int x_coord;
+		int y_coord;
+		if (isAlpha(inputs[0]) && isNumber(inputs[1])) {
+			x_coord = translateLetter(inputs[0]);
+			y_coord = Integer.parseInt(inputs[1]);
+		} else if (isNumber(inputs[0]) && isAlpha(inputs[1])) {
+			x_coord = translateLetter(inputs[1]);
+			y_coord = Integer.parseInt(inputs[0]);
+		} else
+			throw new InvalidIndexException(move);
 		return new BoardLocation(y_coord - 1, x_coord - 1);
 	}
 
@@ -74,4 +82,23 @@ public class Player implements IPlayer{
 		return letter.toLowerCase().toCharArray()[0] - 96;
 	}
 
+	private static boolean isAlpha(String string){
+		char[] chars = string.toCharArray();
+		for (char c : chars){
+			if (!Character.isLetter(c)){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isNumber(String string) {
+		char[] chars = string.toCharArray();
+		for (char c : chars){
+			if (!Character.isDigit(c)){
+				return false;
+			}
+		}
+		return true;
+	}
 }
