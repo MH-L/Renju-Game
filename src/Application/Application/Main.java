@@ -100,11 +100,11 @@ public class Main {
 	private static void printInstruction() {
 		// TODO fix the magic number
 		System.out.println("Game instruction:\nEach player takes turn to place a stone on the board." +
-				"\nYour goal is to place 5 consecutive stones in a row. The first one to do so wins!" +
+				"\nYour goal is to place "+Board.NUM_STONES_TO_WIN+" consecutive stones in a row. The first one to do so wins!" +
 				"\nTo place a stone, enter the letter and number corresponding to the column and row respectively." +
 				"\nSeparate the two by a comma." +
 				"\n  For example: A,1 or 3,B." +
-				"\n\nYou are allowed to undo your last move up to 3 times." +
+				"\n\nYou are allowed to undo your last move up to "+Player.NUM_REGRETS_LIMIT+" times." +
 				"\nEnter \"w\" to withdraw when it is your turn." +
 				"\nTo quit the game, enter \"x\". " +
 				"\nTo see the instructions again, enter \"i\"\n");

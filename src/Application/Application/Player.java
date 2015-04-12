@@ -11,13 +11,17 @@ import java.util.Scanner;
  *
  */
 public class Player implements IPlayer{
+
+	public static final int NUM_HINTS_LIMIT = 3;
+	public static final int NUM_REGRETS_LIMIT = 3;
+
 	private BoardLocation lastMove;
 	private int num_hints;
 	private int num_regrets;
 
 	public Player() {
-		this.num_hints = 3;
-		this.num_regrets = 3;
+		this.num_hints = NUM_HINTS_LIMIT;
+		this.num_regrets = NUM_REGRETS_LIMIT;
 		this.lastMove = null;
 	}
 
