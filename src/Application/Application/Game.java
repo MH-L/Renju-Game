@@ -16,7 +16,7 @@ public class Game {
 	private static Game instance = null;
 	private IPlayer player2;
 	private IPlayer player1;
-	private int difficulty;
+	// possibly also include win status
 
 	public int getMode() {
 		return mode;
@@ -25,23 +25,42 @@ public class Game {
 	private Board board;
 	private IPlayer activePlayer;
 
-	private Game(int mode, int difficulty) {
-		this.mode = mode;
-		this.difficulty = difficulty;
+	private Game() {
 		this.board = new Board();
 
 		player1 = new Player();
 		if (mode == SINGLEPLAYER_GAME_MODE) {
-			player2 = Application.AI.getInstance(difficulty, board);
+			player2 = Application.AI.getInstance();
 		} else {
 			player2 = new Player();
 		}
 		activePlayer = player1;
 	}
 
-	public static Game getInstance(int mode, int difficulty) {
+	public void init(int mode){
+		this.mode = mode;
+	}
+
+	/**
+	 * If the game is single-player, initialize player 2 to be a computer
+	 * with difficulty <code>difficulty</code>
+	 * If the game is multi-player,  this method does nothing.
+	 *
+	 * @param difficulty
+	 * 		The difficulty level
+	 * @param board
+	 * 		The board in play
+	 */
+	public void initAI(int difficulty, Board board){
+		if (mode == SINGLEPLAYER_GAME_MODE) {
+			player2 = Application.AI.getInstance();
+			((AI) player2).initAI(difficulty, board);
+		}
+	}
+
+	public static Game getInstance() {
 		if (instance == null) {
-			instance = new Game(mode, difficulty);
+			instance = new Game();
 		}
 		return instance;
 	}

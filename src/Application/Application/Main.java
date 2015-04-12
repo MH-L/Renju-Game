@@ -14,41 +14,33 @@ import java.util.Scanner;
 public class Main {
 	private static Game game;
 	private static Scanner reader;
+	private static int dispMode = Board.CLASSIC_MODE;
 
 	public static void main(String[] args) {
 		reader = new Scanner(System.in);
-		String inputStream = getGameMode();
-		String dispMode = getDisplayMode();
+		int mode = getGameMode();
+		dispMode = getDisplayMode();
 		printInstruction();
-		if (Integer.parseInt(inputStream) == 2) {
-			String difficulty = getDifficulty();
-			switch(Integer.parseInt(difficulty)) {
-				case 1:
-					game = Game.getInstance(2, 1);
-					break;
-				case 2:
-					game = Game.getInstance(2, 2);
-					break;
-				case 3:
-					game = Game.getInstance(2, 3);
-					break;
-				case 4:
-					game = Game.getInstance(2, 4);
-					break;
-				default:
-					System.out.println("Internal Error!");
-					return;
+		game = game.getInstance();
+		if (mode == Game.SINGLEPLAYER_GAME_MODE) {
+			int diff = getDifficulty();
+			if (1 <= diff && diff <= 4){
+				game.initAI(diff, game.getBoard());
+			} else {
+				System.err.println("Internal Error!");
+				return;
 			}
+		} else {
+			game.init(mode);
 		}
-		game = Game.getInstance(Integer.parseInt(inputStream), 4);
 		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
-		game.getBoard().renderBoard(Integer.parseInt(dispMode));
+		game.getBoard().renderBoard(dispMode);
 
 		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
 			System.out.println("Player " + game.getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
-				game.getBoard().renderBoard(Integer.parseInt(dispMode));
+				game.getBoard().renderBoard(dispMode);
 			} catch (InvalidIndexException e) {
 				switch (e.getMessage()){
 					case "x":
@@ -57,13 +49,13 @@ public class Main {
 					case "w":
 						if (actionWithdraw())
 							continue;
-						break;
 					case "i":
 						printInstruction();
 						break;
 					default:
 						// TODO fix this since Board also throws the exception which doesn't
 						// return the command issued as the message
+						// Could just give a generic response rather than returning the issued command
 						System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
 				}
 				continue;
@@ -115,7 +107,7 @@ public class Main {
 		return board.boardFull();
 	}
 
-	private static String getGameMode() {
+	private static int getGameMode() {
 		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
 				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
 				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
@@ -125,10 +117,10 @@ public class Main {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			gameMode = reader.nextLine();
 		}
-		return gameMode;
+		return Integer.parseInt(gameMode);
 	}
 
-	private static String getDisplayMode() {
+	private static int getDisplayMode() {
 		System.out.println(" Please enter your display mode:\n"
 				+ " (" + Board.CLASSIC_MODE + ") Classic mode\n"
 				+ " (" + Board.FANCY_MODE + ") Fancy mode\n"
@@ -139,7 +131,7 @@ public class Main {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			displayMode = reader.next();
 		}
-		return displayMode;
+		return Integer.parseInt(displayMode);
 	}
 
 //	private static void singlePlayerGameStart(Scanner reader, String inputStream, String dispMode) {
@@ -178,7 +170,7 @@ public class Main {
 //		}
 //	}
 
-	private static String getDifficulty() {
+	private static int getDifficulty() {
 		System.out.println(" Please enter the AI difficulty:\n"
 				+ " (" + Game.NOVICE_DIFFICULTY + ") Novice\n"
 				+ " (" + Game.INTERMEDIATE_DIFFICULTY + ") Intermediate\n"
@@ -193,7 +185,7 @@ public class Main {
 			System.out.println("Invalid difficulty level. Please re-enter your choice.");
 			difficulty = reader.next();
 		}
-		return difficulty;
+		return Integer.parseInt(difficulty);
 	}
 
 	private static void multiPlayerGameStart() {
