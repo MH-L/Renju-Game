@@ -5,9 +5,8 @@ import Exceptions.InvalidIndexException;
 import java.util.ArrayList;
 
 /**
- * A class for the board. A board
- * is always 16*16. It contains
- * grid locations.
+ * A class for the board. A board is always 16*16. It contains grid locations.
+ *
  * @author Minghao Liu
  * @Date 2015/4/9
  *
@@ -30,10 +29,13 @@ public class Board {
 	private static int HEIGHT = 16;
 	private static int DIAG = 31;
 
-	private static final int NUM_STONES_TO_WIN = 5;
-	private static final int EMPTY_SPOT = 0;
-	private static final int FIRST_PLAYER = 1;
-	private static final int SECOND_PLAYER = 2;
+	public static final int NUM_STONES_TO_WIN = 5;
+	public static final int EMPTY_SPOT = 0;
+	public static final int FIRST_PLAYER = 1;
+	public static final int SECOND_PLAYER = 2;
+	public static final int CLASSIC_MODE = 1;
+	public static final int FANCY_MODE = 2;
+
 	/**
 	 * A default constructor. Makes a default board of size 16.
 	 */
@@ -42,9 +44,10 @@ public class Board {
 	}
 
 	public Board(int size) {
+		// TODO Change this to let the two diagonals different
 		WIDTH = size;
 		HEIGHT = size;
-		DIAG = 2*size - 1;
+		DIAG = 2 * size - 1;
 		this.basicGrid = initGrid();
 		this.rows = initRows();
 		this.columns = initCols();
@@ -67,7 +70,7 @@ public class Board {
 	}
 
 	public ArrayList<int[]> getURDiags() {
-		return this.diagonals_Uleft;
+		return this.diagonals_Uright;
 	}
 
 	public int[][] getGrids() {
@@ -81,7 +84,8 @@ public class Board {
 	public int[] getColumnByIndex(int index) {
 		if (index < 0 || index > WIDTH)
 			try {
-				throw new InvalidIndexException("The column index is out of bounds.");
+				throw new InvalidIndexException(
+						"The column index is out of bounds.");
 			} catch (InvalidIndexException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -93,7 +97,8 @@ public class Board {
 	public int[] getRowByIndex(int index) {
 		if (index < 0 || index > HEIGHT) {
 			try {
-				throw new InvalidIndexException("The row index is out of bounds.");
+				throw new InvalidIndexException(
+						"The row index is out of bounds.");
 			} catch (InvalidIndexException e) {
 				e.printStackTrace();
 			}
@@ -105,31 +110,33 @@ public class Board {
 	public int[] getULDiagByIndex(int index) {
 		if (index < 0 || index > DIAG) {
 			try {
-				throw new InvalidIndexException("The diagonal index is out of bounds.");
+				throw new InvalidIndexException(
+						"The diagonal index is out of bounds.");
 			} catch (InvalidIndexException e) {
 				e.printStackTrace();
 			}
 		}
 
-		return this.getULDiagByIndex(index);
+		return this.getULDiags().get(index);
 	}
 
 	public int[] getURDiagByIndex(int index) {
 		if (index < 0 || index > DIAG) {
 			try {
-				throw new InvalidIndexException("The diagonal index is out of bounds.");
+				throw new InvalidIndexException(
+						"The diagonal index is out of bounds.");
 			} catch (InvalidIndexException e) {
 				e.printStackTrace();
 			}
 		}
 
-		return this.getURDiagByIndex(index);
+		return this.getURDiags().get(index);
 	}
 
 	/**
-	 * Initialize the grid of the board.
-	 * The grid is always 16*16.
-	 * The init grid is empty. Each entry is just 0.
+	 * Initialize the grid of the board. The grid is always 16*16. The init grid
+	 * is empty. Each entry is just 0.
+	 *
 	 * @return The initial grid.
 	 */
 	private int[][] initGrid() {
@@ -180,14 +187,21 @@ public class Board {
 	}
 
 	public boolean checkrow() {
-		int consectCount = 0; // This counts the number of consecutive stones for one player.
-		int prev = 0; // This is the last stone. 0 denotes that there is no last stone.
+		// TODO change here.
+		int consectCount = 0; // This counts the number of consecutive stones
+								// for one player.
+		int prev = EMPTY_SPOT; // This is the last stone. 0 denotes that there is no last
+						// stone.
 		for (int[] array : this.rows) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != 0)
-					consectCount ++;
-				else
-					consectCount = 1;
+				if (prev == array[i] && array[i] != EMPTY_SPOT)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
 				prev = array[i];
 				if (consectCount >= NUM_STONES_TO_WIN)
 					return true;
@@ -200,13 +214,17 @@ public class Board {
 
 	public boolean checkcol() {
 		int consectCount = 0;
-		int prev = 0;
+		int prev = EMPTY_SPOT;
 		for (int[] array : this.columns) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != 0)
-					consectCount ++;
-				else
-					consectCount = 1;
+				if (prev == array[i] && array[i] != EMPTY_SPOT)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
 				prev = array[i];
 				if (consectCount >= NUM_STONES_TO_WIN)
 					return true;
@@ -219,32 +237,43 @@ public class Board {
 
 	public boolean checkdiag() {
 		int consectCount = 0;
-		int prev = 0;
+		int prev = EMPTY_SPOT;
 		for (int[] array : this.diagonals_Uleft) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != 0)
-					consectCount ++;
-				else
-					consectCount = 1;
+				if (prev == array[i] && array[i] != EMPTY_SPOT)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
 				prev = array[i];
 				if (consectCount >= NUM_STONES_TO_WIN)
 					return true;
 			}
-			prev = 0;
+			prev = EMPTY_SPOT;
 			consectCount = 0;
 		}
 
+		consectCount = 0;
+		prev = EMPTY_SPOT;
+
 		for (int[] array : this.diagonals_Uright) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != 0)
-					consectCount ++;
-				else
-					consectCount = 1;
+				if (prev == array[i] && array[i] != EMPTY_SPOT)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
 				prev = array[i];
 				if (consectCount >= NUM_STONES_TO_WIN)
 					return true;
 			}
-			prev = 0;
+			prev = EMPTY_SPOT;
 			consectCount = 0;
 		}
 
@@ -253,15 +282,20 @@ public class Board {
 
 	/**
 	 * The function updates the board given the location and the player.
-	 * @param loc Indicates the board location to place the stone
-	 * @param player True means it is player's stone, otherwise it is computer's stone.
-	 * @return
-	 * 		false if it did not succeed. true if succeeded
+	 *
+	 * @param loc
+	 *            Indicates the board location to place the stone
+	 * @param player
+	 *            True means it is player's stone, otherwise it is computer's
+	 *            stone.
+	 * @return false if it did not succeed. true if succeeded
 	 * @throws InvalidIndexException
 	 */
-	public boolean updateBoard(BoardLocation loc, boolean player) throws InvalidIndexException {
+	public boolean updateBoard(BoardLocation loc, boolean player)
+			throws InvalidIndexException {
 		if (!isReachable(loc))
-			throw new InvalidIndexException("The location indexes is out of bound!");
+			throw new InvalidIndexException(
+					"The location indexes is out of bound!");
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
@@ -311,7 +345,7 @@ public class Board {
 
 	public ArrayList<ArrayList<BoardLocation>> initLocs() {
 		ArrayList<ArrayList<BoardLocation>> locations = new ArrayList<ArrayList<BoardLocation>>();
-		for (int i = 0; i < WIDTH; i++){
+		for (int i = 0; i < WIDTH; i++) {
 			ArrayList<BoardLocation> locs = new ArrayList<BoardLocation>();
 			for (int j = 0; j < HEIGHT; j++) {
 				BoardLocation bdloc = new BoardLocation(i, j);
@@ -322,29 +356,48 @@ public class Board {
 		return locations;
 	}
 
-	public void renderBoard() {
+	public void renderBoard(int mode) {
 		System.out.println("   A B C D E F G H I J K L M N O P");
-		for (int i = 0; i < this.basicGrid.length; i++) {
-			System.out.print(i + 1);
-			if (i < 9)
-				System.out.print("\u0020\u0020");
-			else
-				System.out.print("\u0020");
-			for (int j = 0; j < this.basicGrid[0].length; j++) {
-				if (this.basicGrid[i][j] == EMPTY_SPOT)
-					System.out.print("\u25A1\u0020");
-				else if (this.basicGrid[i][j] == FIRST_PLAYER)
-					System.out.print("\u25CB\u0020");
+		if (mode == CLASSIC_MODE) {
+			for (int i = 0; i < this.basicGrid.length; i++) {
+				System.out.print(i + 1);
+				if (i < 9)
+					System.out.print("\u0020\u0020");
 				else
-					System.out.print("\u25CF\u0020");
+					System.out.print("\u0020");
+				for (int j = 0; j < this.basicGrid[0].length; j++) {
+					if (this.basicGrid[i][j] == EMPTY_SPOT)
+						System.out.print("-\u0020");
+					else if (this.basicGrid[i][j] == FIRST_PLAYER)
+						System.out.print("X\u0020");
+					else
+						System.out.print("O\u0020");
+				}
+				System.out.print('\n');
 			}
-			System.out.print('\n');
+		} else {
+			for (int i = 0; i < this.basicGrid.length; i++) {
+				System.out.print(i + 1);
+				if (i < 9)
+					System.out.print("\u0020\u0020");
+				else
+					System.out.print("\u0020");
+				for (int j = 0; j < this.basicGrid[0].length; j++) {
+					if (this.basicGrid[i][j] == EMPTY_SPOT)
+						System.out.print("\u25A1\u0020");
+					else if (this.basicGrid[i][j] == FIRST_PLAYER)
+						System.out.print("\u25CB\u0020");
+					else
+						System.out.print("\u25CF\u0020");
+				}
+				System.out.print('\n');
+			}
 		}
 	}
 
 	/**
-	 * Resets the board to the init board. Also changes other fields associated with
-	 * the board.
+	 * Resets the board to the init board. Also changes other fields associated
+	 * with the board.
 	 */
 	public void reset() {
 		this.basicGrid = initGrid();
@@ -382,12 +435,17 @@ public class Board {
 		return this.basicGrid[y_coord][x_coord];
 	}
 
-	public void withdrawMove(BoardLocation lastMove) {
+	public void withdrawMove(BoardLocation lastMove)
+			throws InvalidIndexException {
+		if (!isReachable(lastMove)) {
+			throw new InvalidIndexException(
+					"The location to withdraw is invalid.");
+		}
 		int x_coord = lastMove.getXPos();
 		int y_coord = lastMove.getYPos();
 		int indexUL = y_coord - x_coord + WIDTH - 1;
 		int indexUR = y_coord + x_coord;
-		int ULIndex = indexUL >= WIDTH ? y_coord : x_coord;
+		int ULIndex = indexUL >= WIDTH ? x_coord : y_coord;
 		int URIndex = indexUR >= WIDTH ? WIDTH - 1 - x_coord : y_coord;
 		this.basicGrid[y_coord][x_coord] = 0;
 		this.getColumns().get(x_coord)[y_coord] = EMPTY_SPOT;
@@ -400,6 +458,7 @@ public class Board {
 
 	/**
 	 * Get the total number of stones on the board.
+	 *
 	 * @return the total number of stones.
 	 */
 	public int getTotalStones() {
@@ -407,22 +466,24 @@ public class Board {
 		for (int i = 0; i < this.basicGrid.length; i++)
 			for (int j = 0; j < this.basicGrid[0].length; j++)
 				if (getGridVal(new BoardLocation(i, j)) != EMPTY_SPOT)
-					count ++;
+					count++;
 		return count;
 	}
 
-	public static BoardLocation getInvalidBoardLocation(){
+	public static BoardLocation getInvalidBoardLocation() {
 		return new BoardLocation(HEIGHT, WIDTH);
 	}
 
 	/**
-	 * Determines whether the location is reacheable.
-	 * A location is reacheable if its x-coordinate and y-coordinate
-	 * are both in the range from 0 to 15. (Since the board is 16*16)
+	 * Determines whether the location is reacheable. A location is reacheable
+	 * if its x-coordinate and y-coordinate are both in the range from 0 to 15.
+	 * (Since the board is 16*16)
+	 *
 	 * @return true if the location is reacheable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
 		return location.getXPos() < WIDTH && location.getXPos() > -1
-				&& location.getYPos() < HEIGHT && location.getYPos() > -1;
+				&& location != null && location.getYPos() < HEIGHT
+				&& location.getYPos() > -1;
 	}
 }

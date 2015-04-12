@@ -24,6 +24,33 @@ public class BoardTest {
 		this.bd = new Board();
 	}
 
+	public void printAllDiags() {
+		for (int i = 0; i < bd.getULDiags().size(); i++) {
+			for (int j = 0; j < bd.getULDiagByIndex(i).length; j++) {
+				System.out.print(bd.getULDiagByIndex(i)[j]);
+			}
+			System.out.println("");
+		}
+
+		for (int i = 0; i < bd.getURDiags().size(); i++) {
+			for (int j = 0; j < bd.getURDiagByIndex(i).length; j++) {
+				System.out.print(bd.getURDiagByIndex(i)[j]);
+			}
+			System.out.println("");
+		}
+	}
+
+	public int sumAllDiags() {
+		int count = 0;
+		for (int i = 0; i < bd.getURDiags().size(); i++) {
+			for (int j = 0; j < bd.getURDiagByIndex(i).length; j++) {
+				if (bd.getURDiagByIndex(i)[j] != Board.EMPTY_SPOT)
+					count ++;
+			}
+		}
+		return count;
+	}
+
 	@Test
 	public void testIsValid() {
 		BoardLocation bdloc = new BoardLocation(16,16);
@@ -44,19 +71,23 @@ public class BoardTest {
 		BoardLocation player = new BoardLocation(1,0);
 		bd.updateBoard(player, true);
 		bd.updateBoard(toPlace, false);
+		bd.updateBoard(new BoardLocation(7,7), false);
+
 		assertEquals(bd.getGrids()[0][0], 2);
 		assertEquals(bd.getGrids()[1][0], 1);
 		assertEquals(bd.getGridVal(new BoardLocation(0,0)), 2);
 		assertEquals(bd.getGridVal(new BoardLocation(1,0)), 1);
 		assertEquals(bd.getLocations().get(0).get(0).getValue(), 2);
 		assertEquals(bd.getLocations().get(1).get(0).getValue(), 1);
-		bd.updateBoard(player, false);
+		assertFalse(bd.updateBoard(player, false));
 		assertEquals(bd.getGrids()[1][0], 1);
 		assertEquals(bd.getULDiags().get(15)[0], 2);
 		assertEquals(bd.getULDiags().get(16)[0], 1);
 		assertEquals(bd.getURDiags().get(0)[0], 2);
 		assertEquals(bd.getURDiags().get(1)[1], 1);
-		assertEquals(2, bd.getTotalStones());
+		assertEquals(3, bd.getTotalStones());
+		assertEquals(bd.getULDiagByIndex(15)[7], 2);
+		assertEquals(bd.getURDiagByIndex(14)[7], 2);
 	}
 
 	@Test
@@ -103,14 +134,22 @@ public class BoardTest {
 
 	@Test
 	public void testCheckDiags() throws InvalidIndexException {
-		bd.updateBoard(new BoardLocation(7,9), false);
-		bd.updateBoard(new BoardLocation(6,8), false);
-		bd.updateBoard(new BoardLocation(8,10), false);
-		bd.updateBoard(new BoardLocation(9,11), false);
+		assertTrue(bd.updateBoard(new BoardLocation(7,9), false));
+		assertTrue(bd.updateBoard(new BoardLocation(6,8), false));
+		assertTrue(bd.updateBoard(new BoardLocation(8,10), false));
+		assertTrue(bd.updateBoard(new BoardLocation(9,11), false));
+		assertFalse(bd.checkdiag());
 		bd.updateBoard(new BoardLocation(10,12), false);
 		assertTrue(bd.checkdiag());
 		assertFalse(bd.checkcol());
 		assertFalse(bd.checkrow());
+		bd.withdrawMove(new BoardLocation(8,10));
+		assertEquals(bd.getTotalStones(), 4);
+		assertFalse(bd.checkdiag());
+		assertTrue(bd.updateBoard(new BoardLocation(8,10), false));
+		assertEquals(bd.getTotalStones(), 5);
+		assertTrue(bd.checkdiag());
+
 	}
 
 	@Test

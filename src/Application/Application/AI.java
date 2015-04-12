@@ -1,5 +1,6 @@
 package Application;
 
+import Algorithm.Algorithm;
 import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
@@ -17,6 +18,7 @@ public class AI implements IPlayer{
 	private static int difficulty;
 	private static Board board;
 	private BoardLocation lastMove;
+	private Algorithm solver;
 
 	private AI(int difficulty, Board board) {
 		this.lastMove = Model.Board.getInvalidBoardLocation();
@@ -52,24 +54,16 @@ public class AI implements IPlayer{
 	@Override
 	public boolean withdraw() throws WithdrawException {
 		// TODO Auto-generated method stub
+		// Since AI will never withdraw, just do not do anything.
 		return false;
 	}
 
 	@Override
 	public void forceWithdraw() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public BoardLocation makeMove() {
-		BoardLocation nextMove = AI.getNextMove(board);
 		try {
-			board.updateBoard(nextMove, false);
-			lastMove = nextMove;
+			board.withdrawMove(lastMove);
 		} catch (InvalidIndexException e) {
-			System.out.println("The system needs maintenance.");
+			e.printStackTrace();
 		}
-		return nextMove;
 	}
 }

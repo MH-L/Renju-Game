@@ -67,11 +67,5 @@ public class Player implements IPlayer{
 		return num_hints;
 	}
 
-	@Override
-	public BoardLocation makeMove() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 }

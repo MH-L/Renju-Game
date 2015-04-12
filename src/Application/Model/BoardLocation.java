@@ -26,8 +26,6 @@ public class BoardLocation {
 		return y_pos;
 	}
 
-
-
 	public boolean occupied() {
 		return this.value != 0;
 	}
@@ -38,6 +36,14 @@ public class BoardLocation {
 
 	public int getValue() {
 		return this.value;
+	}
+
+	public boolean compare(BoardLocation loc) {
+		return this.getXPos() == loc.getXPos() && this.getYPos() == loc.getYPos();
+	}
+
+	public static boolean compare(BoardLocation loc1, BoardLocation loc2) {
+		return loc1.getXPos() == loc2.getXPos() && loc1.getYPos() == loc2.getYPos();
 	}
 
 }
