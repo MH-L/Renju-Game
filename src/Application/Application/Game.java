@@ -18,66 +18,58 @@ public class Game {
 	private IPlayer player1;
 	// possibly also include win status
 
-	public int getMode() {
-		return mode;
-	}
-
 	private Board board;
 	private IPlayer activePlayer;
 
 	private Game() {
 		this.board = new Board();
-
-		player1 = new Player();
-		if (mode == SINGLEPLAYER_GAME_MODE) {
-			player2 = Application.AI.getInstance();
-		} else {
-			player2 = new Player();
-		}
-		activePlayer = player1;
-	}
-
-	public void init(int mode){
-		this.mode = mode;
 	}
 
 	/**
-	 * If the game is single-player, initialize player 2 to be a computer
-	 * with difficulty <code>difficulty</code>
-	 * If the game is multi-player,  this method does nothing.
-	 *
-	 * @param difficulty
-	 * 		The difficulty level
-	 * @param board
-	 * 		The board in play
+	 * Initialize the game to a local multiplayer game with two Players
 	 */
-	public void initAI(int difficulty, Board board){
-		if (mode == SINGLEPLAYER_GAME_MODE) {
-			player2 = Application.AI.getInstance();
-			((AI) player2).initAI(difficulty, board);
-		}
+	public void initMultiplayer(){
+		this.mode = MULTIPLAYER_GAME_MODE;
+		this.board = new Board();
+		player1 = new Player();
+		player2 = new Player();
+		activePlayer = player1;
+	}
+
+	/**
+	 * Initialize the game to single-player of difficulty <code>difficulty</code>
+	 * @param difficulty
+	 * 		The difficulty of the game
+	 */
+	public void initSinglePlayer(int difficulty){
+		this.mode = SINGLEPLAYER_GAME_MODE;
+		this.board = new Board();
+		player1 = new Player();
+		player2 = Application.AI.getInstance();
+		AI.initAI(difficulty, board);
+		activePlayer = player1;
 	}
 
 	public static Game getInstance() {
 		if (instance == null) {
 			instance = new Game();
+			instance.initMultiplayer();
 		}
 		return instance;
 	}
 
-	public void withdraw(boolean first) {
-		if (mode == 1)
-			try {
-				if (first) {
-					player1.withdraw();
-					player2.forceWithdraw();
-				} else {
-					player2.withdraw();
-					player1.withdraw();
-				}
-			} catch (WithdrawException e){
-				e.printStackTrace(); // TODO
-			}
+	public void withdraw() {
+		try {
+			getActivePlayer().withdraw();
+			getInactivePlayer().forceWithdraw();
+		} catch (WithdrawException e) {
+			// TODO
+			e.printStackTrace();
+		}
+	}
+
+	public int getMode() {
+		return mode;
 	}
 
 	public void makeMove() throws InvalidIndexException {
@@ -98,6 +90,12 @@ public class Game {
 
 	public IPlayer getActivePlayer() {
 		return activePlayer;
+	}
+
+	public IPlayer getInactivePlayer(){
+		if (isPlayer1Active()){
+			return player1;
+		} else return player2;
 	}
 
 	public boolean isPlayer1Active(){

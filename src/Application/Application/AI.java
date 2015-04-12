@@ -31,13 +31,9 @@ public class AI implements IPlayer{
 	}
 
 	public static void initAI(int difficulty, Board board){
+		// TODO Board param may not be needed if game board is static
 		AI.difficulty = difficulty;
 		AI.board = board;
-	}
-
-	private static BoardLocation getNextMove(Board board) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -59,7 +55,8 @@ public class AI implements IPlayer{
 
 	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
-		BoardLocation nextMove = AI.getNextMove(board);
+		BoardLocation nextMove = null;
+		// TODO
 		return nextMove;
 	}
 }

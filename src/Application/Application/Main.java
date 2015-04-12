@@ -17,26 +17,37 @@ public class Main {
 	private static int dispMode = Board.CLASSIC_MODE;
 
 	public static void main(String[] args) {
+		// Get initializations
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
 		dispMode = getDisplayMode();
+		game = Game.getInstance();
 		printInstruction();
-		game = game.getInstance();
+
+		// Initialize game mode
 		if (mode == Game.SINGLEPLAYER_GAME_MODE) {
 			int diff = getDifficulty();
-			if (1 <= diff && diff <= 4){
-				game.initAI(diff, game.getBoard());
+			if (Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY){
+				// This would be better if initSinglePlayer handled this input
+				// but creating a new exception might be overkill for something
+				// that likely isn't going to change
+				game.initSinglePlayer(diff);
 			} else {
 				System.err.println("Internal Error!");
 				return;
 			}
 		} else {
-			game.init(mode);
+			game.initMultiplayer();
 		}
+
 		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
 		game.getBoard().renderBoard(dispMode);
 
+		// Play the game
 		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
+			if (game.getActivePlayer() == null){
+				throw new RuntimeException("There is no player!");
+			}
 			System.out.println("Player " + game.getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
