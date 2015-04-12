@@ -3,7 +3,6 @@ package Application;
 import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
-import Model.BoardLocation;
 
 import java.util.Scanner;
 
@@ -18,65 +17,45 @@ public class Main {
 		game = Game.getInstance(Integer.parseInt(inputStream), 4);
 		printInstruction();
 		game.getBoard().renderBoard();
-		boolean isPlayer1 = true;
-		String dispStr;
-		// note that the y-coord is the first, and the x-coord is the second;
-		// to comply with the indices of the grid.
-		// also notice that the location is always 1-based (user-friendly).
-		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
-			if (isPlayer1)
-				dispStr = "one";
-			else
-				dispStr = "two";
 
-			System.out.println("Player " + dispStr + ", it is your turn.");
-			inputStream = reader.next();
-			switch (inputStream){
-				case "x":
-					actionGameOver(reader);
-					return;
-				case "w":
-					try {
-						game.getPlayer1().withdraw();
-					} catch (WithdrawException e) {
-						System.out.println(e.getMessage());
-						continue;
-					}
-					break;
-				case "i":
-					printInstruction();
-					break;
-			}
-			if (inputStream.contains(",")) {
-				inputStream = inputStream.trim();
-				String[] inputs = inputStream.split(",");
-				if (inputs.length != 2) {
-					System.out.println("The input you entered is invalid!");
-					continue;
+		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
+			System.out.println("Player " + game.getActivePlayerAsString() + ", it is your turn.");
+			try {
+				game.makeMove();
+				game.getBoard().renderBoard();
+			} catch (InvalidIndexException e) {
+				switch (e.getMessage()){
+					case "x":
+						actionGameOver(reader);
+						return;
+					case "w":
+						if (actionWithdraw())
+							continue;
+						break;
+					case "i":
+						printInstruction();
+						break;
+					default:
+						System.out.println("The move is invalid. Please try another.");
 				}
-				int x_coord = translate(inputs[0]);
-				int y_coord = Integer.parseInt(inputs[1]);
-				BoardLocation toPlace = new BoardLocation(y_coord - 1,
-						x_coord - 1);
-//				if (!Board.isReachable(toPlace)) {
-//					System.out.println("The input you entered is not valid.\n All coordinates"
-//							+ " must be between 1 and 16.");
-//					continue;
-//				};
-				try {
-					game.getBoard().updateBoard(toPlace, isPlayer1);
-					game.getBoard().renderBoard();
-				} catch (InvalidIndexException e) {
-					System.out.println("The move is invalid. Please try another.");
-					continue;
-				}
+				continue;
 			}
-			isPlayer1 = !isPlayer1;
+			game.toggleActivePlayer();
 		}
 		if (isWinning(game.getBoard())) {
 			System.out.println("You won!");
 		}
 		reader.close();
+	}
+
+	private static boolean actionWithdraw() {
+		try {
+            game.getPlayer1().withdraw();
+        } catch (WithdrawException e) {
+            System.out.println(e.getMessage());
+			return true;
+        }
+		return false;
 	}
 
 	private static void actionGameOver(Scanner reader) {
@@ -105,10 +84,6 @@ public class Main {
 		return board.boardFull();
 	}
 
-	public static int translate(String letter) {
-		return letter.toLowerCase().toCharArray()[0] - 96;
-	}
-
 	private static String getGameMode(Scanner reader) {
 		System.out.println(" Welcome to the Renju Game!\n Select a game mode:\n " +
 				" (" + Game.MULTIPLAYER_GAME_MODE + ") multiplayer\n " +
@@ -117,7 +92,7 @@ public class Main {
 		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
 				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
-			gameMode = reader.next();
+			gameMode = reader.nextLine();
 		}
 		return gameMode;
 	}

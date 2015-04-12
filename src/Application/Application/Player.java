@@ -1,11 +1,9 @@
 package Application;
 
-import Exceptions.MultipleWithdrawException;
-import Exceptions.NothingToWithdrawException;
-import Exceptions.OverWithdrawException;
-import Exceptions.WithdrawException;
-import Model.Board;
+import Exceptions.*;
 import Model.BoardLocation;
+
+import java.util.Scanner;
 
 /**
  * This class records the recent moves of the player.
@@ -16,20 +14,11 @@ public class Player implements IPlayer{
 	private BoardLocation lastMove;
 	private int num_hints;
 	private int num_regrets;
-	private boolean first;
 
 	public Player() {
 		this.num_hints = 3;
 		this.num_regrets = 3;
 		this.lastMove = null;
-		this.first = false;
-	}
-
-	public Player(boolean first) {
-		this.num_hints = 3;
-		this.num_regrets = 3;
-		this.lastMove = null;
-		this.first = first;
 	}
 
 	@Override
@@ -50,11 +39,6 @@ public class Player implements IPlayer{
 	}
 
 	@Override
-	public void makeMove(BoardLocation location) {
-		lastMove = location;
-	}
-
-	@Override
 	public void forceWithdraw() {
 		lastMove = Model.Board.getInvalidBoardLocation();
 	}
@@ -68,10 +52,26 @@ public class Player implements IPlayer{
 	}
 
 	@Override
-	public BoardLocation makeMove() {
-		// TODO Auto-generated method stub
-		return null;
+	public BoardLocation makeMove() throws InvalidIndexException {
+		// note that the y-coord is the first, and the x-coord is the second;
+		// to comply with the indices of the grid.
+		// also notice that the location is always 1-based (user-friendly).enerated method stub
+		Scanner input = new Scanner(System.in);
+		String move = input.nextLine();
+		if (!move.contains(",")) {
+			throw new InvalidIndexException(move);
+		}
+		String[] inputs = move.split(",");
+		if (inputs.length != 2) {
+			throw new InvalidIndexException("The input you entered is invalid!");
+		}
+		int x_coord = translateLetter(inputs[0]);
+		int y_coord = Integer.parseInt(inputs[1]);
+		return new BoardLocation(y_coord - 1, x_coord - 1);
 	}
 
+	private static int translateLetter(String letter) {
+		return letter.toLowerCase().toCharArray()[0] - 96;
+	}
 
 }

@@ -3,7 +3,6 @@ package Application;
 import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
-import Model.BoardLocation;
 
 public class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
@@ -15,21 +14,20 @@ public class Game {
 	private IPlayer player1;
 	private int difficulty;
 	private Board board;
-	private boolean activePlayer;
+	private IPlayer activePlayer;
 
 	private Game(int mode, int difficulty) {
 		this.mode = mode;
-		if (mode == 1) {
+		this.difficulty = difficulty;
+		this.board = new Board();
+
+		player1 = new Player();
+		if (mode == SINGLEPLAYER_GAME_MODE) {
 			player2 = Application.AI.getInstance(difficulty, board);
-			player1 = new Player();
-			this.difficulty = difficulty;
-			this.board = new Board();
 		} else {
-			player1 = new Player();
 			player2 = new Player();
-			this.difficulty = difficulty;
-			this.board = new Board();
 		}
+		activePlayer = player1;
 	}
 
 	public static Game getInstance(int mode, int difficulty) {
@@ -54,19 +52,8 @@ public class Game {
 			}
 	}
 
-	public void makeMove(){
-		BoardLocation loc;
-		if (activePlayer) {
-			loc = player1.makeMove();
-		} else {
-			loc = player2.makeMove();
-		}
-
-		try {
-			board.updateBoard(loc, activePlayer);
-		} catch (InvalidIndexException e) {
-			e.printStackTrace();
-		}
+	public void makeMove() throws InvalidIndexException {
+		board.updateBoard(activePlayer.makeMove(), isPlayer1Active());
 	}
 
 	public Board getBoard(){
@@ -81,13 +68,34 @@ public class Game {
 		return player1;
 	}
 
-	public boolean getActivePlayer() {
+	public IPlayer getActivePlayer() {
 		return activePlayer;
 	}
 
-	public void setActivePlayer(boolean active) {
-		this.activePlayer = active;
+	public boolean isPlayer1Active(){
+		return activePlayer.equals(player1);
 	}
 
+	public IPlayer toggleActivePlayer(){
+		if (activePlayer.equals(player1)){
+			activePlayer = player2;
+		} else {
+			activePlayer = player1;
+		}
+		return activePlayer;
+	}
+
+	/**
+	 * Returns the active player as a string of either "one" if player 1 is active
+	 * and "two" if player two is active
+	 * @return
+	 * 		"one" if player 1 is active.
+	 * 		"two if player 2 is active.
+	 */
+	public String getActivePlayerAsString(){
+		if (isPlayer1Active()){
+			return "one";
+		} else return "two";
+	}
 
 }

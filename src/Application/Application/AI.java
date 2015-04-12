@@ -30,20 +30,6 @@ public class AI implements IPlayer{
 		return instance;
 	}
 
-	@Override
-	public void makeMove(BoardLocation location) {
-		this.lastMove = location;
-	}
-
-	public void makeMove(Board board) {
-		this.lastMove = AI.getNextMove(board);
-		try {
-			board.updateBoard(lastMove, false);
-		} catch (InvalidIndexException e) {
-			System.out.println("The system needs maintenance.");
-		}
-	}
-
 	private static BoardLocation getNextMove(Board board) {
 		// TODO Auto-generated method stub
 		return null;
@@ -62,14 +48,8 @@ public class AI implements IPlayer{
 	}
 
 	@Override
-	public BoardLocation makeMove() {
+	public BoardLocation makeMove() throws InvalidIndexException {
 		BoardLocation nextMove = AI.getNextMove(board);
-		try {
-			board.updateBoard(nextMove, false);
-			lastMove = nextMove;
-		} catch (InvalidIndexException e) {
-			System.out.println("The system needs maintenance.");
-		}
 		return nextMove;
 	}
 }

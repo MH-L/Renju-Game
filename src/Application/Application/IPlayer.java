@@ -1,12 +1,12 @@
 package Application;
 
+import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.BoardLocation;
 
 public interface IPlayer {
-	public void makeMove(BoardLocation location);
-	public BoardLocation makeMove();
-	public boolean withdraw() throws WithdrawException;
-	public void forceWithdraw();
+	BoardLocation makeMove() throws InvalidIndexException;
+	boolean withdraw() throws WithdrawException;
+	void forceWithdraw();
 
 }
