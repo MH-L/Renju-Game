@@ -33,16 +33,72 @@ public class BoardChecker {
 		retVal.addAll(checkBoardOpenPatDisc(board, first, 4));
 		retVal.addAll(checkBoardOpenPatDisc(board, first, 5));
 		retVal.addAll(checkBoardOpenPatDisc(board, first, 6));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 7));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 8));
+		retVal.addAll(checkBoardClosedPatCont(board, first, 4));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 4));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 5));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 6));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 7));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 8));
 		return retVal;
 	}
 
-	public static ArrayList<Pattern> checkBoardClosedPat(Board board,
+	public static ArrayList<Pattern> checkBoardClosedPatDisc(Board board,
 			boolean first, int numLocs) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		ArrayList<int[]> rows = board.getRows();
 		ArrayList<int[]> columns = board.getColumns();
 		ArrayList<int[]> ulDiags = board.getULDiags();
 		ArrayList<int[]> urDiags = board.getURDiags();
+		for (int i = 0; i < rows.size(); i++) {
+			patterns.addAll(checkClosedPatDisc(rows.get(i), i, Pattern.ON_ROW,
+					first, numLocs, board));
+		}
+
+		for (int i = 0; i < columns.size(); i++) {
+			patterns.addAll(checkClosedPatDisc(columns.get(i), i,
+					Pattern.ON_COL, first, numLocs, board));
+		}
+
+		for (int i = 0; i < ulDiags.size(); i++) {
+			patterns.addAll(checkClosedPatDisc(ulDiags.get(i), i,
+					Pattern.ON_ULDIAG, first, numLocs, board));
+		}
+
+		for (int i = 0; i < urDiags.size(); i++) {
+			patterns.addAll(checkClosedPatDisc(urDiags.get(i), i,
+					Pattern.ON_URDIAG, first, numLocs, board));
+		}
+		return patterns;
+	}
+
+	public static ArrayList<Pattern> checkBoardClosedPatCont(Board board,
+			boolean first, int numLocs) {
+		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		ArrayList<int[]> rows = board.getRows();
+		ArrayList<int[]> columns = board.getColumns();
+		ArrayList<int[]> ulDiags = board.getULDiags();
+		ArrayList<int[]> urDiags = board.getURDiags();
+		for (int i = 0; i < rows.size(); i++) {
+			patterns.addAll(checkClosedPatCont(rows.get(i), i, Pattern.ON_ROW,
+					first, numLocs, board));
+		}
+
+		for (int i = 0; i < columns.size(); i++) {
+			patterns.addAll(checkClosedPatCont(columns.get(i), i,
+					Pattern.ON_COL, first, numLocs, board));
+		}
+
+		for (int i = 0; i < ulDiags.size(); i++) {
+			patterns.addAll(checkClosedPatCont(ulDiags.get(i), i,
+					Pattern.ON_ULDIAG, first, numLocs, board));
+		}
+
+		for (int i = 0; i < urDiags.size(); i++) {
+			patterns.addAll(checkClosedPatCont(urDiags.get(i), i,
+					Pattern.ON_URDIAG, first, numLocs, board));
+		}
 		return patterns;
 	}
 
@@ -326,13 +382,10 @@ public class BoardChecker {
 				throw new InvalidPatternException(
 						"The number of stones in a closed discrete pattern must be at least four!");
 			} catch (InvalidPatternException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
-		int prev = Board.EMPTY_SPOT;
-		int count = 0;
 		int checker;
 		int blocker;
 		if (first) {
@@ -342,52 +395,72 @@ public class BoardChecker {
 			checker = Board.SECOND_PLAYER;
 			blocker = Board.FIRST_PLAYER;
 		}
-		boolean blocked = false;
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 		for (int i = 0; i < array.length; i++) {
-			for (int j = 0; j <= num; j++) {
+			for (int j = 0; j <= num + 1; j++) {
 				temp.add(array[i + j]);
 			}
-			int playerFreq = 1;
-			if (count == num) {
-				BoardLocation firstStone;
-				switch (type) {
-				case Pattern.ON_ROW:
-					firstStone = new BoardLocation(arrayIndex, i - num + 1);
-					break;
-				case Pattern.ON_COL:
-					firstStone = new BoardLocation(i - num + 1, arrayIndex);
-					break;
-				case Pattern.ON_ULDIAG:
-					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
-							true);
-					break;
-				case Pattern.ON_URDIAG:
-					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
-							false);
-					break;
-				default:
-					firstStone = Board.getInvalidBoardLocation();
-					break;
-				}
-				if (blocked) {
-					if (i == array.length - 1) {
-						Pattern candidate = makeContiguousPattern(firstStone,
-								type, num, true, board);
-						patterns.add(candidate);
-					} else if (array[i + 1] == Board.EMPTY_SPOT) {
-						Pattern candidate = makeContiguousPattern(firstStone,
-								type, num, true, board);
-						patterns.add(candidate);
+			int checkerFreq = Collections.frequency(temp, checker);
+			int blockerFreq = Collections.frequency(temp, blocker);
+			int emptyFreq = Collections.frequency(temp, Board.EMPTY_SPOT);
+			if (emptyFreq == 1 && blockerFreq == 1 && checkerFreq == num) {
+				if (temp.get(0) == blocker || temp.get(num + 1) == blocker) {
+					int diff = temp.indexOf(blocker)
+							- temp.indexOf(Board.EMPTY_SPOT);
+					if (Math.abs(diff) != 1) {
+						BoardLocation firstStone;
+						// add that pattern to the outcome
+						if (temp.get(0) == blocker) {
+							switch (type) {
+							case Pattern.ON_ROW:
+								firstStone = new BoardLocation(arrayIndex,
+										i + 1);
+								break;
+							case Pattern.ON_COL:
+								firstStone = new BoardLocation(i + 1,
+										arrayIndex);
+								break;
+							case Pattern.ON_ULDIAG:
+								firstStone = Board.convertDiagToXY(arrayIndex,
+										i + 1, true);
+								break;
+							case Pattern.ON_URDIAG:
+								firstStone = Board.convertDiagToXY(arrayIndex,
+										i + 1, false);
+								break;
+							default:
+								firstStone = Board.getInvalidBoardLocation();
+								break;
+							}
+						} else {
+							switch (type) {
+							case Pattern.ON_ROW:
+								firstStone = new BoardLocation(arrayIndex,
+										i + 1);
+								break;
+							case Pattern.ON_COL:
+								firstStone = new BoardLocation(i + 1,
+										arrayIndex);
+								break;
+							case Pattern.ON_ULDIAG:
+								firstStone = Board.convertDiagToXY(arrayIndex,
+										i + 1, true);
+								break;
+							case Pattern.ON_URDIAG:
+								firstStone = Board.convertDiagToXY(arrayIndex,
+										i + 1, false);
+								break;
+							default:
+								firstStone = Board.getInvalidBoardLocation();
+								break;
+							}
+						}
+						patterns.add(makeDiscPattern(firstStone, type,
+								temp.indexOf(Board.EMPTY_SPOT), num, true,
+								board));
 					}
-				} else {
-					if (i != array.length - 1 && array[i + 1] == blocker) {
-						Pattern candidate = makeContiguousPattern(firstStone,
-								type, num, true, board);
-						patterns.add(candidate);
-					}
 				}
-				count = 0;
+				temp.clear();
 			}
 		}
 		return patterns;
