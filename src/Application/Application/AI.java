@@ -24,29 +24,16 @@ public class AI implements IPlayer{
 		this.lastMove = Model.Board.getInvalidBoardLocation();
 	}
 
-	public static AI getInstance(int difficulty, Board board) {
+	public static AI getInstance() {
 		if (instance == null)
 			instance = new AI();
 		return instance;
 	}
 
-	@Override
-	public void makeMove(BoardLocation location) {
-		this.lastMove = location;
-	}
-
-	public void makeMove(Board board) {
-		this.lastMove = AI.getNextMove(board);
-		try {
-			board.updateBoard(lastMove, false);
-		} catch (InvalidIndexException e) {
-			System.out.println("The system needs maintenance.");
-		}
-	}
-
-	private static BoardLocation getNextMove(Board board) {
-		// TODO Auto-generated method stub
-		return null;
+	public static void initAI(int difficulty, Board board){
+		// TODO Board param may not be needed if game board is static
+		AI.difficulty = difficulty;
+		AI.board = board;
 	}
 
 	@Override
@@ -59,9 +46,17 @@ public class AI implements IPlayer{
 	@Override
 	public void forceWithdraw() {
 		try {
+			// TODO Auto-generated method stub
 			board.withdrawMove(lastMove);
 		} catch (InvalidIndexException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public BoardLocation makeMove() throws InvalidIndexException {
+		BoardLocation nextMove = null;
+		// TODO
+		return nextMove;
 	}
 }

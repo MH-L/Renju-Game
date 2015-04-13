@@ -313,41 +313,29 @@ public class Board {
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
 			return false;
-		if (first) {
-			this.basicGrid[row_num][col_num] = FIRST_PLAYER;
-			this.locations.get(row_num).get(col_num).setValue(FIRST_PLAYER);
-			this.getColumns().get(col_num)[row_num] = FIRST_PLAYER;
-			this.getRows().get(row_num)[col_num] = FIRST_PLAYER;
-			int indexURDiag = getULDiagIndex(loc);
-			int indexULDiag = getURDiagIndex(loc);
-			if (indexURDiag >= WIDTH)
-				this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = FIRST_PLAYER;
-			else
-				this.getURDiags().get(indexURDiag)[row_num] = FIRST_PLAYER;
-			if (indexULDiag >= WIDTH)
-				this.getULDiags().get(indexULDiag)[col_num] = FIRST_PLAYER;
-			else
-				this.getULDiags().get(indexULDiag)[row_num] = FIRST_PLAYER;
-			this.player1Stone.add(loc);
-			return true;
-		} else {
-			this.basicGrid[row_num][col_num] = SECOND_PLAYER;
-			this.locations.get(row_num).get(col_num).setValue(SECOND_PLAYER);
-			this.getColumns().get(col_num)[row_num] = SECOND_PLAYER;
-			this.getRows().get(row_num)[col_num] = SECOND_PLAYER;
-			int indexURDiag = col_num + row_num;
-			int indexULDiag = row_num - col_num + WIDTH - 1;
-			if (indexURDiag >= WIDTH)
-				this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = SECOND_PLAYER;
-			else
-				this.getURDiags().get(indexURDiag)[row_num] = SECOND_PLAYER;
-			if (indexULDiag >= WIDTH)
-				this.getULDiags().get(indexULDiag)[col_num] = SECOND_PLAYER;
-			else
-				this.getULDiags().get(indexULDiag)[row_num] = SECOND_PLAYER;
-			this.player2Stone.add(loc);
-			return true;
-		}
+		int marker;
+		if (first)
+			marker = FIRST_PLAYER;
+		else
+			marker = SECOND_PLAYER;
+
+		this.basicGrid[row_num][col_num] = marker;
+		this.locations.get(row_num).get(col_num).setValue(marker);
+		this.getColumns().get(col_num)[row_num] = marker;
+		this.getRows().get(row_num)[col_num] = marker;
+		int indexURDiag = getULDiagIndex(loc);
+		int indexULDiag = getURDiagIndex(loc);
+		if (indexURDiag >= WIDTH)
+			this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = marker;
+		else
+			this.getURDiags().get(indexURDiag)[row_num] = marker;
+		if (indexULDiag >= WIDTH)
+			this.getULDiags().get(indexULDiag)[col_num] = marker;
+		else
+			this.getULDiags().get(indexULDiag)[row_num] = marker;
+		this.player1Stone.add(loc);
+		return true;
+
 	}
 
 	public boolean boardFull() {
@@ -373,40 +361,34 @@ public class Board {
 
 	public void renderBoard(int mode) {
 		System.out.println("   A B C D E F G H I J K L M N O P");
+		char firstPlayerChar;
+		char secondPlayerChar;
+		char emptyLocChar;
 		if (mode == CLASSIC_MODE) {
-			for (int i = 0; i < this.basicGrid.length; i++) {
-				System.out.print(i + 1);
-				if (i < 9)
-					System.out.print("\u0020\u0020");
-				else
-					System.out.print("\u0020");
-				for (int j = 0; j < this.basicGrid[0].length; j++) {
-					if (this.basicGrid[i][j] == EMPTY_SPOT)
-						System.out.print("-\u0020");
-					else if (this.basicGrid[i][j] == FIRST_PLAYER)
-						System.out.print("X\u0020");
-					else
-						System.out.print("O\u0020");
-				}
-				System.out.print('\n');
-			}
+			firstPlayerChar = 'X';
+			secondPlayerChar = 'O';
+			emptyLocChar = '-';
 		} else {
-			for (int i = 0; i < this.basicGrid.length; i++) {
-				System.out.print(i + 1);
-				if (i < 9)
-					System.out.print("\u0020\u0020");
+			firstPlayerChar = '\u25CB';
+			secondPlayerChar = '\u25CF';
+			emptyLocChar = '\u25A1';
+		}
+
+		for (int i = 0; i < this.basicGrid.length; i++) {
+			System.out.print(i + 1);
+			if (i < 9)
+				System.out.print("\u0020\u0020");
+			else
+				System.out.print("\u0020");
+			for (int j = 0; j < this.basicGrid[0].length; j++) {
+				if (this.basicGrid[i][j] == EMPTY_SPOT)
+					System.out.print(emptyLocChar + "\u0020");
+				else if (this.basicGrid[i][j] == FIRST_PLAYER)
+					System.out.print(firstPlayerChar + "\u0020");
 				else
-					System.out.print("\u0020");
-				for (int j = 0; j < this.basicGrid[0].length; j++) {
-					if (this.basicGrid[i][j] == EMPTY_SPOT)
-						System.out.print("\u25A1\u0020");
-					else if (this.basicGrid[i][j] == FIRST_PLAYER)
-						System.out.print("\u25CB\u0020");
-					else
-						System.out.print("\u25CF\u0020");
-				}
-				System.out.print('\n');
+					System.out.print(secondPlayerChar + "\u0020");
 			}
+			System.out.print('\n');
 		}
 	}
 
@@ -498,70 +480,50 @@ public class Board {
 	 * @return true if the location is reachable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
+		if (location == null)
+			return false;
 		return location.getXPos() < WIDTH && location.getXPos() > -1
-				&& location != null && location.getYPos() < HEIGHT
-				&& location.getYPos() > -1;
+				&& location.getYPos() < HEIGHT && location.getYPos() > -1;
 	}
 
 	public static ArrayList<BoardLocation> findBlockingLocs(
 			ArrayList<BoardLocation> locations, int type) {
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
+		int firstIncrement;
+		int secondIncrement;
 		switch (type) {
 		case Pattern.ON_ROW:
-			for (int i = 0; i < locations.size(); i++) {
-				BoardLocation candidate = new BoardLocation(locations.get(i)
-						.getYPos(), locations.get(i).getXPos() + 1);
-				BoardLocation anotherCandidate = new BoardLocation(locations
-						.get(i).getYPos(), locations.get(i).getXPos() - 1);
-				if (!locations.contains(candidate) && isReachable(candidate))
-					retLocs.add(candidate);
-				if (!locations.contains(anotherCandidate)
-						&& isReachable(anotherCandidate))
-					retLocs.add(anotherCandidate);
-			}
+			firstIncrement = 0;
+			secondIncrement = 1;
 			break;
 		case Pattern.ON_COL:
-			for (int i = 0; i < locations.size(); i++) {
-				BoardLocation candidate = new BoardLocation(locations.get(i)
-						.getYPos() + 1, locations.get(i).getXPos());
-				BoardLocation anotherCandidate = new BoardLocation(locations
-						.get(i).getYPos() - 1, locations.get(i).getXPos());
-				if (!locations.contains(candidate) && isReachable(candidate))
-					retLocs.add(candidate);
-				if (!locations.contains(anotherCandidate)
-						&& isReachable(anotherCandidate))
-					retLocs.add(anotherCandidate);
-			}
+			firstIncrement = 1;
+			secondIncrement = 0;
 			break;
 		case Pattern.ON_ULDIAG:
-			for (int i = 0; i < locations.size(); i++) {
-				BoardLocation candidate = new BoardLocation(locations.get(i)
-						.getYPos() + 1, locations.get(i).getXPos() + 1);
-				BoardLocation anotherCandidate = new BoardLocation(locations
-						.get(i).getYPos() - 1, locations.get(i).getXPos() - 1);
-				if (!locations.contains(candidate) && isReachable(candidate))
-					retLocs.add(candidate);
-				if (!locations.contains(anotherCandidate)
-						&& isReachable(anotherCandidate))
-					retLocs.add(anotherCandidate);
-			}
+			firstIncrement = 1;
+			secondIncrement = 1;
 			break;
 		case Pattern.ON_URDIAG:
-			for (int i = 0; i < locations.size(); i++) {
-				BoardLocation candidate = new BoardLocation(locations.get(i)
-						.getYPos() + 1, locations.get(i).getXPos() - 1);
-				BoardLocation anotherCandidate = new BoardLocation(locations
-						.get(i).getYPos() - 1, locations.get(i).getXPos() + 1);
-				if (!locations.contains(candidate) && isReachable(candidate))
-					retLocs.add(candidate);
-				if (!locations.contains(anotherCandidate)
-						&& isReachable(anotherCandidate))
-					retLocs.add(anotherCandidate);
-			}
+			firstIncrement = 1;
+			secondIncrement = -1;
 			break;
 		default:
+			firstIncrement = 0;
+			secondIncrement = 0;
 			break;
 
+		}
+		for (int i = 0; i < locations.size(); i++) {
+			BoardLocation candidate = new BoardLocation(locations.get(i)
+					.getYPos() + firstIncrement, locations.get(i).getXPos() + secondIncrement);
+			BoardLocation anotherCandidate = new BoardLocation(locations
+					.get(i).getYPos() - firstIncrement, locations.get(i).getXPos() - secondIncrement);
+			if (!locations.contains(candidate) && isReachable(candidate))
+				retLocs.add(candidate);
+			if (!locations.contains(anotherCandidate)
+					&& isReachable(anotherCandidate))
+				retLocs.add(anotherCandidate);
 		}
 
 		return retLocs;
@@ -640,117 +602,53 @@ public class Board {
 			ArrayList<BoardLocation> locations, int type) {
 		boolean first = this.getGridVal(locations.get(0)) == 1;
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
+		int firstIncrement = 0;
+		int secondIncrement = 0;
 		switch (type) {
 		case Pattern.ON_ROW:
-			for (int i = 0; i < locations.size(); i++) {
-				int xPos = locations.get(i).getXPos();
-				int yPos = locations.get(i).getYPos();
-				BoardLocation candidate1 = new BoardLocation(yPos, xPos - 1);
-				BoardLocation candidate2 = new BoardLocation(yPos, xPos + 1);
-				if (Board.isReachable(candidate1)) {
-					if (first) {
-						if (this.getGridVal(candidate1) == 2)
-							retLocs.add(candidate1);
-					} else {
-						if (this.getGridVal(candidate1) == 1)
-							retLocs.add(candidate1);
-					}
-				}
-
-				if (Board.isReachable(candidate2)) {
-					if (first) {
-						if (this.getGridVal(candidate2) == 2)
-							retLocs.add(candidate2);
-					} else {
-						if (this.getGridVal(candidate2) == 1)
-							retLocs.add(candidate2);
-					}
-				}
-			}
+			firstIncrement = 0;
+			secondIncrement = 1;
 			break;
 		case Pattern.ON_COL:
-			for (int i = 0; i < locations.size(); i++) {
-				int xPos = locations.get(i).getXPos();
-				int yPos = locations.get(i).getYPos();
-				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos);
-				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos);
-				if (Board.isReachable(candidate1)) {
-					if (first) {
-						if (this.getGridVal(candidate1) == 2)
-							retLocs.add(candidate1);
-					} else {
-						if (this.getGridVal(candidate1) == 1)
-							retLocs.add(candidate1);
-					}
-				}
-
-				if (Board.isReachable(candidate2)) {
-					if (first) {
-						if (this.getGridVal(candidate2) == 2)
-							retLocs.add(candidate2);
-					} else {
-						if (this.getGridVal(candidate2) == 1)
-							retLocs.add(candidate2);
-					}
-				}
-			}
+			firstIncrement = 1;
+			secondIncrement = 0;
 			break;
 		case Pattern.ON_ULDIAG:
-			for (int i = 0; i < locations.size(); i++) {
-				int xPos = locations.get(i).getXPos();
-				int yPos = locations.get(i).getYPos();
-				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos - 1);
-				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos + 1);
-				if (Board.isReachable(candidate1)) {
-					if (first) {
-						if (this.getGridVal(candidate1) == 2)
-							retLocs.add(candidate1);
-					} else {
-						if (this.getGridVal(candidate1) == 1)
-							retLocs.add(candidate1);
-					}
-				}
-
-				if (Board.isReachable(candidate2)) {
-					if (first) {
-						if (this.getGridVal(candidate2) == 2)
-							retLocs.add(candidate2);
-					} else {
-						if (this.getGridVal(candidate2) == 1)
-							retLocs.add(candidate2);
-					}
-				}
-			}
+			firstIncrement = 1;
+			secondIncrement = 1;
 			break;
 		case Pattern.ON_URDIAG:
-			for (int i = 0; i < locations.size(); i++) {
-				int xPos = locations.get(i).getXPos();
-				int yPos = locations.get(i).getYPos();
-				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos + 1);
-				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos - 1);
-				if (Board.isReachable(candidate1)) {
-					if (first) {
-						if (this.getGridVal(candidate1) == 2)
-							retLocs.add(candidate1);
-					} else {
-						if (this.getGridVal(candidate1) == 1)
-							retLocs.add(candidate1);
-					}
-				}
-
-				if (Board.isReachable(candidate2)) {
-					if (first) {
-						if (this.getGridVal(candidate2) == 2)
-							retLocs.add(candidate2);
-					} else {
-						if (this.getGridVal(candidate2) == 1)
-							retLocs.add(candidate2);
-					}
-				}
-			}
+			firstIncrement = 1;
+			secondIncrement = -1;
 			break;
 		default:
 			return retLocs;
+		}
+
+		for (int i = 0; i < locations.size(); i++) {
+			int xPos = locations.get(i).getXPos();
+			int yPos = locations.get(i).getYPos();
+			BoardLocation candidate1 = new BoardLocation(yPos + firstIncrement, xPos + secondIncrement);
+			BoardLocation candidate2 = new BoardLocation(yPos - firstIncrement, xPos - secondIncrement);
+			if (Board.isReachable(candidate1)) {
+				if (first) {
+					if (this.getGridVal(candidate1) == 2)
+						retLocs.add(candidate1);
+				} else {
+					if (this.getGridVal(candidate1) == 1)
+						retLocs.add(candidate1);
+				}
+			}
+
+			if (Board.isReachable(candidate2)) {
+				if (first) {
+					if (this.getGridVal(candidate2) == 2)
+						retLocs.add(candidate2);
+				} else {
+					if (this.getGridVal(candidate2) == 1)
+						retLocs.add(candidate2);
+				}
+			}
 		}
 		return retLocs;
 	}
@@ -801,16 +699,16 @@ public class Board {
 		consectCount = 0;
 
 		for (int[] array : this.diagonals_Uleft) {
-			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] == FIRST_PLAYER)
+			for (int i : array) {
+				if (prev == i && i == FIRST_PLAYER)
 					consectCount++;
 				else {
-					if (array[i] != EMPTY_SPOT)
+					if (i != EMPTY_SPOT)
 						consectCount = 1;
 					else
 						consectCount = 0;
 				}
-				prev = array[i];
+				prev = i;
 				if (consectCount >= NUM_STONES_TO_FOUL)
 					return true;
 			}
