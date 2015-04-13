@@ -39,7 +39,6 @@ public class Main {
 			game.initMultiplayer();
 		}
 
-//		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
 		System.out.println("The match is set as " + getModeAsString() + " in a " +
 				Board.getWidth() + "x" + Board.getHeight() + " board as shown:");
 		game.getBoard().renderBoard(dispMode);
@@ -80,10 +79,8 @@ public class Main {
 			game.toggleActivePlayer();
 		}
 		if (Game.isWinning()) {
-			// a little convoluted since the current active player is the losing player
-			// at this point
-			game.toggleActivePlayer();
-			System.out.println("Player " + getActivePlayerAsString() + ", You won!");
+			// get inactive player because the current player was toggled at the end of the round
+			System.out.println("Player " + getInactivePlayerAsString() + ", You won!");
 		} else if (Game.boardFull()) {
 			System.out.println("There are no more moves left. You both lose!");
 		}
@@ -141,42 +138,6 @@ public class Main {
 		return Integer.parseInt(displayMode);
 	}
 
-//	private static void singlePlayerGameStart(Scanner reader, String inputStream, String dispMode) {
-//		boolean isPlayer1 = true;
-//		String dispStr;
-//		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
-//			if (isPlayer1)
-//				dispStr = "one";
-//			else
-//				dispStr = "two";
-//
-//			System.out.println("Player " + dispStr + ", it is your turn.");
-//			inputStream = reader.next();
-//			switch (inputStream){
-//				case "x":
-//					actionGameOver(reader);
-//					return;
-//				case "w":
-//					try {
-//						game.getPlayer1().withdraw();
-//					} catch (WithdrawException e) {
-//						System.out.println(e.getMessage());
-//						continue;
-//					}
-//					break;
-//				case "i":
-//					printInstruction();
-//					break;
-//			}
-//			if (!sanitiseAndPrint(inputStream, isPlayer1, dispMode))
-//				continue;
-//			isPlayer1 = !isPlayer1;
-//		}
-//		if (isWinning(game.getBoard())) {
-//			System.out.println("You won!");
-//		}
-//	}
-
 	private static int getDifficulty() {
 		System.out.println(" Please enter the AI difficulty:\n"
 				+ " (" + Game.NOVICE_DIFFICULTY + ") Novice\n"
@@ -195,12 +156,6 @@ public class Main {
 		return Integer.parseInt(difficulty);
 	}
 
-	private static void multiPlayerGameStart() {
-
-
-	}
-
-
 	/**
 	 * Returns the active player as a string of either "one" if player 1 is active
 	 * and "two" if player two is active
@@ -212,6 +167,12 @@ public class Main {
 		if (game.isPlayer1Active()){
 			return "one";
 		} else return "two";
+	}
+
+	private static String getInactivePlayerAsString(){
+		if(game.isPlayer1Active()){
+			return "two";
+		} else return "one";
 	}
 
 	/**

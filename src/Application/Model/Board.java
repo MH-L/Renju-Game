@@ -300,7 +300,7 @@ public class Board {
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
-			return false;
+			throw new InvalidIndexException("The location is already occupied!");
 		if (player) {
 			this.basicGrid[row_num][col_num] = FIRST_PLAYER;
 			this.locations.get(row_num).get(col_num).setValue(FIRST_PLAYER);
