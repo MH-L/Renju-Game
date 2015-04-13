@@ -1,35 +1,29 @@
 package Application;
 
-import Exceptions.MultipleWithdrawException;
-import Exceptions.NothingToWithdrawException;
-import Exceptions.OverWithdrawException;
-import Exceptions.WithdrawException;
-import Model.Board;
+import Exceptions.*;
 import Model.BoardLocation;
+
+import java.util.Scanner;
 
 /**
  * This class records the recent moves of the player.
  * @author Minghao Liu
+ * @RecreatedBy Kelvin Yip
  *
  */
 public class Player implements IPlayer{
+
+	public static final int NUM_HINTS_LIMIT = 3;
+	public static final int NUM_REGRETS_LIMIT = 3;
+
 	private BoardLocation lastMove;
 	private int num_hints;
 	private int num_regrets;
-	private boolean first;
 
 	public Player() {
-		this.num_hints = 3;
-		this.num_regrets = 3;
+		this.num_hints = NUM_HINTS_LIMIT;
+		this.num_regrets = NUM_REGRETS_LIMIT;
 		this.lastMove = null;
-		this.first = false;
-	}
-
-	public Player(boolean first) {
-		this.num_hints = 3;
-		this.num_regrets = 3;
-		this.lastMove = null;
-		this.first = first;
 	}
 
 	@Override
@@ -50,11 +44,6 @@ public class Player implements IPlayer{
 	}
 
 	@Override
-	public void makeMove(BoardLocation location) {
-		lastMove = location;
-	}
-
-	@Override
 	public void forceWithdraw() {
 		lastMove = Model.Board.getInvalidBoardLocation();
 	}
@@ -67,5 +56,51 @@ public class Player implements IPlayer{
 		return num_hints;
 	}
 
+	@Override
+	public BoardLocation makeMove() throws InvalidIndexException {
+		Scanner input = new Scanner(System.in);
+		String move = input.nextLine();
+		if (!move.contains(",")) {
+			throw new InvalidIndexException(move);
+		}
+		String[] inputs = move.trim().split("\\s*,\\s*");
+		if (inputs.length != 2) {
+			throw new InvalidIndexException(move);
+		}
+		int x_coord;
+		int y_coord;
+		if (isAlpha(inputs[0]) && isNumber(inputs[1])) {
+			x_coord = translateLetter(inputs[0]);
+			y_coord = Integer.parseInt(inputs[1]);
+		} else if (isNumber(inputs[0]) && isAlpha(inputs[1])) {
+			x_coord = translateLetter(inputs[1]);
+			y_coord = Integer.parseInt(inputs[0]);
+		} else
+			throw new InvalidIndexException(move);
+		return new BoardLocation(y_coord - 1, x_coord - 1);
+	}
 
+	private static int translateLetter(String letter) {
+		return letter.toLowerCase().toCharArray()[0] - 96;
+	}
+
+	private static boolean isAlpha(String string){
+		char[] chars = string.toCharArray();
+		for (char c : chars){
+			if (!Character.isLetter(c)){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isNumber(String string) {
+		char[] chars = string.toCharArray();
+		for (char c : chars){
+			if (!Character.isDigit(c)){
+				return false;
+			}
+		}
+		return true;
+	}
 }

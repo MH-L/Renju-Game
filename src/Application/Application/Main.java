@@ -1,9 +1,9 @@
+
 package Application;
 
 import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
-import Model.BoardLocation;
 
 import java.util.Scanner;
 /**
@@ -13,78 +13,87 @@ import java.util.Scanner;
  *
  */
 public class Main {
-	// TODO make changes to make this final
 	private static Game game;
+	private static Scanner reader;
 
 	public static void main(String[] args) {
-		Scanner reader = new Scanner(System.in);
-		String inputStream = getGameMode(reader);
-		String dispMode = getDisplayMode(reader);
-		// TODO get difficulty from the user
+		// Get initializations
+		reader = new Scanner(System.in);
+		int mode = getGameMode();
+		int dispMode = getDisplayMode();
+		game = Game.getInstance();
 		printInstruction();
-		if (Integer.parseInt(inputStream) == 2) {
-			String difficulty = getDifficulty(reader);
-			switch(Integer.parseInt(difficulty)) {
-				case 1:
-					game = Game.getInstance(2, 1);
-					break;
-				case 2:
-					game = Game.getInstance(2, 2);
-					break;
-				case 3:
-					game = Game.getInstance(2, 3);
-					break;
-				case 4:
-					game = Game.getInstance(2, 4);
-					break;
-				default:
-					System.out.println("Internal Error!");
-					return;
+
+		// Initialize game mode
+		if (mode == Game.SINGLEPLAYER_GAME_MODE) {
+			int diff = getDifficulty();
+			if (Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY){
+				// This would be better if initSinglePlayer handled this input
+				// but creating a new exception might be overkill for something
+				// that likely isn't going to change
+				game.initSinglePlayer(diff);
+			} else {
+				System.err.println("Internal Error!");
+				return;
 			}
+		} else {
+			game.initMultiplayer();
 		}
-		game = Game.getInstance(Integer.parseInt(inputStream), 4);
-		System.out.println("Now the game starts.\nThe initial board is shown as follows:\n");
-		game.getBoard().renderBoard(Integer.parseInt(dispMode));
-		if (game.getMode() == 1) {
-			singlePlayerGameStart(reader, inputStream, dispMode);
-		} else if (game.getMode() == 2) {
-			multiPlayerGameStart(reader, dispMode);
+
+		System.out.println("The match is set as " + getModeAsString() + " in a " +
+				Board.getWidth() + "x" + Board.getHeight() + " board as shown:");
+		game.getBoard().renderBoard(dispMode);
+
+		// Play the game
+		while (!Game.boardFull() && !Game.isWinning()) {
+			if (game.getActivePlayer() == null){
+				throw new RuntimeException("There is no player!");
+			}
+			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+			try {
+				game.makeMove();
+				game.getBoard().renderBoard(dispMode);
+			} catch (InvalidIndexException e) {
+				switch (e.getMessage()){
+					case "x":
+						actionGameOver();
+						return;
+					case "w":
+						try {
+							actionWithdraw();
+						} catch (WithdrawException e1) {
+							// Redo this turn since the player is out of withdrawals
+							continue;
+						}
+					case "i":
+						printInstruction();
+						break;
+					default:
+						// TODO fix this since Board also throws the exception which doesn't
+						// return the command issued as the message
+						// Could just give a generic response rather than returning the issued command
+						System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
+				}
+				continue;
+			}
+
+			game.toggleActivePlayer();
+		}
+		if (Game.isWinning()) {
+			// get inactive player because the current player was toggled at the end of the round
+			System.out.println("Player " + getInactivePlayerAsString() + ", You won!");
+		} else if (Game.boardFull()) {
+			System.out.println("There are no more moves left. You both lose!");
 		}
 
 		reader.close();
 	}
 
-	private static boolean sanitiseAndPrint(String inputStream, boolean isPlayer1, String dispMode) {
-		if (inputStream.contains(",")) {
-			inputStream = inputStream.trim();
-			String[] inputs = inputStream.split(",");
-			if (inputs.length != 2) {
-				System.out.println("The input you entered is invalid!");
-				return false;
-			} else if (!isInteger(inputs[1])) {
-				System.out.println("The second input must be an integer from 1 to 16!");
-				return false;
-			}
-			int x_coord = translate(inputs[0]);
-			int y_coord = Integer.parseInt(inputs[1]);
-			BoardLocation toPlace = new BoardLocation(y_coord - 1,
-					x_coord - 1);
-			try {
-				game.getBoard().updateBoard(toPlace, isPlayer1);
-				game.getBoard().renderBoard(Integer.parseInt(dispMode));
-			} catch (InvalidIndexException e) {
-				System.out.println("The move is invalid. Please try another.");
-				return false;
-			}
-		} else {
-			System.out.println("The input is invalid. Please try again!");
-			return false;
-		}
-		return true;
-
+	private static void actionWithdraw() throws WithdrawException {
+		game.withdraw();
 	}
 
-	private static void actionGameOver(Scanner reader) {
+	private static void actionGameOver() {
 		System.out.println("Game Over!");
 		reader.close();
 	}
@@ -92,42 +101,31 @@ public class Main {
 	private static void printInstruction() {
 		// TODO fix the magic number
 		System.out.println("Game instruction:\nEach player takes turn to place a stone on the board." +
-				"\nThe first one to place 5 consecutive stones in a row wins the game." +
-				"\nTo place a stone, select the x-position then y-position delimited by a comma." +
-				"\n  For example: A,1 or B,3." +
-				"\n\nYou are allowed to undo your last move up to 3 times." +
-				"Enter \"w\" to withdraw when it is your turn." +
-				"\nTo exit the game, enter \"x\". " +
-				"\nTo reshow the instruction, enter \"i\"\n");
-
+				"\nYour goal is to place "+Board.NUM_STONES_TO_WIN+" consecutive stones in a row. " +
+				"The first one to do so wins!" +
+				"\nTo place a stone, enter the letter and number corresponding to the column and row respectively." +
+				"\nSeparate the two by a comma." +
+				"\n  For example: A,1 or 3,B." +
+				"\n\nYou are allowed to undo your last move up to "+Player.NUM_REGRETS_LIMIT+" times." +
+				"\nEnter \"w\" to withdraw when it is your turn." +
+				"\nTo quit the game, enter \"x\". " +
+				"\nTo see the instructions again, enter \"i\"\n");
 	}
 
-	public static boolean isWinning(Board board) {
-		return board.checkrow() || board.checkcol() || board.checkdiag();
-	}
-
-	public static boolean boardFull(Board board) {
-		return board.boardFull();
-	}
-
-	public static int translate(String letter) {
-		return letter.toLowerCase().toCharArray()[0] - 96;
-	}
-
-	private static String getGameMode(Scanner reader) {
-		System.out.println(" Welcome to the Renju Game!\n Select a game mode:\n " +
-				" (" + Game.MULTIPLAYER_GAME_MODE + ") multiplayer\n " +
-				" (" + Game.SINGLEPLAYER_GAME_MODE + ") singleplayer");
+	private static int getGameMode() {
+		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
+				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
+				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
 		String gameMode = reader.next();
 		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
 				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
-			gameMode = reader.next();
+			gameMode = reader.nextLine();
 		}
-		return gameMode;
+		return Integer.parseInt(gameMode);
 	}
 
-	private static String getDisplayMode(Scanner reader) {
+	private static int getDisplayMode() {
 		System.out.println(" Please enter your display mode:\n"
 				+ " (" + Board.CLASSIC_MODE + ") Classic mode\n"
 				+ " (" + Board.FANCY_MODE + ") Fancy mode\n"
@@ -138,57 +136,10 @@ public class Main {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			displayMode = reader.next();
 		}
-		return displayMode;
+		return Integer.parseInt(displayMode);
 	}
 
-	public static boolean isInteger(String input) {
-		try {
-			@SuppressWarnings("unused")
-			int i = Integer.parseInt(input);
-		} catch (NumberFormatException nfe) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private static void singlePlayerGameStart(Scanner reader, String inputStream, String dispMode) {
-		boolean isPlayer1 = true;
-		String dispStr;
-		while (!boardFull(game.getBoard()) && !isWinning(game.getBoard())) {
-			if (isPlayer1)
-				dispStr = "one";
-			else
-				dispStr = "two";
-
-			System.out.println("Player " + dispStr + ", it is your turn.");
-			inputStream = reader.next();
-			switch (inputStream){
-				case "x":
-					actionGameOver(reader);
-					return;
-				case "w":
-					try {
-						game.getPlayer1().withdraw();
-					} catch (WithdrawException e) {
-						System.out.println(e.getMessage());
-						continue;
-					}
-					break;
-				case "i":
-					printInstruction();
-					break;
-			}
-			if (!sanitiseAndPrint(inputStream, isPlayer1, dispMode))
-				continue;
-			isPlayer1 = !isPlayer1;
-		}
-		if (isWinning(game.getBoard())) {
-			System.out.println("You won!");
-		}
-	}
-
-	private static String getDifficulty(Scanner reader) {
+	private static int getDifficulty() {
 		System.out.println(" Please enter the AI difficulty:\n"
 				+ " (" + Game.NOVICE_DIFFICULTY + ") Novice\n"
 				+ " (" + Game.INTERMEDIATE_DIFFICULTY + ") Intermediate\n"
@@ -203,12 +154,40 @@ public class Main {
 			System.out.println("Invalid difficulty level. Please re-enter your choice.");
 			difficulty = reader.next();
 		}
-		return difficulty;
+		return Integer.parseInt(difficulty);
 	}
 
-	private static void multiPlayerGameStart(Scanner reader, String dispMode) {
-
-
+	/**
+	 * Returns the active player as a string of either "one" if player 1 is active
+	 * and "two" if player two is active
+	 * @return
+	 * 		"one" if player 1 is active.
+	 * 		"two if player 2 is active.
+	 */
+	private static String getActivePlayerAsString(){
+		if (game.isPlayer1Active()){
+			return "one";
+		} else return "two";
 	}
 
+	private static String getInactivePlayerAsString(){
+		if(game.isPlayer1Active()){
+			return "two";
+		} else return "one";
+	}
+
+	/**
+	 * Retusn the game mode as a string
+	 *
+	 * @return
+	 * 		"single player" if the mode is SINGLEPLAYER_GAME_MODE
+	 * 		"multi-player" if the mode is MULTIPLAYER_GAME_MODE
+	 */
+	private static String getModeAsString(){
+		if (game.getMode()== Game.SINGLEPLAYER_GAME_MODE){
+			return "single player";
+		} else {
+			return "multiplayer";
+		}
+	}
 }
