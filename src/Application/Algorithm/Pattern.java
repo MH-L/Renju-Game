@@ -74,4 +74,31 @@ public abstract class Pattern {
 		}
 		return -1;
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((blockingLocs == null) ? 0 : blockingLocs.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pattern other = (Pattern) obj;
+		if (blockingLocs == null) {
+			if (other.blockingLocs != null)
+				return false;
+		} else if (!blockingLocs.equals(other.blockingLocs))
+			return false;
+		return true;
+	}
 }

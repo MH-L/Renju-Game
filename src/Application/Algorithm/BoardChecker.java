@@ -91,7 +91,7 @@ public class BoardChecker {
 		return patterns;
 	}
 
-	private static ArrayList<Pattern> checkOpenPatDisc(int[] array,
+	public static ArrayList<Pattern> checkOpenPatDisc(int[] array,
 			int arrayIndex, int type, boolean first, int numLocs, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		ArrayList<Integer> temp = new ArrayList<Integer>();
