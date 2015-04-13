@@ -14,10 +14,6 @@ import Model.BoardLocation;
  *
  */
 public class BoardChecker {
-	private static final int TYPE_ROW = 1;
-	private static final int TYPE_COL = 2;
-	private static final int TYPE_ULDIAG = 1;
-	private static final int TYPE_URDIAG = 2;
 
 	/**
 	 * Checks for contiguous open patterns. By pattern, it means there are no
@@ -40,23 +36,23 @@ public class BoardChecker {
 		ArrayList<int[]> ulDiags = board.getULDiags();
 		ArrayList<int[]> urDiags = board.getURDiags();
 		for (int i = 0; i < rows.size(); i++) {
-			patterns.addAll(checkLineOpenPatCont(rows.get(i), i, TYPE_ROW,
+			patterns.addAll(checkOpenPatCont(rows.get(i), i, Pattern.ON_ROW,
 					first, numLocs, board));
 		}
 
 		for (int i = 0; i < columns.size(); i++) {
-			patterns.addAll(checkLineOpenPatCont(columns.get(i), i, TYPE_COL,
+			patterns.addAll(checkOpenPatCont(columns.get(i), i, Pattern.ON_COL,
 					first, numLocs, board));
 		}
 
 		for (int i = 0; i < ulDiags.size(); i++) {
-			patterns.addAll(checkDiagOpenPatCont(ulDiags.get(i), i,
-					TYPE_ULDIAG, first, numLocs, board));
+			patterns.addAll(checkOpenPatCont(ulDiags.get(i), i,
+					Pattern.ON_ULDIAG, first, numLocs, board));
 		}
 
 		for (int i = 0; i < urDiags.size(); i++) {
-			patterns.addAll(checkDiagOpenPatCont(urDiags.get(i), i,
-					TYPE_URDIAG, first, numLocs, board));
+			patterns.addAll(checkOpenPatCont(urDiags.get(i), i,
+					Pattern.ON_URDIAG, first, numLocs, board));
 		}
 		return patterns;
 	}
@@ -70,23 +66,23 @@ public class BoardChecker {
 		ArrayList<int[]> urDiags = board.getURDiags();
 
 		for (int i = 0; i < rows.size(); i++) {
-			patterns.addAll(checkOpenPatDisc(rows.get(i), i, TYPE_ROW, first,
-					numLocs, board));
+			patterns.addAll(checkOpenPatDisc(rows.get(i), i, Pattern.ON_ROW,
+					first, numLocs, board));
 		}
 
 		for (int i = 0; i < columns.size(); i++) {
-			patterns.addAll(checkOpenPatDisc(columns.get(i), i, TYPE_COL,
+			patterns.addAll(checkOpenPatDisc(columns.get(i), i, Pattern.ON_COL,
 					first, numLocs, board));
 		}
 
 		for (int i = 0; i < ulDiags.size(); i++) {
-			patterns.addAll(checkOpenPatDisc(ulDiags.get(i), i, TYPE_ULDIAG,
-					first, numLocs, board));
+			patterns.addAll(checkOpenPatDisc(ulDiags.get(i), i,
+					Pattern.ON_ULDIAG, first, numLocs, board));
 		}
 
 		for (int i = 0; i < urDiags.size(); i++) {
-			patterns.addAll(checkOpenPatDisc(urDiags.get(i), i, TYPE_URDIAG,
-					first, numLocs, board));
+			patterns.addAll(checkOpenPatDisc(urDiags.get(i), i,
+					Pattern.ON_URDIAG, first, numLocs, board));
 		}
 		return patterns;
 	}
@@ -207,7 +203,7 @@ public class BoardChecker {
 	 *            indicates whether the candidate is a row
 	 * @return arraylist of patterns found on that line/column
 	 */
-	public static ArrayList<Pattern> checkLineOpenPatCont(int[] array,
+	public static ArrayList<Pattern> checkOpenPatCont(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		int checker;
@@ -232,23 +228,40 @@ public class BoardChecker {
 				if (count == num) {
 					if (i == array.length - 1
 							|| array[i + 1] == Board.EMPTY_SPOT) {
-						if (type == TYPE_ROW) {
-							BoardLocation firstStone = new BoardLocation(
-									arrayIndex, i - 2);
-							Pattern candidate = makeContiguousPattern(
-									firstStone, false, TYPE_ROW, num, false,
-									board);
+						BoardLocation firstStone;
+						Pattern candidate;
+						switch (type) {
+						case Pattern.ON_ROW:
+							firstStone = new BoardLocation(arrayIndex, i - 2);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ROW, num, false, board);
 							patterns.add(candidate);
-						} else {
-							BoardLocation firstStone = new BoardLocation(i - 2,
-									arrayIndex);
-							Pattern candidate = makeContiguousPattern(
-									firstStone, false, TYPE_COL, num, false,
-									board);
+							break;
+						case Pattern.ON_COL:
+							firstStone = new BoardLocation(i - 2, arrayIndex);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_COL, num, false, board);
 							patterns.add(candidate);
+							break;
+						case Pattern.ON_ULDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex,
+									i - 2, true);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ULDIAG, num, false, board);
+							patterns.add(candidate);
+							break;
+						case Pattern.ON_URDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex,
+									i - 2, true);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ULDIAG, num, false, board);
+							patterns.add(candidate);
+							break;
+						default:
+							break;
 						}
 					} else {
-						// Don't add that pattern to the output.
+						// Don't add that pattern.
 					}
 				}
 				prev = array[i];
@@ -257,52 +270,8 @@ public class BoardChecker {
 		return patterns;
 	}
 
-	public static ArrayList<Pattern> checkDiagOpenPatCont(int[] diag,
-			int diagIndex, int type, boolean first, int num, Board board) {
-		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
-		if (diag.length < 2)
-			return patterns;
-		int checker;
-		if (first)
-			checker = Board.FIRST_PLAYER;
-		else
-			checker = Board.SECOND_PLAYER;
-		int count = 0;
-		int prev = Board.EMPTY_SPOT;
-		for (int i = 0; i < diag.length; i++) {
-			if (count == 0) {
-				if (prev == Board.EMPTY_SPOT && diag[i] == checker) {
-					count++;
-				}
-			} else if (diag[i] == checker) {
-				count++;
-			}
-
-			if (count == num) {
-				if (i == diag.length - 1 || diag[i + 1] == Board.EMPTY_SPOT) {
-					if (type == TYPE_ULDIAG) {
-						BoardLocation firstStone = Board.convertDiagToXY(
-								diagIndex, i - 2, true);
-						Pattern candidate = makeContiguousPattern(firstStone,
-								true, TYPE_ULDIAG, num, false, board);
-						patterns.add(candidate);
-					} else {
-						BoardLocation firstStone = Board.convertDiagToXY(
-								diagIndex, i - 2, true);
-						Pattern candidate = makeContiguousPattern(firstStone,
-								true, TYPE_URDIAG, num, false, board);
-						patterns.add(candidate);
-					}
-				} else {
-					// Don't add that pattern.
-				}
-			}
-		}
-		return patterns;
-	}
-
 	public static Pattern makeContiguousPattern(BoardLocation firstStone,
-			boolean isDiag, int type, int num, boolean isClosed, Board board) {
+			int type, int num, boolean isClosed, Board board) {
 		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
 		if (num != 3 && num != 4)
 			try {
@@ -311,28 +280,33 @@ public class BoardChecker {
 			} catch (InvalidPatternException e) {
 				e.printStackTrace();
 			}
-		if (isDiag)
-			if (type == TYPE_ULDIAG) {
-				for (int i = 0; i < num; i++) {
-					locations.add(new BoardLocation(firstStone.getYPos() + i,
-							firstStone.getXPos() + i));
-				}
-			} else {
-				for (int i = 0; i < num; i++) {
-					locations.add(new BoardLocation(firstStone.getYPos() + i,
-							firstStone.getXPos() - i));
-				}
+		switch (type) {
+		case Pattern.ON_ULDIAG:
+			for (int i = 0; i < num; i++) {
+				locations.add(new BoardLocation(firstStone.getYPos() + i,
+						firstStone.getXPos() + i));
 			}
-		else if (type == TYPE_ROW) {
+			break;
+		case Pattern.ON_URDIAG:
+			for (int i = 0; i < num; i++) {
+				locations.add(new BoardLocation(firstStone.getYPos() + i,
+						firstStone.getXPos() - i));
+			}
+			break;
+		case Pattern.ON_ROW:
 			for (int i = 0; i < num; i++) {
 				locations.add(new BoardLocation(firstStone.getYPos(),
 						firstStone.getXPos() + i));
 			}
-		} else {
+			break;
+		case Pattern.ON_COL:
 			for (int i = 0; i < num; i++) {
 				locations.add(new BoardLocation(firstStone.getYPos() + i,
 						firstStone.getXPos()));
 			}
+			break;
+		default:
+			break;
 		}
 		Pattern pat;
 		if (isClosed) {
