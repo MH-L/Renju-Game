@@ -35,6 +35,16 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static ArrayList<Pattern> checkBoardClosedPat(Board board,
+			boolean first, int numLocs) {
+		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		ArrayList<int[]> rows = board.getRows();
+		ArrayList<int[]> columns = board.getColumns();
+		ArrayList<int[]> ulDiags = board.getULDiags();
+		ArrayList<int[]> urDiags = board.getURDiags();
+		return patterns;
+	}
+
 	/**
 	 * Checks for contiguous open patterns. By pattern, it means there are no
 	 * blocking stones on either end.
@@ -234,6 +244,52 @@ public class BoardChecker {
 		} else
 			return new DiscOpenPattern(locations, type);
 
+	}
+
+	public static ArrayList<Pattern> checkClosedPatCont(int[] array,
+			int arrayIndex, int type, boolean first, int num, Board board) {
+		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		int prev = Board.EMPTY_SPOT;
+		int count = 0;
+		int checker;
+		int blocker;
+		if (first) {
+			checker = Board.FIRST_PLAYER;
+			blocker = Board.SECOND_PLAYER;
+		} else {
+			checker = Board.SECOND_PLAYER;
+			blocker = Board.SECOND_PLAYER;
+		}
+		boolean blocked = false;
+		for (int i = 0; i < array.length; i++) {
+			int cur = array[i];
+			if (cur == blocker)
+				blocked = true;
+			else if (cur == Board.EMPTY_SPOT)
+				blocked = false;
+			if (cur == prev && cur == checker)
+				count ++;
+			else if (cur != prev && cur == checker)
+				count = 1;
+			else
+				count = 0;
+			if (count == num) {
+				if (blocked) {
+					if (i == array.length - 1) {
+						// TODO add that pattern to the result
+					} else if (array[i+1] == Board.EMPTY_SPOT) {
+						// add that pattern to the result
+					}
+				} else {
+					if (i != array.length - 1 && array[i+1] == blocker) {
+						// add that pattern to the result
+					}
+				}
+				count = 0;
+			}
+			prev = cur;
+		}
+		return null;
 	}
 
 	/**
