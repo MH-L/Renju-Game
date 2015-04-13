@@ -1,3 +1,4 @@
+
 package Application;
 
 import Exceptions.InvalidIndexException;
@@ -86,12 +87,21 @@ public class Main {
 		}
 
 		reader.close();
+<<<<<<< HEAD
 	}
 
 	private static void actionWithdraw() throws WithdrawException {
 		game.withdraw();
 	}
 
+=======
+	}
+
+	private static void actionWithdraw() throws WithdrawException {
+		game.withdraw();
+	}
+
+>>>>>>> refactor
 	private static void actionGameOver() {
 		System.out.println("Game Over!");
 		reader.close();
@@ -189,4 +199,8 @@ public class Main {
 			return "multiplayer";
 		}
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> refactor

@@ -30,10 +30,25 @@ public class Board {
 	 * This is the height of the board. It is always 16.
 	 */
 	private static int height = 16;
+<<<<<<< HEAD
 	private static int diag = 31;
+	public static int getWidth() {
+		return width;
+	}
+
+	public static int getHeight() {
+		return height;
+	}
+
+	public static int getDiag() {
+		return diag;
+	}
 
 	private ArrayList<BoardLocation> player1Stone;
 	private ArrayList<BoardLocation> player2Stone;
+=======
+	private static int DIAG = 31;
+>>>>>>> refactor
 
 	public static final int NUM_STONES_TO_WIN = 5;
 	public static final int NUM_STONES_TO_FOUL = 6;
@@ -51,9 +66,16 @@ public class Board {
 	}
 
 	public Board(int size) {
+<<<<<<< HEAD
 		width = size;
 		height = size;
 		diag = 2 * size - 1;
+=======
+		// TODO Change this to let the two diagonals different
+		width = size;
+		height = size;
+		DIAG = 2 * size - 1;
+>>>>>>> refactor
 		this.basicGrid = initGrid();
 		this.rows = initRows();
 		this.columns = initCols();
@@ -313,7 +335,8 @@ public class Board {
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
-			throw new InvalidIndexException("The location is already occupied!");
+<<<<<<< HEAD
+			return false;
 		int marker;
 		if (first)
 			marker = FIRST_PLAYER;
@@ -337,6 +360,42 @@ public class Board {
 		this.player1Stone.add(loc);
 		return true;
 
+=======
+			throw new InvalidIndexException("The location is already occupied!");
+		if (player) {
+			this.basicGrid[row_num][col_num] = FIRST_PLAYER;
+			this.locations.get(row_num).get(col_num).setValue(FIRST_PLAYER);
+			this.getColumns().get(col_num)[row_num] = FIRST_PLAYER;
+			this.getRows().get(row_num)[col_num] = FIRST_PLAYER;
+			int indexURDiag = col_num + row_num;
+			int indexULDiag = row_num - col_num + width - 1;
+			if (indexURDiag >= width)
+				this.getURDiags().get(indexURDiag)[width - 1 - col_num] = FIRST_PLAYER;
+			else
+				this.getURDiags().get(indexURDiag)[row_num] = FIRST_PLAYER;
+			if (indexULDiag >= width)
+				this.getULDiags().get(indexULDiag)[col_num] = FIRST_PLAYER;
+			else
+				this.getULDiags().get(indexULDiag)[row_num] = FIRST_PLAYER;
+			return true;
+		} else {
+			this.basicGrid[row_num][col_num] = SECOND_PLAYER;
+			this.locations.get(row_num).get(col_num).setValue(SECOND_PLAYER);
+			this.getColumns().get(col_num)[row_num] = SECOND_PLAYER;
+			this.getRows().get(row_num)[col_num] = SECOND_PLAYER;
+			int indexURDiag = col_num + row_num;
+			int indexULDiag = row_num - col_num + width - 1;
+			if (indexURDiag >= width)
+				this.getURDiags().get(indexURDiag)[width - 1 - col_num] = SECOND_PLAYER;
+			else
+				this.getURDiags().get(indexURDiag)[row_num] = SECOND_PLAYER;
+			if (indexULDiag >= width)
+				this.getULDiags().get(indexULDiag)[col_num] = SECOND_PLAYER;
+			else
+				this.getULDiags().get(indexULDiag)[row_num] = SECOND_PLAYER;
+			return true;
+		}
+>>>>>>> refactor
 	}
 
 	public boolean boardFull() {
@@ -481,10 +540,19 @@ public class Board {
 	 * @return true if the location is reachable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
+<<<<<<< HEAD
 		if (location == null)
 			return false;
 		return location.getXPos() < width && location.getXPos() > -1
 				&& location.getYPos() < height && location.getYPos() > -1;
+	}
+
+	public static ArrayList<BoardLocation> findBlockingLocs(
+			ArrayList<BoardLocation> locations, int type) {
+=======
+		return location.getXPos() < width && location.getXPos() > -1
+				&& location != null && location.getYPos() < height
+				&& location.getYPos() > -1;
 	}
 
 	public static int getWidth() {
@@ -495,11 +563,8 @@ public class Board {
 		return height;
 	}
 
-	public static int getDiag() {
-		return diag;
-	}
-
-	public static ArrayList<BoardLocation> findBlockingLocs( ArrayList<BoardLocation> locations, int type) {
+	public static ArrayList<BoardLocation> findBlockingLocs( ArrayList<BoardLocation> locations, boolean isContiguous, int type) {
+>>>>>>> refactor
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		int firstIncrement;
 		int secondIncrement;
