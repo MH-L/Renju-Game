@@ -31,17 +31,6 @@ public class Board {
 	 */
 	private static int height = 16;
 	private static int diag = 31;
-	public static int getWidth() {
-		return width;
-	}
-
-	public static int getHeight() {
-		return height;
-	}
-
-	public static int getDiag() {
-		return diag;
-	}
 
 	private ArrayList<BoardLocation> player1Stone;
 	private ArrayList<BoardLocation> player2Stone;
@@ -324,7 +313,7 @@ public class Board {
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
-			return false;
+			throw new InvalidIndexException("The location is already occupied!");
 		int marker;
 		if (first)
 			marker = FIRST_PLAYER;
@@ -498,8 +487,19 @@ public class Board {
 				&& location.getYPos() < height && location.getYPos() > -1;
 	}
 
-	public static ArrayList<BoardLocation> findBlockingLocs(
-			ArrayList<BoardLocation> locations, int type) {
+	public static int getWidth() {
+		return width;
+	}
+
+	public static int getHeight() {
+		return height;
+	}
+
+	public static int getDiag() {
+		return diag;
+	}
+
+	public static ArrayList<BoardLocation> findBlockingLocs( ArrayList<BoardLocation> locations, int type) {
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		int firstIncrement;
 		int secondIncrement;

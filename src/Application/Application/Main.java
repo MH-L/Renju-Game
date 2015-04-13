@@ -1,4 +1,3 @@
-
 package Application;
 
 import Exceptions.InvalidIndexException;
