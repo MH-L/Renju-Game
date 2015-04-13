@@ -18,32 +18,38 @@ public class Game {
 	private IPlayer player2;
 	private IPlayer player1;
 	private int difficulty;
+	private static Board board;
+	private IPlayer activePlayer;
 
 	public int getMode() {
 		return mode;
 	}
 
-	private Board board;
-	private boolean activePlayer;
+	private Game() {
+		board = new Board();
+		initMultiplayer();
+	}
 
-	private Game(int mode, int difficulty) {
-		this.mode = mode;
-		if (mode == 1) {
-			player2 = Application.AI.getInstance(difficulty, board);
-			player1 = new Player();
-			this.difficulty = difficulty;
-			this.board = new Board();
-		} else {
-			player1 = new Player();
-			player2 = new Player();
-			this.difficulty = difficulty;
-			this.board = new Board();
-		}
+	public void initMultiplayer() {
+		this.mode = MULTIPLAYER_GAME_MODE;
+		board = new Board();
+		player1 = new Player();
+		player2 = new Player();
+		activePlayer = player1;
+	}
+
+	public void initSinglePlayer(int difficulty) {
+		this.mode = SINGLEPLAYER_GAME_MODE;
+		board = new Board();
+		player1 = new Player();
+		player2 = new Application.AI.getInstance();
+		AI.initAI(difficulty, board);
+		activePlayer = player1;
 	}
 
 	public static Game getInstance(int mode, int difficulty) {
 		if (instance == null) {
-			instance = new Game(mode, difficulty);
+			instance = new Game();
 		}
 		return instance;
 	}
@@ -90,7 +96,7 @@ public class Game {
 		return player1;
 	}
 
-	public boolean getActivePlayer() {
+	public IPlayer getActivePlayer() {
 		return activePlayer;
 	}
 

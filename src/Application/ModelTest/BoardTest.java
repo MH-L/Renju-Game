@@ -144,6 +144,8 @@ public class BoardTest {
 		assertFalse(bd.checkcol());
 		assertFalse(bd.checkrow());
 		bd.withdrawMove(new BoardLocation(8,10));
+		System.out.println(bd.getPlayer1Stone().size());
+		System.out.println(bd.getPlayer2Stone().size());
 		assertEquals(bd.getTotalStones(), 4);
 		assertFalse(bd.checkdiag());
 		assertTrue(bd.updateBoard(new BoardLocation(8,10), false));

@@ -20,15 +20,13 @@ public class AI implements IPlayer{
 	private BoardLocation lastMove;
 	private Algorithm solver;
 
-	private AI(int difficulty, Board board) {
+	private AI() {
 		this.lastMove = Model.Board.getInvalidBoardLocation();
-		this.difficulty = difficulty;
-		this.board = board;
 	}
 
 	public static AI getInstance(int difficulty, Board board) {
 		if (instance == null)
-			instance = new AI(difficulty, board);
+			instance = new AI();
 		return instance;
 	}
 

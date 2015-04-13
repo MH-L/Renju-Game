@@ -11,20 +11,27 @@ import Model.BoardLocation;
  * @author Minghao Liu
  *
  */
-public class Pattern {
+public abstract class Pattern {
 	private ArrayList<BoardLocation> constituent;
-	private boolean isContiguous;
 	private ArrayList<BoardLocation> blockingLocs;
 	private int type;
+
 	public static final int ON_ROW = 1;
 	public static final int ON_COL = 2;
 	public static final int ON_ULDIAG = 3;
 	public static final int ON_URDIAG = 4;
 
-	public Pattern(ArrayList<BoardLocation> locations, boolean isContiguous, int type) {
+	public Pattern(ArrayList<BoardLocation> locations, int type) {
 		this.constituent = locations;
-		this.isContiguous = isContiguous;
-		this.blockingLocs = Board.findBlockingLocs(locations, isContiguous, type);
+		this.blockingLocs = Board.findBlockingLocs(locations, type);
+	}
+
+	public ArrayList<BoardLocation> getBlockingLocs() {
+		return blockingLocs;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 	public int getNumLocs() {
@@ -51,5 +58,20 @@ public class Pattern {
 				if (!loc1.compare(loc2))
 					return true;
 		return false;
+	}
+
+	public static int findBubbleIndex(ArrayList<BoardLocation> locs, int type) {
+		BoardLocation prev = null;
+		switch (type) {
+		case Pattern.ON_ROW:
+			for (int i = 0; i < locs.size(); i++) {
+				if (prev != null) {
+					if (locs.get(i).getXPos() - prev.getXPos() > 1)
+						return i;
+				}
+				prev = locs.get(i);
+			}
+		}
+		return -1;
 	}
 }

@@ -2,6 +2,32 @@ package Model;
 
 public class BoardLocation {
 	private int x_pos;
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + x_pos;
+		result = prime * result + y_pos;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoardLocation other = (BoardLocation) obj;
+		if (x_pos != other.x_pos)
+			return false;
+		if (y_pos != other.y_pos)
+			return false;
+		return true;
+	}
+
 	private int y_pos;
 	/**
 	 * Indicates which party's chess is placed in the location.

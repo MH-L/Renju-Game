@@ -1,5 +1,7 @@
 package Model;
 
+import Algorithm.ContClosedPattern;
+import Algorithm.ContOpenPattern;
 import Algorithm.Pattern;
 import Exceptions.InvalidIndexException;
 
@@ -29,8 +31,11 @@ public class Board {
 	 */
 	private static int HEIGHT = 16;
 	private static int DIAG = 31;
+	private ArrayList<BoardLocation> player1Stone;
+	private ArrayList<BoardLocation> player2Stone;
 
 	public static final int NUM_STONES_TO_WIN = 5;
+	public static final int NUM_STONES_TO_FOUL = 6;
 	public static final int EMPTY_SPOT = 0;
 	public static final int FIRST_PLAYER = 1;
 	public static final int SECOND_PLAYER = 2;
@@ -45,7 +50,6 @@ public class Board {
 	}
 
 	public Board(int size) {
-		// TODO Change this to let the two diagonals different
 		WIDTH = size;
 		HEIGHT = size;
 		DIAG = 2 * size - 1;
@@ -55,6 +59,16 @@ public class Board {
 		this.diagonals_Uleft = initDiags();
 		this.diagonals_Uright = initDiags();
 		this.locations = initLocs();
+		this.player1Stone = new ArrayList<BoardLocation>();
+		this.player2Stone = new ArrayList<BoardLocation>();
+	}
+
+	public ArrayList<BoardLocation> getPlayer1Stone() {
+		return player1Stone;
+	}
+
+	public ArrayList<BoardLocation> getPlayer2Stone() {
+		return player2Stone;
 	}
 
 	// Getters for the board class.
@@ -88,7 +102,6 @@ public class Board {
 				throw new InvalidIndexException(
 						"The column index is out of bounds.");
 			} catch (InvalidIndexException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -188,7 +201,6 @@ public class Board {
 	}
 
 	public boolean checkrow() {
-		// TODO change here.
 		int consectCount = 0; // This counts the number of consecutive stones
 								// for one player.
 		int prev = EMPTY_SPOT; // This is the last stone. 0 denotes that there
@@ -292,7 +304,7 @@ public class Board {
 	 * @return false if it did not succeed. true if succeeded
 	 * @throws InvalidIndexException
 	 */
-	public boolean updateBoard(BoardLocation loc, boolean player)
+	public boolean updateBoard(BoardLocation loc, boolean first)
 			throws InvalidIndexException {
 		if (!isReachable(loc))
 			throw new InvalidIndexException(
@@ -301,13 +313,13 @@ public class Board {
 		int row_num = loc.getYPos();
 		if (locations.get(row_num).get(col_num).occupied())
 			return false;
-		if (player) {
+		if (first) {
 			this.basicGrid[row_num][col_num] = FIRST_PLAYER;
 			this.locations.get(row_num).get(col_num).setValue(FIRST_PLAYER);
 			this.getColumns().get(col_num)[row_num] = FIRST_PLAYER;
 			this.getRows().get(row_num)[col_num] = FIRST_PLAYER;
-			int indexURDiag = col_num + row_num;
-			int indexULDiag = row_num - col_num + WIDTH - 1;
+			int indexURDiag = getULDiagIndex(loc);
+			int indexULDiag = getURDiagIndex(loc);
 			if (indexURDiag >= WIDTH)
 				this.getURDiags().get(indexURDiag)[WIDTH - 1 - col_num] = FIRST_PLAYER;
 			else
@@ -316,6 +328,7 @@ public class Board {
 				this.getULDiags().get(indexULDiag)[col_num] = FIRST_PLAYER;
 			else
 				this.getULDiags().get(indexULDiag)[row_num] = FIRST_PLAYER;
+			this.player1Stone.add(loc);
 			return true;
 		} else {
 			this.basicGrid[row_num][col_num] = SECOND_PLAYER;
@@ -332,6 +345,7 @@ public class Board {
 				this.getULDiags().get(indexULDiag)[col_num] = SECOND_PLAYER;
 			else
 				this.getULDiags().get(indexULDiag)[row_num] = SECOND_PLAYER;
+			this.player2Stone.add(loc);
 			return true;
 		}
 	}
@@ -417,6 +431,8 @@ public class Board {
 		for (int i = 0; i < this.diagonals_Uright.size(); i++)
 			for (int j = 0; j < this.diagonals_Uright.get(i).length; j++)
 				this.getURDiags().get(i)[j] = EMPTY_SPOT;
+		this.player1Stone.clear();
+		this.player2Stone.clear();
 
 	}
 
@@ -454,6 +470,10 @@ public class Board {
 		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
 		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
 		this.locations.get(y_coord).get(x_coord).setValue(EMPTY_SPOT);
+		if (this.player1Stone.size() > this.player2Stone.size())
+			this.player1Stone.remove(lastMove);
+		else
+			this.player2Stone.remove(lastMove);
 
 	}
 
@@ -463,12 +483,7 @@ public class Board {
 	 * @return the total number of stones.
 	 */
 	public int getTotalStones() {
-		int count = 0;
-		for (int i = 0; i < this.basicGrid.length; i++)
-			for (int j = 0; j < this.basicGrid[0].length; j++)
-				if (getGridVal(new BoardLocation(i, j)) != EMPTY_SPOT)
-					count++;
-		return count;
+		return this.player1Stone.size() + this.player2Stone.size();
 	}
 
 	public static BoardLocation getInvalidBoardLocation() {
@@ -489,7 +504,7 @@ public class Board {
 	}
 
 	public static ArrayList<BoardLocation> findBlockingLocs(
-			ArrayList<BoardLocation> locations, boolean isContiguous, int type) {
+			ArrayList<BoardLocation> locations, int type) {
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		switch (type) {
 		case Pattern.ON_ROW:
@@ -548,6 +563,7 @@ public class Board {
 			break;
 
 		}
+
 		return retLocs;
 	}
 
@@ -571,5 +587,257 @@ public class Board {
 						* diagIndex + subIndex - WIDTH + 1);
 		}
 
+	}
+
+	// TODO make a static method to determine if a pattern is dead
+	// i.e. if there is no chance to win
+	public static boolean isPatternDead(Pattern pat) {
+		if (pat.getClass().equals(ContOpenPattern.class)
+				|| pat.getClass().equals(ContClosedPattern.class)) {
+			if (pat.getClass().equals(ContOpenPattern.class)) {
+				if (pat.getLocations().size() == 3) {
+					// this is a special case since three can be already dead
+					// even if open
+				} else if (pat.getLocations().size() == 4) {
+					if (pat.getType() == Pattern.ON_ULDIAG) {
+						int diagIndex = getULDiagIndex(pat.getLocations()
+								.get(0));
+						if (diagIndex < 4 || diagIndex > WIDTH - 4)
+							return true;
+						else
+							return false;
+					} else if (pat.getType() == Pattern.ON_URDIAG) {
+						int diagIndex = getURDiagIndex(pat.getLocations()
+								.get(0));
+						if (diagIndex < 4 || diagIndex > WIDTH - 4)
+							return true;
+						else
+							return false;
+					} else {
+						return false;
+					}
+				}
+			} else {
+				// TODO pattern is not open. need to do this part.
+
+			}
+		} else {
+			// TODO pattern is discontinuous. need to do this part.
+		}
+
+		return false;
+	}
+
+	public static int getULDiagIndex(BoardLocation loc) {
+		return loc.getXPos() + loc.getYPos();
+	}
+
+	public static int getURDiagIndex(BoardLocation loc) {
+		return loc.getYPos() - loc.getXPos() + WIDTH - 1;
+	}
+
+	public ArrayList<BoardLocation> getBlockedStones(
+			ArrayList<BoardLocation> locations, int type) {
+		boolean first = this.getGridVal(locations.get(0)) == 1;
+		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
+		switch (type) {
+		case Pattern.ON_ROW:
+			for (int i = 0; i < locations.size(); i++) {
+				int xPos = locations.get(i).getXPos();
+				int yPos = locations.get(i).getYPos();
+				BoardLocation candidate1 = new BoardLocation(yPos, xPos - 1);
+				BoardLocation candidate2 = new BoardLocation(yPos, xPos + 1);
+				if (Board.isReachable(candidate1)) {
+					if (first) {
+						if (this.getGridVal(candidate1) == 2)
+							retLocs.add(candidate1);
+					} else {
+						if (this.getGridVal(candidate1) == 1)
+							retLocs.add(candidate1);
+					}
+				}
+
+				if (Board.isReachable(candidate2)) {
+					if (first) {
+						if (this.getGridVal(candidate2) == 2)
+							retLocs.add(candidate2);
+					} else {
+						if (this.getGridVal(candidate2) == 1)
+							retLocs.add(candidate2);
+					}
+				}
+			}
+			break;
+		case Pattern.ON_COL:
+			for (int i = 0; i < locations.size(); i++) {
+				int xPos = locations.get(i).getXPos();
+				int yPos = locations.get(i).getYPos();
+				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos);
+				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos);
+				if (Board.isReachable(candidate1)) {
+					if (first) {
+						if (this.getGridVal(candidate1) == 2)
+							retLocs.add(candidate1);
+					} else {
+						if (this.getGridVal(candidate1) == 1)
+							retLocs.add(candidate1);
+					}
+				}
+
+				if (Board.isReachable(candidate2)) {
+					if (first) {
+						if (this.getGridVal(candidate2) == 2)
+							retLocs.add(candidate2);
+					} else {
+						if (this.getGridVal(candidate2) == 1)
+							retLocs.add(candidate2);
+					}
+				}
+			}
+			break;
+		case Pattern.ON_ULDIAG:
+			for (int i = 0; i < locations.size(); i++) {
+				int xPos = locations.get(i).getXPos();
+				int yPos = locations.get(i).getYPos();
+				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos - 1);
+				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos + 1);
+				if (Board.isReachable(candidate1)) {
+					if (first) {
+						if (this.getGridVal(candidate1) == 2)
+							retLocs.add(candidate1);
+					} else {
+						if (this.getGridVal(candidate1) == 1)
+							retLocs.add(candidate1);
+					}
+				}
+
+				if (Board.isReachable(candidate2)) {
+					if (first) {
+						if (this.getGridVal(candidate2) == 2)
+							retLocs.add(candidate2);
+					} else {
+						if (this.getGridVal(candidate2) == 1)
+							retLocs.add(candidate2);
+					}
+				}
+			}
+			break;
+		case Pattern.ON_URDIAG:
+			for (int i = 0; i < locations.size(); i++) {
+				int xPos = locations.get(i).getXPos();
+				int yPos = locations.get(i).getYPos();
+				BoardLocation candidate1 = new BoardLocation(yPos - 1, xPos + 1);
+				BoardLocation candidate2 = new BoardLocation(yPos + 1, xPos - 1);
+				if (Board.isReachable(candidate1)) {
+					if (first) {
+						if (this.getGridVal(candidate1) == 2)
+							retLocs.add(candidate1);
+					} else {
+						if (this.getGridVal(candidate1) == 1)
+							retLocs.add(candidate1);
+					}
+				}
+
+				if (Board.isReachable(candidate2)) {
+					if (first) {
+						if (this.getGridVal(candidate2) == 2)
+							retLocs.add(candidate2);
+					} else {
+						if (this.getGridVal(candidate2) == 1)
+							retLocs.add(candidate2);
+					}
+				}
+			}
+			break;
+		default:
+			return retLocs;
+		}
+		return retLocs;
+	}
+
+	public boolean checkFoul() {
+		int consectCount = 0;
+		int prev = EMPTY_SPOT;
+		for (int[] array : this.rows) {
+			for (int i = 0; i < array.length; i++) {
+				if (prev == array[i] && array[i] == FIRST_PLAYER)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
+				prev = array[i];
+				if (consectCount >= NUM_STONES_TO_FOUL)
+					return true;
+			}
+			prev = 0;
+			consectCount = 0;
+		}
+
+		prev = EMPTY_SPOT;
+		consectCount = 0;
+
+		for (int[] array : this.columns) {
+			for (int i = 0; i < array.length; i++) {
+				if (prev == array[i] && array[i] == FIRST_PLAYER)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
+				prev = array[i];
+				if (consectCount >= NUM_STONES_TO_FOUL)
+					return true;
+			}
+			prev = 0;
+			consectCount = 0;
+		}
+
+		prev = EMPTY_SPOT;
+		consectCount = 0;
+
+		for (int[] array : this.diagonals_Uleft) {
+			for (int i = 0; i < array.length; i++) {
+				if (prev == array[i] && array[i] == FIRST_PLAYER)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
+				prev = array[i];
+				if (consectCount >= NUM_STONES_TO_FOUL)
+					return true;
+			}
+			prev = EMPTY_SPOT;
+			consectCount = 0;
+		}
+
+		consectCount = 0;
+		prev = EMPTY_SPOT;
+
+		for (int[] array : this.diagonals_Uright) {
+			for (int i = 0; i < array.length; i++) {
+				if (prev == array[i] && array[i] == FIRST_PLAYER)
+					consectCount++;
+				else {
+					if (array[i] != EMPTY_SPOT)
+						consectCount = 1;
+					else
+						consectCount = 0;
+				}
+				prev = array[i];
+				if (consectCount >= NUM_STONES_TO_FOUL)
+					return true;
+			}
+			prev = EMPTY_SPOT;
+			consectCount = 0;
+		}
+		return false;
 	}
 }
