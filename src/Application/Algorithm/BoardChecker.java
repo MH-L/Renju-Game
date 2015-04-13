@@ -8,7 +8,8 @@ import Model.Board;
 import Model.BoardLocation;
 
 /**
- * Checks works against player, not AI.
+ * Checks works against players, including AI. Check for AI because this helps
+ * making attacks.
  *
  * @author Minghao Liu
  *
@@ -258,7 +259,7 @@ public class BoardChecker {
 			blocker = Board.SECOND_PLAYER;
 		} else {
 			checker = Board.SECOND_PLAYER;
-			blocker = Board.SECOND_PLAYER;
+			blocker = Board.FIRST_PLAYER;
 		}
 		boolean blocked = false;
 		for (int i = 0; i < array.length; i++) {
@@ -268,28 +269,128 @@ public class BoardChecker {
 			else if (cur == Board.EMPTY_SPOT)
 				blocked = false;
 			if (cur == prev && cur == checker)
-				count ++;
+				count++;
 			else if (cur != prev && cur == checker)
 				count = 1;
 			else
 				count = 0;
 			if (count == num) {
+				BoardLocation firstStone;
+				switch (type) {
+				case Pattern.ON_ROW:
+					firstStone = new BoardLocation(arrayIndex, i - num + 1);
+					break;
+				case Pattern.ON_COL:
+					firstStone = new BoardLocation(i - num + 1, arrayIndex);
+					break;
+				case Pattern.ON_ULDIAG:
+					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
+							true);
+					break;
+				case Pattern.ON_URDIAG:
+					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
+							false);
+					break;
+				default:
+					firstStone = Board.getInvalidBoardLocation();
+					break;
+				}
 				if (blocked) {
 					if (i == array.length - 1) {
-						// TODO add that pattern to the result
-					} else if (array[i+1] == Board.EMPTY_SPOT) {
-						// add that pattern to the result
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
+					} else if (array[i + 1] == Board.EMPTY_SPOT) {
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
 					}
 				} else {
-					if (i != array.length - 1 && array[i+1] == blocker) {
-						// add that pattern to the result
+					if (i != array.length - 1 && array[i + 1] == blocker) {
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
 					}
 				}
 				count = 0;
 			}
 			prev = cur;
 		}
-		return null;
+		return patterns;
+	}
+
+	public static ArrayList<Pattern> checkClosedPatDisc(int[] array,
+			int arrayIndex, int type, boolean first, int num, Board board) {
+		if (num < 4) {
+			try {
+				throw new InvalidPatternException(
+						"The number of stones in a closed discrete pattern must be at least four!");
+			} catch (InvalidPatternException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		int prev = Board.EMPTY_SPOT;
+		int count = 0;
+		int checker;
+		int blocker;
+		if (first) {
+			checker = Board.FIRST_PLAYER;
+			blocker = Board.SECOND_PLAYER;
+		} else {
+			checker = Board.SECOND_PLAYER;
+			blocker = Board.FIRST_PLAYER;
+		}
+		boolean blocked = false;
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j <= num; j++) {
+				temp.add(array[i + j]);
+			}
+			int playerFreq = 1;
+			if (count == num) {
+				BoardLocation firstStone;
+				switch (type) {
+				case Pattern.ON_ROW:
+					firstStone = new BoardLocation(arrayIndex, i - num + 1);
+					break;
+				case Pattern.ON_COL:
+					firstStone = new BoardLocation(i - num + 1, arrayIndex);
+					break;
+				case Pattern.ON_ULDIAG:
+					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
+							true);
+					break;
+				case Pattern.ON_URDIAG:
+					firstStone = Board.convertDiagToXY(arrayIndex, i - num + 1,
+							false);
+					break;
+				default:
+					firstStone = Board.getInvalidBoardLocation();
+					break;
+				}
+				if (blocked) {
+					if (i == array.length - 1) {
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
+					} else if (array[i + 1] == Board.EMPTY_SPOT) {
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
+					}
+				} else {
+					if (i != array.length - 1 && array[i + 1] == blocker) {
+						Pattern candidate = makeContiguousPattern(firstStone,
+								type, num, true, board);
+						patterns.add(candidate);
+					}
+				}
+				count = 0;
+			}
+		}
+		return patterns;
 	}
 
 	/**
