@@ -16,6 +16,26 @@ import Model.BoardLocation;
 public class BoardChecker {
 
 	/**
+	 * Checks for all patterns on board for a given player.
+	 *
+	 * @param board
+	 *            The board where patterns are on.
+	 * @param first
+	 *            Specifies if it is the first player.
+	 * @return An ArrayList of all patterns on board.
+	 */
+	public static ArrayList<Pattern> checkAllPattern(Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		retVal.addAll(checkBoardOpenPatCont(board, first, 3));
+		retVal.addAll(checkBoardOpenPatCont(board, first, 4));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 3));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 4));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 5));
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 6));
+		return retVal;
+	}
+
+	/**
 	 * Checks for contiguous open patterns. By pattern, it means there are no
 	 * blocking stones on either end.
 	 *
@@ -101,7 +121,7 @@ public class BoardChecker {
 			checker = Board.SECOND_PLAYER;
 		for (int i = 0; i < array.length - numLocs; i++) {
 			for (int j = 0; j <= numLocs; j++)
-				temp.add(array[j]);
+				temp.add(array[i + j]);
 			if (prev != Board.EMPTY_SPOT)
 				continue;
 			int playerFreq = Collections.frequency(temp, checker);
@@ -133,9 +153,34 @@ public class BoardChecker {
 						Pattern candidate = makeDiscPattern(firstStone, type,
 								bubbleIndex, numLocs, false, board);
 						patterns.add(candidate);
+					} else if (array[i + numLocs + 1] == Board.EMPTY_SPOT) {
+						int bubbleIndex = temp.indexOf(Board.EMPTY_SPOT);
+						BoardLocation firstStone;
+						switch (type) {
+						case Pattern.ON_ROW:
+							firstStone = new BoardLocation(arrayIndex, i);
+							break;
+						case Pattern.ON_COL:
+							firstStone = new BoardLocation(i, arrayIndex);
+							break;
+						case Pattern.ON_ULDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex, i,
+									true);
+							break;
+						case Pattern.ON_URDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex, i,
+									false);
+							break;
+						default:
+							continue;
+						}
+						Pattern candidate = makeDiscPattern(firstStone, type,
+								bubbleIndex, numLocs, false, board);
+						patterns.add(candidate);
 					}
 				}
 			}
+			temp.clear();
 		}
 
 		return patterns;
@@ -226,33 +271,34 @@ public class BoardChecker {
 				}
 
 				if (count == num) {
-					if (i == array.length - 1
-							|| array[i + 1] == Board.EMPTY_SPOT) {
+					if (i == array.length - 1) {
 						BoardLocation firstStone;
 						Pattern candidate;
 						switch (type) {
 						case Pattern.ON_ROW:
-							firstStone = new BoardLocation(arrayIndex, i - 2);
+							firstStone = new BoardLocation(arrayIndex, i - num
+									+ 1);
 							candidate = makeContiguousPattern(firstStone,
 									Pattern.ON_ROW, num, false, board);
 							patterns.add(candidate);
 							break;
 						case Pattern.ON_COL:
-							firstStone = new BoardLocation(i - 2, arrayIndex);
+							firstStone = new BoardLocation(i - num + 1,
+									arrayIndex);
 							candidate = makeContiguousPattern(firstStone,
 									Pattern.ON_COL, num, false, board);
 							patterns.add(candidate);
 							break;
 						case Pattern.ON_ULDIAG:
-							firstStone = Board.convertDiagToXY(arrayIndex,
-									i - 2, true);
+							firstStone = Board.convertDiagToXY(arrayIndex, i
+									- num + 1, true);
 							candidate = makeContiguousPattern(firstStone,
 									Pattern.ON_ULDIAG, num, false, board);
 							patterns.add(candidate);
 							break;
 						case Pattern.ON_URDIAG:
-							firstStone = Board.convertDiagToXY(arrayIndex,
-									i - 2, true);
+							firstStone = Board.convertDiagToXY(arrayIndex, i
+									- num + 1, true);
 							candidate = makeContiguousPattern(firstStone,
 									Pattern.ON_ULDIAG, num, false, board);
 							patterns.add(candidate);
@@ -260,9 +306,43 @@ public class BoardChecker {
 						default:
 							break;
 						}
-					} else {
-						// Don't add that pattern.
+					} else if (array[i + 1] == Board.EMPTY_SPOT) {
+						BoardLocation firstStone;
+						Pattern candidate;
+						switch (type) {
+						case Pattern.ON_ROW:
+							firstStone = new BoardLocation(arrayIndex, i - num
+									+ 1);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ROW, num, false, board);
+							patterns.add(candidate);
+							break;
+						case Pattern.ON_COL:
+							firstStone = new BoardLocation(i - num + 1,
+									arrayIndex);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_COL, num, false, board);
+							patterns.add(candidate);
+							break;
+						case Pattern.ON_ULDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex, i
+									- num + 1, true);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ULDIAG, num, false, board);
+							patterns.add(candidate);
+							break;
+						case Pattern.ON_URDIAG:
+							firstStone = Board.convertDiagToXY(arrayIndex, i
+									- num + 1, true);
+							candidate = makeContiguousPattern(firstStone,
+									Pattern.ON_ULDIAG, num, false, board);
+							patterns.add(candidate);
+							break;
+						default:
+							break;
+						}
 					}
+					count = 0;
 				}
 				prev = array[i];
 			}
