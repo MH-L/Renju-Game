@@ -80,4 +80,12 @@ public abstract class Algorithm {
 		return candidates.get(maxIndex);
 
 	}
+
+	public BoardLocation makeMoveBeginning() {
+		if (board.getTotalStones() == 1)
+			return makeFirstMoveSecond();
+		else if (board.getTotalStones() == 0)
+			return makeFirstMoveFirst();
+		return null;
+	}
 }
