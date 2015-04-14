@@ -15,11 +15,29 @@ import java.util.ArrayList;
  *
  */
 public class Board {
-	// Board is a 16*16 grid.
+	/**
+	 * A height-by-width grid representing the board. Grid value is zero if the
+	 * spot is empty, 1 if occupied by a stone belongs to the first player, 2 if
+	 * occupied by a stone belongs to the second player.
+	 */
 	private int[][] basicGrid;
+	/**
+	 * All rows on the board. A row's index on board equals its index in the
+	 * array list.
+	 */
 	private ArrayList<int[]> rows;
+	/**
+	 * All columns on the board. A column's index on board equals its index in
+	 * the array list.
+	 */
 	private ArrayList<int[]> columns;
+	/**
+	 * All upper-left diagonals on the board.
+	 */
 	private ArrayList<int[]> diagonals_Uleft;
+	/**
+	 * All upper-right diagonals on the board.
+	 */
 	private ArrayList<int[]> diagonals_Uright;
 	/**
 	 * This is the width of the board. It is always 16.
@@ -29,17 +47,47 @@ public class Board {
 	 * This is the height of the board. It is always 16.
 	 */
 	private static int height = 16;
+	/**
+	 * The number of diagonals on board. Note that there are the same number of
+	 * upper-left diagonals and upper-right diagonals.
+	 */
 	private static int diag = 31;
-
+	/**
+	 * Player 1's stones on board.
+	 */
 	private ArrayList<BoardLocation> player1Stone;
+	/**
+	 * Player 2's stones on board.
+	 */
 	private ArrayList<BoardLocation> player2Stone;
-
+	/**
+	 * Number of stones in a row in order to win.
+	 */
 	public static final int NUM_STONES_TO_WIN = 5;
+	/**
+	 * Number of stones in a row which commits a foul. Note that this only
+	 * applies to the first player.
+	 */
 	public static final int NUM_STONES_TO_FOUL = 6;
+	/**
+	 * Value of a grid if it is unoccupied.
+	 */
 	public static final int EMPTY_SPOT = 0;
+	/**
+	 * Value of a grid if it is occupied by the first player.
+	 */
 	public static final int FIRST_PLAYER = 1;
+	/**
+	 * Value of a grid if it is occupied by the second player.
+	 */
 	public static final int SECOND_PLAYER = 2;
+	/**
+	 * Display mode -- classic mode.
+	 */
 	public static final int CLASSIC_MODE = 1;
+	/**
+	 * Display mode -- fancy mode. Note that fancy mode requires UTF-8 encoding.
+	 */
 	public static final int FANCY_MODE = 2;
 
 	/**
@@ -49,6 +97,12 @@ public class Board {
 		this(16);
 	}
 
+	/**
+	 * Constructs a board with the given size. The board is square in shape.
+	 *
+	 * @param size
+	 *            The size of the board.
+	 */
 	public Board(int size) {
 		width = size;
 		height = size;
@@ -70,7 +124,6 @@ public class Board {
 		return player2Stone;
 	}
 
-	// Getters for the board class.
 	public ArrayList<int[]> getRows() {
 		return this.rows;
 	}
@@ -143,8 +196,8 @@ public class Board {
 	}
 
 	/**
-	 * Initialize the grid of the board. The grid is always 16*16. The init grid
-	 * is empty. Each entry is just 0.
+	 * Initialize all grids on the board. The init grid has no stones on it.
+	 * Each entry is just 0.
 	 *
 	 * @return The initial grid.
 	 */
@@ -156,6 +209,12 @@ public class Board {
 		return grid;
 	}
 
+	/**
+	 * Initialize all rows on the board. Each element is set to zero when
+	 * initialized.
+	 *
+	 * @return
+	 */
 	private ArrayList<int[]> initRows() {
 		ArrayList<int[]> rows = new ArrayList<int[]>();
 		for (int i = 0; i < height; i++) {
@@ -168,6 +227,11 @@ public class Board {
 		return rows;
 	}
 
+	/**
+	 * Initializes all columns on the board.
+	 *
+	 * @return
+	 */
 	private ArrayList<int[]> initCols() {
 		ArrayList<int[]> cols = new ArrayList<int[]>();
 		for (int i = 0; i < width; i++) {
@@ -180,6 +244,11 @@ public class Board {
 		return cols;
 	}
 
+	/**
+	 * Initializes all diagonals on the board.
+	 *
+	 * @return An array list of all diagonals.
+	 */
 	private ArrayList<int[]> initDiags() {
 		ArrayList<int[]> diags = new ArrayList<int[]>();
 		for (int i = 0; i < diag; i++) {
@@ -195,6 +264,12 @@ public class Board {
 		return diags;
 	}
 
+	/**
+	 * Checks the rows to see if there are five stones in a row that belongs to
+	 * the same player.
+	 *
+	 * @return True if there is such combination, false if there is not.
+	 */
 	public boolean checkrow() {
 		int consectCount = 0; // This counts the number of consecutive stones
 								// for one player.
@@ -220,6 +295,12 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Check columns to see if there are five stones in a row that belongs to
+	 * the same player.
+	 *
+	 * @return True if there are, false if cannot find such combination.
+	 */
 	public boolean checkcol() {
 		int consectCount = 0;
 		int prev = EMPTY_SPOT;
@@ -243,6 +324,12 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Check diagonals to see if there are five stones in a row that belongs to
+	 * the same player.
+	 *
+	 * @return True if there are, false if cannot find such combination.
+	 */
 	public boolean checkdiag() {
 		int consectCount = 0;
 		int prev = EMPTY_SPOT;
@@ -338,6 +425,11 @@ public class Board {
 
 	}
 
+	/**
+	 * Check if the board is full of stones.
+	 *
+	 * @return True if the board is full and false otherwise.
+	 */
 	public boolean boardFull() {
 		for (int i = 0; i < this.basicGrid.length; i++)
 			for (int j = 0; j < this.basicGrid[0].length; j++)
@@ -346,19 +438,15 @@ public class Board {
 		return true;
 	}
 
-	public ArrayList<ArrayList<BoardLocation>> initLocs() {
-		ArrayList<ArrayList<BoardLocation>> locations = new ArrayList<ArrayList<BoardLocation>>();
-		for (int i = 0; i < width; i++) {
-			ArrayList<BoardLocation> locs = new ArrayList<BoardLocation>();
-			for (int j = 0; j < height; j++) {
-				BoardLocation bdloc = new BoardLocation(i, j);
-				locs.add(j, bdloc);
-			}
-			locations.add(i, locs);
-		}
-		return locations;
-	}
-
+	/**
+	 * Render the board on console.
+	 *
+	 * @param mode
+	 *            Classic mode -- display empty spot as "-", first player's
+	 *            stone as "X" and second player's stone as "O". Fancy mode --
+	 *            displays empty spot as an empty square, first player's stone
+	 *            as an empty circle, second player's stone as a solid circle.
+	 */
 	public void renderBoard(int mode) {
 		System.out.println("   A B C D E F G H I J K L M N O P");
 		char firstPlayerChar;
@@ -434,6 +522,14 @@ public class Board {
 		return this.basicGrid[y_coord][x_coord];
 	}
 
+	/**
+	 * Withdraws the given move on board. There is no stone after withdrawal.
+	 *
+	 * @param lastMove
+	 *            The BoardLocation to withdraw.
+	 * @throws InvalidIndexException
+	 *             If the given BoardLocation is unreachable.
+	 */
 	public void withdrawMove(BoardLocation lastMove)
 			throws InvalidIndexException {
 		if (!isReachable(lastMove)) {
@@ -461,7 +557,7 @@ public class Board {
 	/**
 	 * Get the total number of stones on the board.
 	 *
-	 * @return the total number of stones.
+	 * @return The total number of stones.
 	 */
 	public int getTotalStones() {
 		return this.player1Stone.size() + this.player2Stone.size();
@@ -476,7 +572,7 @@ public class Board {
 	 * its x-coordinate and y-coordinate are both in the range from 0 to 15.
 	 * (Since the board is 16*16)
 	 *
-	 * @return true if the location is reachable and false otherwise.
+	 * @return True if the location is reachable and false otherwise.
 	 */
 	public static boolean isReachable(BoardLocation location) {
 		if (location == null)
@@ -497,7 +593,18 @@ public class Board {
 		return diag;
 	}
 
-	public static ArrayList<BoardLocation> findBlockingLocs( ArrayList<BoardLocation> locations, int type) {
+	/**
+	 * Finds the locations where the other player can block the pattern.
+	 *
+	 * @param locations
+	 *            The BoardLocations forming the pattern.
+	 * @param type
+	 *            Whether the pattern is on row/column/upper-left
+	 *            diagonal/upper-right diagonal.
+	 * @return The list of all proper blocking locations of the given pattern.
+	 */
+	public static ArrayList<BoardLocation> findBlockingLocs(
+			ArrayList<BoardLocation> locations, int type) {
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		int firstIncrement;
 		int secondIncrement;
@@ -526,9 +633,11 @@ public class Board {
 		}
 		for (int i = 0; i < locations.size(); i++) {
 			BoardLocation candidate = new BoardLocation(locations.get(i)
-					.getYPos() + firstIncrement, locations.get(i).getXPos() + secondIncrement);
-			BoardLocation anotherCandidate = new BoardLocation(locations
-					.get(i).getYPos() - firstIncrement, locations.get(i).getXPos() - secondIncrement);
+					.getYPos() + firstIncrement, locations.get(i).getXPos()
+					+ secondIncrement);
+			BoardLocation anotherCandidate = new BoardLocation(locations.get(i)
+					.getYPos() - firstIncrement, locations.get(i).getXPos()
+					- secondIncrement);
 			if (!locations.contains(candidate) && isReachable(candidate))
 				retLocs.add(candidate);
 			if (!locations.contains(anotherCandidate)
@@ -539,6 +648,18 @@ public class Board {
 		return retLocs;
 	}
 
+	/**
+	 * Converts the diagonal index and the subIndex in a diagonal to x and y
+	 * coordinates on board.
+	 *
+	 * @param diagIndex
+	 *            The index of the diagonal on board.
+	 * @param subIndex
+	 *            The index of the location on the given diagonal
+	 * @param isUL
+	 *            Whether the diagonal is from upper-left to bottom-right.
+	 * @return A BoardLocation as the result of the conversion.
+	 */
 	public static BoardLocation convertDiagToXY(int diagIndex, int subIndex,
 			boolean isUL) {
 		assert (diagIndex > -1 && diagIndex < diag && subIndex > -1 && subIndex < (diagIndex > (diag - 1) / 2 ? diag
@@ -563,6 +684,15 @@ public class Board {
 
 	// TODO make a static method to determine if a pattern is dead
 	// i.e. if there is no chance to win
+	/**
+	 * Determines whether the pattern has potential to form five in a row.
+	 * Special case if the pattern belongs to the first player, then more than
+	 * five stones in a row is not allowed.
+	 *
+	 * @param pat
+	 *            The pattern to check.
+	 * @return True if the pattern has potential, false otherwise.
+	 */
 	public static boolean isPatternDead(Pattern pat) {
 		if (pat.getClass().equals(ContOpenPattern.class)
 				|| pat.getClass().equals(ContClosedPattern.class)) {
@@ -608,6 +738,16 @@ public class Board {
 		return loc.getYPos() - loc.getXPos() + width - 1;
 	}
 
+	/**
+	 * Get a list of stones blocking the given closed pattern.
+	 *
+	 * @param locations
+	 *            The BoardLocations forming the pattern.
+	 * @param type
+	 *            The type of the pattern. Whether it is on a row/ column/
+	 *            upper-right diagonal/ upper-left diagonal.
+	 * @return A list of all blocking stones of the other party.
+	 */
 	public ArrayList<BoardLocation> getBlockedStones(
 			ArrayList<BoardLocation> locations, int type) {
 		boolean first = this.getGridVal(locations.get(0)) == 1;
@@ -638,8 +778,10 @@ public class Board {
 		for (int i = 0; i < locations.size(); i++) {
 			int xPos = locations.get(i).getXPos();
 			int yPos = locations.get(i).getYPos();
-			BoardLocation candidate1 = new BoardLocation(yPos + firstIncrement, xPos + secondIncrement);
-			BoardLocation candidate2 = new BoardLocation(yPos - firstIncrement, xPos - secondIncrement);
+			BoardLocation candidate1 = new BoardLocation(yPos + firstIncrement,
+					xPos + secondIncrement);
+			BoardLocation candidate2 = new BoardLocation(yPos - firstIncrement,
+					xPos - secondIncrement);
 			if (Board.isReachable(candidate1)) {
 				if (first) {
 					if (this.getGridVal(candidate1) == 2)
@@ -663,6 +805,12 @@ public class Board {
 		return retLocs;
 	}
 
+	/**
+	 * Checks if the first player fouled. The first player fouled if and only if
+	 * it has more than five stones in a row.
+	 *
+	 * @return True if the first player fouls and false otherwise.
+	 */
 	public boolean checkFoul() {
 		int consectCount = 0;
 		int prev = EMPTY_SPOT;

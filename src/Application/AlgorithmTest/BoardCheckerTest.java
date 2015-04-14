@@ -8,6 +8,8 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
+import Algorithm.Algorithm;
+import Algorithm.BoardChecker;
 import Algorithm.Pattern;
 import Exceptions.InvalidIndexException;
 import Model.Board;
@@ -64,53 +66,57 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(4, 8), true);
 		board.updateBoard(new BoardLocation(4, 3), false);
 		assertEquals(
-				Algorithm.BoardChecker.checkClosedPatDisc(
-						board.getRowByIndex(4), 4, Pattern.ON_ROW, true, 4,
-						board).size(), 1);
+				BoardChecker.checkClosedPatDisc(board.getRowByIndex(4), 4,
+						Pattern.ON_ROW, true, 4, board).size(), 1);
 		board.reset();
 		assertTrue(board.isEmpty());
 		for (int i = 0; i < 4; i++) {
 			board.updateBoard(new BoardLocation(4 + i, 5 + i), false);
 		}
-		assertEquals(
-				Algorithm.BoardChecker.checkBoardClosedPatDisc(board, false, 4)
-						.size(), 0);
+		assertEquals(BoardChecker.checkBoardClosedPatDisc(board, false, 4)
+				.size(), 0);
 		board.withdrawMove(new BoardLocation(4, 5));
 		board.updateBoard(new BoardLocation(8, 9), true);
 		board.updateBoard(new BoardLocation(3, 4), false);
-		assertEquals(
-				Algorithm.BoardChecker.checkBoardClosedPatDisc(board, false, 4)
-						.size(), 1);
+		assertEquals(BoardChecker.checkBoardClosedPatDisc(board, false, 4)
+				.size(), 1);
 	}
 
 	@Test
 	public void testCheckContClosedPattern() throws InvalidIndexException {
-		board.updateBoard(new BoardLocation(4,4), true);
-		board.updateBoard(new BoardLocation(5,5), true);
-		board.updateBoard(new BoardLocation(6,6), true);
-		board.updateBoard(new BoardLocation(7,7), true);
-		board.updateBoard(new BoardLocation(8,8), false);
-		assertEquals(Algorithm.BoardChecker.checkBoardClosedPatCont(board, true, 4).size(), 1);
+		board.updateBoard(new BoardLocation(4, 4), true);
+		board.updateBoard(new BoardLocation(5, 5), true);
+		board.updateBoard(new BoardLocation(6, 6), true);
+		board.updateBoard(new BoardLocation(7, 7), true);
+		board.updateBoard(new BoardLocation(8, 8), false);
+		assertEquals(BoardChecker.checkBoardClosedPatCont(board, true, 4)
+				.size(), 1);
 	}
 
 	@Test
 	public void testCheckAllPatterns() throws InvalidIndexException {
-		board.updateBoard(new BoardLocation(5,3), false);
-		board.updateBoard(new BoardLocation(4,4), false);
-		board.updateBoard(new BoardLocation(5,5), false);
-		board.updateBoard(new BoardLocation(6,6), false);
-		board.updateBoard(new BoardLocation(7,7), false);
-		board.updateBoard(new BoardLocation(8,8), true);
-		board.updateBoard(new BoardLocation(6,2), false);
-		board.updateBoard(new BoardLocation(4,5), false);
-		board.updateBoard(new BoardLocation(4,6), false);
-		board.updateBoard(new BoardLocation(4,7), false);
-		board.updateBoard(new BoardLocation(4,8), true);
+		board.updateBoard(new BoardLocation(5, 3), false);
+		board.updateBoard(new BoardLocation(4, 4), false);
+		board.updateBoard(new BoardLocation(5, 5), false);
+		board.updateBoard(new BoardLocation(6, 6), false);
+		board.updateBoard(new BoardLocation(7, 7), false);
+		board.updateBoard(new BoardLocation(8, 8), true);
+		board.updateBoard(new BoardLocation(6, 2), false);
+		board.updateBoard(new BoardLocation(4, 5), false);
+		board.updateBoard(new BoardLocation(4, 6), false);
+		board.updateBoard(new BoardLocation(4, 7), false);
+		board.updateBoard(new BoardLocation(4, 8), true);
 		board.updateBoard(new BoardLocation(5, 8), true);
 		board.updateBoard(new BoardLocation(6, 8), true);
 
 		board.renderBoard(Board.FANCY_MODE);
-		ArrayList<Pattern> pts = Algorithm.BoardChecker.checkAllPattern(board, false);
-		assertEquals(Algorithm.BoardChecker.checkAllPattern(board, false).size(), 3);
+		ArrayList<Pattern> pts = BoardChecker.checkAllPattern(board, false);
+		assertEquals(BoardChecker.checkAllPattern(board, false).size(), 3);
+	}
+
+	@Test
+	public void testMakePatterns() {
+		BoardLocation testLocation = new BoardLocation(1,2);
+		Pattern newPat = BoardChecker.makeContiguousPattern(testLocation, 0, 0, false, board);
 	}
 }

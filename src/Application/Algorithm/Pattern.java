@@ -6,19 +6,38 @@ import Model.Board;
 import Model.BoardLocation;
 
 /**
- * Defines a single pattern on the board.
- * Example: an open three or a closed four
+ * Defines a single pattern on the board. Example: an open three or a closed
+ * four
+ *
  * @author Minghao Liu
  *
  */
 public abstract class Pattern {
+	/**
+	 * List of stones forming the pattern.
+	 */
 	private ArrayList<BoardLocation> constituent;
+	/**
+	 * List of BoardLocations that can block the pattern and are unoccupied.
+	 */
 	private ArrayList<BoardLocation> blockingLocs;
 	private int type;
 
+	/**
+	 * The pattern is on a row.
+	 */
 	public static final int ON_ROW = 1;
+	/**
+	 * The pattern is on a column.
+	 */
 	public static final int ON_COL = 2;
+	/**
+	 * The pattern is on an upper-left diagonal.
+	 */
 	public static final int ON_ULDIAG = 3;
+	/**
+	 * The pattern is on an upper-right diagonal.
+	 */
 	public static final int ON_URDIAG = 4;
 
 	public Pattern(ArrayList<BoardLocation> locations, int type) {
@@ -42,6 +61,15 @@ public abstract class Pattern {
 		return this.constituent;
 	}
 
+	/**
+	 * Check if the two patterns are intersecting (i.e. shares the same board
+	 * locations)
+	 *
+	 * @param pat
+	 *            The pattern to be compared with the first pattern which is the
+	 *            object the method is operating on.
+	 * @return True if the two patterns intersect and false otherwise.
+	 */
 	public boolean isIntersecting(Pattern pat) {
 		if (pat.getNumLocs() == 0)
 			return false;
@@ -52,6 +80,12 @@ public abstract class Pattern {
 		return false;
 	}
 
+	/**
+	 * Check if the two patterns are different
+	 *
+	 * @param pat
+	 * @return True if the tow are different, false otherwise.
+	 */
 	public boolean isDifferent(Pattern pat) {
 		for (BoardLocation loc1 : pat.getLocations())
 			for (BoardLocation loc2 : this.constituent)
@@ -60,6 +94,16 @@ public abstract class Pattern {
 		return false;
 	}
 
+	/**
+	 * Finds the index where there is a bubble (i.e. an empty spot) inside a
+	 * discrete pattern.
+	 *
+	 * @param locs
+	 *            BoardLocations forming the pattern.
+	 * @param type
+	 *            Type of the pattern.
+	 * @return Index of the empty spot.
+	 */
 	public static int findBubbleIndex(ArrayList<BoardLocation> locs, int type) {
 		BoardLocation prev = null;
 		switch (type) {
@@ -74,7 +118,6 @@ public abstract class Pattern {
 		}
 		return -1;
 	}
-
 
 	@Override
 	public int hashCode() {

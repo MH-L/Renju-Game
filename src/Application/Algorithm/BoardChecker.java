@@ -23,7 +23,7 @@ public class BoardChecker {
 	 *            The board where patterns are on.
 	 * @param first
 	 *            Specifies if it is the first player.
-	 * @return An ArrayList of all patterns on board.
+	 * @return An ArrayList of all patterns found on board.
 	 */
 	public static ArrayList<Pattern> checkAllPattern(Board board, boolean first) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
@@ -44,6 +44,17 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	/**
+	 * Checks for all discrete closed patterns on board.
+	 *
+	 * @param board
+	 *            the board where the patterns are on
+	 * @param first
+	 *            whether the patterns belong to the first player
+	 * @param numLocs
+	 *            the number of stones forming the pattern
+	 * @return an ArrayList of all patterns found on board.
+	 */
 	public static ArrayList<Pattern> checkBoardClosedPatDisc(Board board,
 			boolean first, int numLocs) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
@@ -73,6 +84,17 @@ public class BoardChecker {
 		return patterns;
 	}
 
+	/**
+	 * Checks for all contiguous closed patterns on board.
+	 *
+	 * @param board
+	 *            the board where the patterns are on.
+	 * @param first
+	 *            whether the patterns belong to the first player
+	 * @param numLocs
+	 *            the number of stones in the pattern
+	 * @return an ArrayList of all closed contiguous patterns found on board.
+	 */
 	public static ArrayList<Pattern> checkBoardClosedPatCont(Board board,
 			boolean first, int numLocs) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
@@ -253,6 +275,27 @@ public class BoardChecker {
 		return patterns;
 	}
 
+	/**
+	 * Makes a discrete pattern with the given first stone and the type.
+	 *
+	 * @param firstStone
+	 *            The first BoardLocation of the pattern
+	 * @param type
+	 *            Indicates whether the pattern is on row/ on column/ on
+	 *            upper-left diagonal/ on upper-right diagonal
+	 * @param bubbleIndex
+	 *            The place where there is an empty spot. E.g. if the empty spot
+	 *            is after the first stone then bubbleIndex is 1.
+	 * @param num
+	 *            Number of stones forming the pattern
+	 * @param isClosed
+	 *            Whether or not the pattern is closed. (i.e. there is a stone
+	 *            of the other party blocking the pattern)
+	 * @param board
+	 *            The board where the patterns are on.
+	 * @return A discrete pattern with the given stone as its first board
+	 *         location and the given type as its type.
+	 */
 	private static Pattern makeDiscPattern(BoardLocation firstStone, int type,
 			int bubbleIndex, int num, boolean isClosed, Board board) {
 		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
@@ -303,6 +346,23 @@ public class BoardChecker {
 
 	}
 
+	/**
+	 * Checks all closed contiguous patterns in a given array.
+	 *
+	 * @param array
+	 *            the array which the patterns are on
+	 * @param arrayIndex
+	 *            the index of the array on board
+	 * @param type
+	 *            the type of the array (row/col/ul-diag/ur-diag)
+	 * @param first
+	 *            whether this is the first player's pattern
+	 * @param num
+	 *            number of stones the pattern has
+	 * @param board
+	 *            the board where the patterns are on
+	 * @return
+	 */
 	public static ArrayList<Pattern> checkClosedPatCont(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
@@ -377,6 +437,23 @@ public class BoardChecker {
 		return patterns;
 	}
 
+	/**
+	 * The method checks discrete closed patterns.
+	 *
+	 * @param array
+	 *            the array where the patterns are on
+	 * @param arrayIndex
+	 *            the index of the given array on board
+	 * @param type
+	 *            there are four types: on row/column/ul-diag/ur-diag
+	 * @param first
+	 *            whether the patterns belong to the first player
+	 * @param num
+	 *            number of stones the pattern consists of
+	 * @param board
+	 *            the board where the patterns are on
+	 * @return all discrete closed patterns in the given array
+	 */
 	public static ArrayList<Pattern> checkClosedPatDisc(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		if (num < 4) {
@@ -480,6 +557,12 @@ public class BoardChecker {
 	 *            the index of the row/col on board
 	 * @param isRow
 	 *            indicates whether the candidate is a row
+	 * @param first
+	 *            indicates whether this is the first player's stone
+	 * @param num
+	 *            the number of stones in the pattern
+	 * @param board
+	 *            the board where the patterns are on
 	 * @return arraylist of patterns found on that line/column
 	 */
 	public static ArrayList<Pattern> checkOpenPatCont(int[] array,
@@ -586,6 +669,25 @@ public class BoardChecker {
 		return patterns;
 	}
 
+	/**
+	 *
+	 * @param firstStone
+	 *            the first stone of the pattern's constituent. The first stone
+	 *            is always the stone with the smallest y-coordinate on board.
+	 *            If all the y-coordinates are the same (i.e. the pattern is on
+	 *            a row), then it has the smallest x-coordinate.
+	 * @param type
+	 *            there are four types: on row/column/upper-right
+	 *            diagonal/upper-left diagonal
+	 * @param num
+	 *            the number of stones in this pattern
+	 * @param isClosed
+	 *            indicates whether there is one stone blocking this pattern
+	 * @param board
+	 *            the board where the patterns are on
+	 * @return The contiguous pattern with the first location and its type
+	 *         given.
+	 */
 	public static Pattern makeContiguousPattern(BoardLocation firstStone,
 			int type, int num, boolean isClosed, Board board) {
 		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
