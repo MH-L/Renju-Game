@@ -82,6 +82,8 @@ public class BoardCheckerTest {
 		board.renderBoard(2);
 		assertEquals(BoardChecker.checkBoardClosedPatDisc(board, false, 5)
 				.size(), 0);
+		Pattern pat = BoardChecker.checkBoardClosedPatDisc(board, false, 4).get(0);
+		assertEquals(pat.getLocations().get(0), new BoardLocation(3,4));
 	}
 
 	@Test

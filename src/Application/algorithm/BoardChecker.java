@@ -244,6 +244,10 @@ public class BoardChecker {
 						patterns.add(candidate);
 					} else if (array[i + numLocs + 1] == Board.EMPTY_SPOT) {
 						int bubbleIndex = temp.indexOf(Board.EMPTY_SPOT);
+						for (int j = 0; j < temp.size(); j++) {
+							if (temp.get(j) == Board.EMPTY_SPOT)
+								bubbleIndex = j;
+						}
 						BoardLocation firstStone;
 						switch (type) {
 						case Pattern.ON_ROW:
@@ -340,9 +344,9 @@ public class BoardChecker {
 		if (isClosed) {
 			ArrayList<BoardLocation> stones = board.getBlockedStones(locations,
 					type);
-			return new DiscClosedPattern(locations, type, stones);
+			return new DiscClosedPattern(locations, type, stones, bubbleIndex);
 		} else
-			return new DiscOpenPattern(locations, type);
+			return new DiscOpenPattern(locations, type, bubbleIndex);
 
 	}
 
@@ -495,20 +499,18 @@ public class BoardChecker {
 						if (temp.get(0) == blocker) {
 							switch (type) {
 							case Pattern.ON_ROW:
-								firstStone = new BoardLocation(arrayIndex,
-										i + 1);
+								firstStone = new BoardLocation(arrayIndex, i);
 								break;
 							case Pattern.ON_COL:
-								firstStone = new BoardLocation(i + 1,
-										arrayIndex);
+								firstStone = new BoardLocation(i, arrayIndex);
 								break;
 							case Pattern.ON_ULDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i + 1, true);
+										i, true);
 								break;
 							case Pattern.ON_URDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i + 1, false);
+										i, false);
 								break;
 							default:
 								firstStone = Board.getInvalidBoardLocation();
@@ -517,20 +519,18 @@ public class BoardChecker {
 						} else {
 							switch (type) {
 							case Pattern.ON_ROW:
-								firstStone = new BoardLocation(arrayIndex,
-										i + 1);
+								firstStone = new BoardLocation(arrayIndex, i);
 								break;
 							case Pattern.ON_COL:
-								firstStone = new BoardLocation(i + 1,
-										arrayIndex);
+								firstStone = new BoardLocation(i, arrayIndex);
 								break;
 							case Pattern.ON_ULDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i + 1, true);
+										i, true);
 								break;
 							case Pattern.ON_URDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i + 1, false);
+										i, false);
 								break;
 							default:
 								firstStone = Board.getInvalidBoardLocation();

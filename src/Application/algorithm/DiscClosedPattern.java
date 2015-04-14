@@ -8,9 +8,9 @@ public class DiscClosedPattern extends ClosedPattern {
 	private int bubbleIndex;
 
 	public DiscClosedPattern(ArrayList<BoardLocation> locations, int type,
-			ArrayList<BoardLocation> blockedStones) {
+			ArrayList<BoardLocation> blockedStones, int bubbleIndex) {
 		super(locations, type, blockedStones);
-		this.bubbleIndex = Pattern.findBubbleIndex(locations, type);
+		this.bubbleIndex = bubbleIndex;
 	}
 
 }

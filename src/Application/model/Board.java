@@ -773,14 +773,19 @@ public class Board {
 				}
 			} else {
 				// TODO pattern is not open. need to do this part.
-				BoardLocation firstStone;
+				BoardLocation firstStone = pat.getLocations().get(0);
 				switch (pat.getType()) {
 				case Pattern.ON_ROW:
+					int rowSubIndex = firstStone.getXPos();
+					if (pat.getLocations().size() == 4 && rowSubIndex == 0)
+						return true;
+					else if (pat.getLocations().size() == 4
+							&& rowSubIndex == width - 4)
+						return true;
 					break;
 				case Pattern.ON_COL:
 					break;
 				case Pattern.ON_ULDIAG:
-					firstStone = pat.getLocations().get(0);
 					int ULDiagIndex = getULDiagIndex(firstStone);
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
 					if (ULDiag.length <= 5)
@@ -794,7 +799,6 @@ public class Board {
 						return true;
 					break;
 				case Pattern.ON_URDIAG:
-					firstStone = pat.getLocations().get(0);
 					int URDiagIndex = getURDiagIndex(firstStone);
 					int[] URDiag = getURDiagByIndex(URDiagIndex);
 					if (URDiag.length <= 5)
@@ -812,11 +816,24 @@ public class Board {
 				}
 			}
 		} else {
-			// TODO Pattern is not contiguous.
-			if (pat.getClass().equals(algorithm.DiscOpenPattern.class))
+			if (pat.getClass().equals(algorithm.DiscOpenPattern.class)) {
+				BoardLocation firstStone = pat.getLocations().get(0);
+				if (pat.getType() == Pattern.ON_ULDIAG) {
+					int ULDiagIndex = getULDiagIndex(firstStone);
+					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
+					if (ULDiag.length < 5)
+						return true;
+				} else if (pat.getType() == Pattern.ON_URDIAG) {
+					int URDiagIndex = getURDiagIndex(firstStone);
+					int[] URDiag = getURDiagByIndex(URDiagIndex);
+					if (URDiag.length < 5)
+						return true;
+				}
 				return false;
+			} else if (pat.getClass().equals(algorithm.DiscClosedPattern.class)) {
+				return false;
+			}
 		}
-
 		return false;
 	}
 
@@ -1001,5 +1018,28 @@ public class Board {
 			consectCount = 0;
 		}
 		return false;
+	}
+
+	public static boolean isMiddleLocation(BoardLocation loc) {
+		if (loc == null || !Board.isReachable(loc))
+			return false;
+		int x_coord = loc.getXPos();
+		int y_coord = loc.getYPos();
+		return !(x_coord < 3 || x_coord > width - 4 || y_coord < 3 || y_coord > width - 4);
+	}
+
+	public static boolean isInCorner(BoardLocation loc) {
+		if (loc == null || !Board.isReachable(loc))
+			return false;
+		return (loc.getXPos() == 0 || loc.getXPos() == width - 1)
+				&& (loc.getYPos() == 0 || loc.getYPos() == height - 1);
+	}
+
+	public static boolean isOnSide(BoardLocation loc) {
+		if (loc == null || !Board.isReachable(loc))
+			return false;
+		return !isInCorner(loc)
+				&& (loc.getXPos() == 0 || loc.getXPos() == width - 1
+						|| loc.getYPos() == 0 || loc.getYPos() == height - 1);
 	}
 }

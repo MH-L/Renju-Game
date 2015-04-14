@@ -115,6 +115,20 @@ public abstract class Pattern {
 				}
 				prev = locs.get(i);
 			}
+			break;
+		case Pattern.ON_COL:
+		case Pattern.ON_ULDIAG:
+		case Pattern.ON_URDIAG:
+			for (int i = 0; i < locs.size(); i++) {
+				if (prev != null) {
+					if (locs.get(i).getYPos() - prev.getYPos() > 1)
+						return i;
+				}
+				prev = locs.get(i);
+			}
+			break;
+		default:
+			break;
 		}
 		return -1;
 	}
