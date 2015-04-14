@@ -25,7 +25,7 @@ public class BoardChecker {
 	 *            Specifies if it is the first player.
 	 * @return An ArrayList of all patterns found on board.
 	 */
-	public static ArrayList<Pattern> checkAllPattern(Board board, boolean first) {
+	public static ArrayList<Pattern> checkAllPatterns(Board board, boolean first) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
 		retVal.addAll(checkBoardOpenPatCont(board, first, 3));
 		retVal.addAll(checkBoardOpenPatCont(board, first, 4));
@@ -296,7 +296,7 @@ public class BoardChecker {
 	 * @return A discrete pattern with the given stone as its first board
 	 *         location and the given type as its type.
 	 */
-	private static Pattern makeDiscPattern(BoardLocation firstStone, int type,
+	public static Pattern makeDiscPattern(BoardLocation firstStone, int type,
 			int bubbleIndex, int num, boolean isClosed, Board board) {
 		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
 		int startXCoord = firstStone.getXPos();
@@ -322,7 +322,7 @@ public class BoardChecker {
 			for (int i = 0; i <= num; i++) {
 				if (i != bubbleIndex) {
 					locations.add(new BoardLocation(startYCoord + i,
-							startXCoord - i));
+							startXCoord + i));
 				}
 			}
 			break;
@@ -330,7 +330,7 @@ public class BoardChecker {
 			for (int i = 0; i <= num; i++) {
 				if (i != bubbleIndex) {
 					locations.add(new BoardLocation(startYCoord + i,
-							startXCoord + i));
+							startXCoord - i));
 				}
 			}
 			break;
@@ -488,7 +488,8 @@ public class BoardChecker {
 				if (temp.get(0) == blocker || temp.get(num + 1) == blocker) {
 					int diff = temp.indexOf(blocker)
 							- temp.indexOf(Board.EMPTY_SPOT);
-					if (Math.abs(diff) != 1) {
+					if (Math.abs(diff) != 1 && temp.get(0) != Board.EMPTY_SPOT
+							&& temp.get(num + 1) != Board.EMPTY_SPOT) {
 						BoardLocation firstStone;
 						// add that pattern to the outcome
 						if (temp.get(0) == blocker) {

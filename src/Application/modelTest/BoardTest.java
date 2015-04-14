@@ -143,8 +143,6 @@ public class BoardTest {
 		assertFalse(bd.checkcol());
 		assertFalse(bd.checkrow());
 		bd.withdrawMove(new BoardLocation(8,10));
-		System.out.println(bd.getPlayer1Stone().size());
-		System.out.println(bd.getPlayer2Stone().size());
 		assertEquals(bd.getTotalStones(), 4);
 		assertFalse(bd.checkdiag());
 		assertTrue(bd.updateBoard(new BoardLocation(8,10), false));
@@ -163,5 +161,15 @@ public class BoardTest {
 		bd.reset();
 		assertTrue(bd.isEmpty());
 		assertEquals(bd.getTotalStones(), 0);
+	}
+
+	@Test
+	public void testConvertDiagToXY() {
+		BoardLocation result = Board.convertDiagToXY(14, 3, true);
+		assertEquals(3, result.getYPos());
+		assertEquals(4, result.getXPos());
+		result = Board.convertDiagToXY(14, 3, false);
+		assertEquals(3, result.getYPos());
+		assertEquals(11, result.getXPos());
 	}
 }
