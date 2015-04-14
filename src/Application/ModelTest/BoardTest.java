@@ -77,8 +77,6 @@ public class BoardTest {
 		assertEquals(bd.getGrids()[1][0], 1);
 		assertEquals(bd.getGridVal(new BoardLocation(0,0)), 2);
 		assertEquals(bd.getGridVal(new BoardLocation(1,0)), 1);
-		assertEquals(bd.getLocations().get(0).get(0).getValue(), 2);
-		assertEquals(bd.getLocations().get(1).get(0).getValue(), 1);
 		assertFalse(bd.updateBoard(player, false));
 		assertEquals(bd.getGrids()[1][0], 1);
 		assertEquals(bd.getULDiags().get(15)[0], 2);

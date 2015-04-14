@@ -21,7 +21,6 @@ public class Board {
 	private ArrayList<int[]> columns;
 	private ArrayList<int[]> diagonals_Uleft;
 	private ArrayList<int[]> diagonals_Uright;
-	private ArrayList<ArrayList<BoardLocation>> locations;
 	/**
 	 * This is the width of the board. It is always 16.
 	 */
@@ -59,7 +58,6 @@ public class Board {
 		this.columns = initCols();
 		this.diagonals_Uleft = initDiags();
 		this.diagonals_Uright = initDiags();
-		this.locations = initLocs();
 		this.player1Stone = new ArrayList<BoardLocation>();
 		this.player2Stone = new ArrayList<BoardLocation>();
 	}
@@ -91,10 +89,6 @@ public class Board {
 
 	public int[][] getGrids() {
 		return this.basicGrid;
-	}
-
-	public ArrayList<ArrayList<BoardLocation>> getLocations() {
-		return this.locations;
 	}
 
 	public int[] getColumnByIndex(int index) {
@@ -294,6 +288,12 @@ public class Board {
 		return false;
 	}
 
+	public boolean isOccupied(BoardLocation loc) {
+		int row = loc.getYPos();
+		int col = loc.getXPos();
+		return this.basicGrid[row][col] != 0;
+	}
+
 	/**
 	 * The function updates the board given the location and the player.
 	 *
@@ -312,8 +312,8 @@ public class Board {
 					"The location indexes is out of bound!");
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
-		if (locations.get(row_num).get(col_num).occupied())
-			throw new InvalidIndexException("The location is already occupied!");
+		if (this.isOccupied(loc))
+			return false;
 		int marker;
 		if (first)
 			marker = FIRST_PLAYER;
@@ -321,7 +321,6 @@ public class Board {
 			marker = SECOND_PLAYER;
 
 		this.basicGrid[row_num][col_num] = marker;
-		this.locations.get(row_num).get(col_num).setValue(marker);
 		this.getColumns().get(col_num)[row_num] = marker;
 		this.getRows().get(row_num)[col_num] = marker;
 		int indexURDiag = getULDiagIndex(loc);
@@ -452,7 +451,6 @@ public class Board {
 		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
 		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
 		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
-		this.locations.get(y_coord).get(x_coord).setValue(EMPTY_SPOT);
 		if (this.player1Stone.size() > this.player2Stone.size())
 			this.player1Stone.remove(lastMove);
 		else

@@ -306,6 +306,8 @@ public class BoardChecker {
 	public static ArrayList<Pattern> checkClosedPatCont(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		if (array.length < num + 1)
+			return patterns;
 		int prev = Board.EMPTY_SPOT;
 		int count = 0;
 		int checker;
@@ -386,6 +388,8 @@ public class BoardChecker {
 			}
 		}
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		if (array.length < num + 2)
+			return patterns;
 		int checker;
 		int blocker;
 		if (first) {
@@ -396,7 +400,7 @@ public class BoardChecker {
 			blocker = Board.FIRST_PLAYER;
 		}
 		ArrayList<Integer> temp = new ArrayList<Integer>();
-		for (int i = 0; i < array.length; i++) {
+		for (int i = 0; i < array.length - num - 1; i++) {
 			for (int j = 0; j <= num + 1; j++) {
 				temp.add(array[i + j]);
 			}
@@ -460,8 +464,8 @@ public class BoardChecker {
 								board));
 					}
 				}
-				temp.clear();
 			}
+			temp.clear();
 		}
 		return patterns;
 	}
@@ -481,6 +485,8 @@ public class BoardChecker {
 	public static ArrayList<Pattern> checkOpenPatCont(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+		if (array.length < num)
+			return patterns;
 		int checker;
 		if (first)
 			checker = Board.FIRST_PLAYER;

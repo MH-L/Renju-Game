@@ -2,6 +2,7 @@ package Model;
 
 public class BoardLocation {
 	private int x_pos;
+	private int y_pos;
 
 	@Override
 	public int hashCode() {
@@ -28,11 +29,6 @@ public class BoardLocation {
 		return true;
 	}
 
-	private int y_pos;
-	/**
-	 * Indicates which party's chess is placed in the location.
-	 */
-	private int value;
 	/**
 	 * Important Notice: The y-coor and the x-coor is flipped,
 	 * different from convention!
@@ -50,18 +46,6 @@ public class BoardLocation {
 
 	public int getYPos() {
 		return y_pos;
-	}
-
-	public boolean occupied() {
-		return this.value != 0;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
-	}
-
-	public int getValue() {
-		return this.value;
 	}
 
 	public boolean compare(BoardLocation loc) {
