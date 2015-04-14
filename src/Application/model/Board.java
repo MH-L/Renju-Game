@@ -684,6 +684,10 @@ public class Board {
 
 	// TODO make a static method to determine if a pattern is dead
 	// i.e. if there is no chance to win
+	// Uhhhhhhh... must first know the logic...
+	// the logic is not that obvious though
+	// Finished the first part.... that is sooo good.
+	// But testing is still needed lol...
 	/**
 	 * Determines whether the pattern has potential to form five in a row.
 	 * Special case if the pattern belongs to the first player, then more than
@@ -693,13 +697,61 @@ public class Board {
 	 *            The pattern to check.
 	 * @return True if the pattern has potential, false otherwise.
 	 */
-	public static boolean isPatternDead(Pattern pat) {
+	public boolean isPatternDead(Pattern pat, boolean first) {
+		int blocker;
+		if (first)
+			blocker = Board.SECOND_PLAYER;
+		else
+			blocker = Board.FIRST_PLAYER;
 		if (pat.getClass().equals(ContOpenPattern.class)
 				|| pat.getClass().equals(ContClosedPattern.class)) {
 			if (pat.getClass().equals(ContOpenPattern.class)) {
 				if (pat.getLocations().size() == 3) {
-					// this is a special case since three can be already dead
-					// even if open
+					if (pat.getType() == Pattern.ON_ULDIAG) {
+						int ULIndex = getULDiagIndex(pat.getLocations().get(0));
+						int[] curULDiag = getULDiagByIndex(ULIndex);
+						if (ULIndex < 4 || ULIndex > diag - 4)
+							return true;
+						else if (getULDiagSubIndex(pat.getLocations().get(0)) == 0) {
+							if (curULDiag[4] == blocker)
+								return true;
+						} else if (getULDiagSubIndex(pat.getLocations().get(0)) == curULDiag.length - 3) {
+							if (curULDiag[curULDiag.length - 5] == blocker)
+								return true;
+						}
+					} else if (pat.getType() == Pattern.ON_URDIAG) {
+						int URIndex = getURDiagIndex(pat.getLocations().get(0));
+						int[] curURDiag = getURDiagByIndex(URIndex);
+						if (URIndex < 4 || URIndex > diag - 4)
+							return true;
+						else if (getURDiagSubIndex(pat.getLocations().get(0)) == 0) {
+							if (curURDiag[4] == blocker)
+								return true;
+						} else if (getURDiagSubIndex(pat.getLocations().get(0)) == curURDiag.length - 3) {
+							if (curURDiag[curURDiag.length - 5] == blocker)
+								return true;
+						}
+					} else if (pat.getType() == Pattern.ON_ROW) {
+						int[] curRow = this.getRowByIndex(pat.getLocations()
+								.get(0).getYPos());
+						if (pat.getLocations().get(0).getXPos() == 0) {
+							if (curRow[4] == blocker)
+								return true;
+						} else if (pat.getLocations().get(0).getXPos() == width - 3) {
+							if (curRow[width - 5] == blocker)
+								return true;
+						}
+					} else if (pat.getType() == Pattern.ON_COL) {
+						int[] curCol = this.getColumnByIndex(pat.getLocations()
+								.get(0).getXPos());
+						if (pat.getLocations().get(0).getYPos() == 0) {
+							if (curCol[4] == blocker)
+								return true;
+						} else if (pat.getLocations().get(0).getYPos() == height - 3) {
+							if (curCol[height - 5] == blocker)
+								return true;
+						}
+					}
 				} else if (pat.getLocations().size() == 4) {
 					if (pat.getType() == Pattern.ON_ULDIAG) {
 						int diagIndex = getULDiagIndex(pat.getLocations()
@@ -721,10 +773,48 @@ public class Board {
 				}
 			} else {
 				// TODO pattern is not open. need to do this part.
-
+				BoardLocation firstStone;
+				switch (pat.getType()) {
+				case Pattern.ON_ROW:
+					break;
+				case Pattern.ON_COL:
+					break;
+				case Pattern.ON_ULDIAG:
+					firstStone = pat.getLocations().get(0);
+					int ULDiagIndex = getULDiagIndex(firstStone);
+					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
+					if (ULDiag.length <= 5)
+						return true;
+					else if (getULDiagSubIndex(firstStone) == 0) {
+						// the pattern is cornered.
+						if (pat.getLocations().size() == 4)
+							return true;
+					} else if (getULDiagSubIndex(firstStone) == ULDiag.length - 4
+							&& pat.getLocations().size() == 4)
+						return true;
+					break;
+				case Pattern.ON_URDIAG:
+					firstStone = pat.getLocations().get(0);
+					int URDiagIndex = getURDiagIndex(firstStone);
+					int[] URDiag = getURDiagByIndex(URDiagIndex);
+					if (URDiag.length <= 5)
+						return true;
+					else if (getURDiagSubIndex(firstStone) == 0) {
+						// the pattern is cornered.
+						if (pat.getLocations().size() == 4)
+							return true;
+					} else if (getURDiagSubIndex(firstStone) == URDiag.length - 4
+							&& pat.getLocations().size() == 4)
+						return true;
+					break;
+				default:
+					break;
+				}
 			}
 		} else {
-			// TODO pattern is discontinuous. need to do this part.
+			// TODO Pattern is not contiguous.
+			if (pat.getClass().equals(algorithm.DiscOpenPattern.class))
+				return false;
 		}
 
 		return false;
@@ -736,6 +826,22 @@ public class Board {
 
 	public static int getURDiagIndex(BoardLocation loc) {
 		return loc.getYPos() - loc.getXPos() + width - 1;
+	}
+
+	public static int getURDiagSubIndex(BoardLocation loc) {
+		int urIndex = getURDiagIndex(loc);
+		if (urIndex >= width)
+			return width - 1 - loc.getXPos();
+		else
+			return loc.getYPos();
+	}
+
+	public static int getULDiagSubIndex(BoardLocation loc) {
+		int ulIndex = getULDiagIndex(loc);
+		if (ulIndex >= width)
+			return loc.getXPos();
+		else
+			return loc.getYPos();
 	}
 
 	/**
