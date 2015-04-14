@@ -1042,4 +1042,94 @@ public class Board {
 				&& (loc.getXPos() == 0 || loc.getXPos() == width - 1
 						|| loc.getYPos() == 0 || loc.getYPos() == height - 1);
 	}
+
+	/**
+	 * Finds the adjacent locations to a location on board.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return All adjacent locations to that location.
+	 */
+	public static ArrayList<BoardLocation> findAdjacentLocs(BoardLocation loc) {
+		if (loc == null || !Board.isReachable(loc))
+			return new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		int x_coord = loc.getXPos();
+		int y_coord = loc.getYPos();
+		if (!isInCorner(loc) && !isOnSide(loc)) {
+			retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
+			retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
+			retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
+			retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
+			retVal.add(new BoardLocation(x_coord + 1, y_coord));
+			retVal.add(new BoardLocation(x_coord - 1, y_coord));
+			retVal.add(new BoardLocation(x_coord, y_coord + 1));
+			retVal.add(new BoardLocation(x_coord, y_coord - 1));
+		} else if (isOnSide(loc)) {
+			if (x_coord == 0) {
+				retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord));
+				retVal.add(new BoardLocation(x_coord, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord, y_coord - 1));
+			} else if (y_coord == 0) {
+				retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord));
+			} else if (x_coord == width - 1) {
+				retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
+				retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				retVal.add(new BoardLocation(x_coord, y_coord + 1));
+				retVal.add(new BoardLocation(x_coord, y_coord - 1));
+			} else {
+				retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
+				retVal.add(new BoardLocation(x_coord, y_coord - 1));
+				retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				retVal.add(new BoardLocation(x_coord + 1, y_coord));
+			}
+		} else if (isInCorner(loc)) {
+			if (x_coord == 0) {
+				if (y_coord == 0) {
+					retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
+					retVal.add(new BoardLocation(x_coord, y_coord + 1));
+					retVal.add(new BoardLocation(x_coord + 1, y_coord));
+				} else {
+					retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
+					retVal.add(new BoardLocation(x_coord, y_coord - 1));
+					retVal.add(new BoardLocation(x_coord + 1, y_coord));
+				}
+			} else {
+				if (y_coord == 0) {
+					retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
+					retVal.add(new BoardLocation(x_coord, y_coord + 1));
+					retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				} else {
+					retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
+					retVal.add(new BoardLocation(x_coord, y_coord - 1));
+					retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				}
+			}
+		}
+		return retVal;
+	}
+
+	public static int findTotalDistToSides(BoardLocation loc) {
+		if (loc == null || !Board.isReachable(loc))
+			return -1;
+		int x_coord = loc.getXPos();
+		int y_coord = loc.getYPos();
+		int x_dist = Math.min(x_coord, width - 1 - x_coord);
+		int y_dist = Math.min(y_coord, height - 1 - y_coord);
+		return x_dist + y_dist;
+	}
+
+	public static int findDistance(BoardLocation loc1, BoardLocation loc2) {
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+			return -1;
+		return Math.abs(loc1.getXPos() - loc2.getXPos()) + Math.abs(loc1.getYPos() - loc2.getYPos());
+	}
 }

@@ -19,16 +19,21 @@ public abstract class Algorithm {
 	}
 
 	public abstract ArrayList<BoardLocation> findLocation();
+
 	public abstract BoardLocation findBestLocation();
+
 	public BoardLocation makeFirstMoveFirst() {
 		if (Board.getWidth() % 2 == 0) {
 			ArrayList<BoardLocation> candidateLocations = new ArrayList<BoardLocation>();
 			int height = Board.getHeight();
 			int width = Board.getWidth();
 			candidateLocations.add(new BoardLocation(height / 2, width / 2));
-			candidateLocations.add(new BoardLocation(height / 2 - 1, width / 2 - 1));
-			candidateLocations.add(new BoardLocation(height / 2 - 1, width / 2));
-			candidateLocations.add(new BoardLocation(height / 2 - 1, width / 2 - 1));
+			candidateLocations.add(new BoardLocation(height / 2 - 1,
+					width / 2 - 1));
+			candidateLocations
+					.add(new BoardLocation(height / 2 - 1, width / 2));
+			candidateLocations.add(new BoardLocation(height / 2 - 1,
+					width / 2 - 1));
 			int randSeed = getRandNum(candidateLocations.size());
 			switch (randSeed) {
 			case 0:
@@ -41,13 +46,38 @@ public abstract class Algorithm {
 				return candidateLocations.get(3);
 			}
 		} else {
-			return new BoardLocation(Board.getHeight() / 2, Board.getWidth() / 2);
+			return new BoardLocation(Board.getHeight() / 2,
+					Board.getWidth() / 2);
 		}
 		return null;
 	}
+
 	public BoardLocation makeFirstMoveSecond() {
-		assert(!board.isEmpty());
-		return null;
+		assert (!board.isEmpty());
+		BoardLocation firstStone = board.getPlayer1Stone().get(0);
+		if (Board.isInCorner(firstStone) || Board.isOnSide(firstStone))
+			return makeFirstMoveFirst();
+		int randSeed = getRandNum(2);
+		int desiredDist = 0;
+		if (randSeed == 1) {
+			desiredDist = 1;
+		} else if (randSeed == 2) {
+			desiredDist = 2;
+		}
+		ArrayList<BoardLocation> adjacents = Board.findAdjacentLocs(firstStone);
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		for (BoardLocation loc : adjacents) {
+			if (Board.findDistance(loc, firstStone) == desiredDist)
+				candidates.add(loc);
+		}
+		int maxIndex = 0;
+		for (int i = 0; i < candidates.size(); i++) {
+			if (Board.findTotalDistToSides(candidates.get(maxIndex)) > Board
+					.findTotalDistToSides(candidates.get(i)))
+				maxIndex = i;
+		}
+
+		return candidates.get(maxIndex);
 
 	}
 }
