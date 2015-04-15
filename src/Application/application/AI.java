@@ -83,6 +83,8 @@ public class AI implements IPlayer {
 		if (board.getTotalStones() < 10)
 			nextMove = solver.makeMoveBeginning();
 		// TODO
+		else
+			nextMove = board.findEmptyLocSpiral();
 		return nextMove;
 	}
 }

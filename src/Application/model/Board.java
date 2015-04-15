@@ -6,6 +6,7 @@ import exceptions.InvalidIndexException;
 import algorithm.ContClosedPattern;
 import algorithm.ContOpenPattern;
 import algorithm.Pattern;
+import application.Game;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -1128,8 +1129,79 @@ public class Board {
 	}
 
 	public static int findDistance(BoardLocation loc1, BoardLocation loc2) {
-		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1)
+				|| !Board.isReachable(loc2))
 			return -1;
-		return Math.abs(loc1.getXPos() - loc2.getXPos()) + Math.abs(loc1.getYPos() - loc2.getYPos());
+		return Math.abs(loc1.getXPos() - loc2.getXPos())
+				+ Math.abs(loc1.getYPos() - loc2.getYPos());
+	}
+
+	/**
+	 * Spiraling from inward (the center of the board), finds the first
+	 * occurrence of empty spot. Note that the checker spirals out clockwise.
+	 *
+	 * @return The first empty spot found on board.
+	 */
+	public BoardLocation findEmptyLocSpiral() {
+		if (Game.boardFull())
+			return Board.getInvalidBoardLocation();
+		BoardLocation firstLoc;
+		if (width % 2 == 0)
+			firstLoc = new BoardLocation(height / 2 - 1, width / 2 - 1);
+		else
+			firstLoc = new BoardLocation(height / 2, width / 2);
+		int firstIncX = 1;
+		int secondIncY = 1;
+		int thirdIncX = -1;
+		int fourthIncY = -1;
+		int curIncX = 1;
+		int curIncY = 0;
+		BoardLocation curLoc = firstLoc;
+		if (width % 2 == 0)
+			while (Board.isReachable(curLoc)) {
+				if (!isOccupied(curLoc))
+					return curLoc;
+				int x_coord = curLoc.getXPos();
+				int y_coord = curLoc.getYPos();
+				if (x_coord == y_coord && x_coord < width / 2) {
+					curIncX = firstIncX;
+					curIncY = 0;
+				} else if (x_coord + y_coord == width - 1 && y_coord < height / 2) {
+					curIncX = 0;
+					curIncY = 1;
+				} else if (x_coord == y_coord && x_coord >= width / 2) {
+					curIncX = -1;
+					curIncY = 0;
+				} else if (x_coord + y_coord == width - 2
+						&& y_coord >= width / 2
+						&& (x_coord != firstLoc.getXPos() || y_coord != firstLoc
+								.getYPos())) {
+					curIncX = 0;
+					curIncY = -1;
+				}
+				curLoc = new BoardLocation(y_coord + curIncY, x_coord + curIncX);
+			}
+		else
+			while (Board.isReachable(curLoc)) {
+				if (!isOccupied(curLoc))
+					return curLoc;
+				int x_coord = curLoc.getXPos();
+				int y_coord = curLoc.getYPos();
+				if (x_coord == y_coord && x_coord <= width / 2) {
+					curIncX = firstIncX;
+					curIncY = 0;
+				} else if (x_coord + y_coord == width && x_coord <= width / 2) {
+					curIncX = 0;
+					curIncY = secondIncY;
+				} else if (x_coord == y_coord && x_coord > width / 2) {
+					curIncX = thirdIncX;
+					curIncY = 0;
+				} else if (x_coord + y_coord == width - 1 && y_coord > height / 2) {
+					curIncX = 0;
+					curIncY = fourthIncY;
+				}
+				curLoc = new BoardLocation(y_coord + curIncY, x_coord + curIncX);
+			}
+		return Board.getInvalidBoardLocation();
 	}
 }

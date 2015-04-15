@@ -264,10 +264,18 @@ public class BoardTest {
 		locations.add(new BoardLocation(0, 3));
 		locations.add(new BoardLocation(1, 2));
 		locations.add(new BoardLocation(2, 1));
-		bd.updateBoard(new BoardLocation(0,3), true);
-		bd.updateBoard(new BoardLocation(1,2), true);
-		bd.updateBoard(new BoardLocation(2,1), true);
+		bd.updateBoard(new BoardLocation(0, 3), true);
+		bd.updateBoard(new BoardLocation(1, 2), true);
+		bd.updateBoard(new BoardLocation(2, 1), true);
 		test = new ContOpenPattern(locations, Pattern.ON_URDIAG);
 		assertTrue(bd.isPatternDead(test, true));
+	}
+
+	@Test
+	public void testTotalDist() {
+		assertEquals(Board.findTotalDistToSides(new BoardLocation(0, 0)), 0);
+		assertEquals(Board.findTotalDistToSides(new BoardLocation(1, 0)), 1);
+		assertEquals(Board.findTotalDistToSides(new BoardLocation(14, 14)), 2);
+		assertEquals(Board.findTotalDistToSides(new BoardLocation(15, 15)), 0);
 	}
 }

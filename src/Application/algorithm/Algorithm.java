@@ -15,7 +15,9 @@ public abstract class Algorithm {
 	}
 
 	public static int getRandNum(int modulo) {
-		return rand.nextInt(modulo);
+		if (modulo <= 0)
+			return -1;
+		return rand.nextInt(modulo) + 1;
 	}
 
 	public abstract ArrayList<BoardLocation> findLocation();
@@ -72,7 +74,7 @@ public abstract class Algorithm {
 		}
 		int maxIndex = 0;
 		for (int i = 0; i < candidates.size(); i++) {
-			if (Board.findTotalDistToSides(candidates.get(maxIndex)) > Board
+			if (Board.findTotalDistToSides(candidates.get(maxIndex)) < Board
 					.findTotalDistToSides(candidates.get(i)))
 				maxIndex = i;
 		}
@@ -86,6 +88,14 @@ public abstract class Algorithm {
 			return makeFirstMoveSecond();
 		else if (board.getTotalStones() == 0)
 			return makeFirstMoveFirst();
-		return null;
+		else if (board.getTotalStones() == 2)
+			return makeSecondMoveFirst();
+		else
+			return board.findEmptyLocSpiral();
+	}
+
+	private BoardLocation makeSecondMoveFirst() {
+		// TODO Auto-generated method stub
+		return board.findEmptyLocSpiral();
 	}
 }
