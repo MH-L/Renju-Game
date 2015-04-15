@@ -1,6 +1,6 @@
 package Net;
 
-import Application.NetworkGame;
+import application.NetworkGame;
 
 import java.io.IOException;
 import java.net.InetAddress;
