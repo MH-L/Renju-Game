@@ -53,6 +53,14 @@ public class Game {
 		activePlayer = player1;
 	}
 
+	public void initNetwork(IPlayer player1, IPlayer player2) {
+		this.mode = NETWORK_GAME_MODE;
+		board = new Board();
+		this.player1 = player1;
+		this.player2 = player2;
+		activePlayer = player1;
+	}
+
 	public static Game getInstance() {
 		if (instance == null) {
 			instance = new Game();
@@ -70,13 +78,24 @@ public class Game {
 	}
 
 	/**
-	 * Prompts the player to make their next move
+	 * Prompts the player to make their next move.
+	 * Toggles the active player at the end of their successful turn.
 	 *
+	 * @return
+	 * 		state of if there's a valid next move to make
 	 * @throws InvalidIndexException
-	 * 		Thrown if the chosen move is invalid
+	 * 		thrown if the move chosen is invalid
 	 */
-	public void makeMove() throws InvalidIndexException {
-		board.updateBoard(activePlayer.makeMove(), isPlayer1Active());
+	public boolean makeMove() throws InvalidIndexException {
+		if (isWinning()){
+			return false;
+		} else if (boardFull()) {
+			return false;
+		} else {
+			if (board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))
+				toggleActivePlayer();
+			return true;
+		}
 	}
 
 	public Board getBoard(){

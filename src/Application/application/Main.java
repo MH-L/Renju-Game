@@ -46,7 +46,8 @@ public class Main {
 			case Game.NETWORK_GAME_MODE:
 				host = getHost();
 				try {
-					NetworkGame g = new NetworkGame(host);
+					NetworkGame ng = new NetworkGame(host);
+					game.initNetwork(ng.getPlayer1(), ng.getPlayer2());
 				} catch (IOException e) {
 					e.printStackTrace();
 					return;
@@ -73,10 +74,10 @@ public class Main {
 	}
 
 	private static void playLocal() {
-		while (!Game.boardFull() && !Game.isWinning()) {
-            if (game.getActivePlayer() == null) {
-                throw new RuntimeException("There is no player!");
-            }
+		if (game.getActivePlayer() == null) {
+			throw new RuntimeException("There is no player!");
+		}
+		while (!Game.isWinning() && !Game.boardFull()) {
             System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
             try {
                 game.makeMove();
@@ -102,10 +103,7 @@ public class Main {
                         // Could just give a generic response rather than returning the issued command
                         System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
                 }
-                continue;
             }
-
-            game.toggleActivePlayer();
         }
 		if (Game.isWinning()) {
             // get inactive player because the current player was toggled at the end of the round
@@ -120,7 +118,7 @@ public class Main {
 	private static boolean getHost() {
 		System.out.println(" Are you host or client?\n"
 				+ " (" + NetworkGame.HOST + ") Host\n"
-				+ " (" + NetworkGame.CLIENT+ ") Client\n");
+				+ " (" + NetworkGame.CLIENT + ") Client\n");
 		String host = reader.next();
 		while (!host.equals(String.valueOf(NetworkGame.HOST)) &&
 				!host.equals(String.valueOf(NetworkGame.CLIENT))) {
@@ -142,12 +140,12 @@ public class Main {
 	private static void printInstruction() {
 		// TODO fix the magic number
 		System.out.println("Game instruction:\nEach player takes turn to place a stone on the board." +
-				"\nYour goal is to place "+Board.NUM_STONES_TO_WIN+" consecutive stones in a row. " +
+				"\nYour goal is to place " + Board.NUM_STONES_TO_WIN + " consecutive stones in a row. " +
 				"The first one to do so wins!" +
 				"\nTo place a stone, enter the letter and number corresponding to the column and row respectively." +
 				"\nSeparate the two by a comma." +
 				"\n  For example: A,1 or 3,B." +
-				"\n\nYou are allowed to undo your last move up to "+Player.NUM_REGRETS_LIMIT+" times." +
+				"\n\nYou are allowed to undo your last move up to " + Player.NUM_REGRETS_LIMIT + " times." +
 				"\nEnter \"w\" to withdraw when it is your turn." +
 				"\nTo quit the game, enter \"x\". " +
 				"\nTo see the instructions again, enter \"i\"\n");

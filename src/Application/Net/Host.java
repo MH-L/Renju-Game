@@ -1,6 +1,8 @@
 package Net;
 
+import application.IPlayer;
 import application.NetworkGame;
+import application.Player;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,9 +13,11 @@ import java.net.ServerSocket;
  */
 public class Host {
     private ServerSocket socket;
+    private IPlayer player;
 
     public Host () throws IOException {
         socket = new ServerSocket(NetworkGame.PORT);
+        this.player = new Player();
     }
 
     public void listen() throws IOException {
@@ -26,4 +30,7 @@ public class Host {
         socket.accept();
     }
 
+    public IPlayer getPlayer() {
+        return player;
+    }
 }

@@ -1,12 +1,12 @@
 package model;
 
-import java.util.ArrayList;
-
-import exceptions.InvalidIndexException;
 import algorithm.ContClosedPattern;
 import algorithm.ContOpenPattern;
 import algorithm.Pattern;
 import application.Game;
+import exceptions.InvalidIndexException;
+
+import java.util.ArrayList;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -387,21 +387,15 @@ public class Board {
 	 *
 	 * @param loc
 	 *            Indicates the board location to place the stone
-	 * @param player
-	 *            True means it is player's stone, otherwise it is computer's
-	 *            stone.
+	 * @param first
+	 *            true means it is player1's stone, otherwise it is player2's
 	 * @return false if it did not succeed. true if succeeded
-	 * @throws InvalidIndexException
 	 */
-	public boolean updateBoard(BoardLocation loc, boolean first)
-			throws InvalidIndexException {
-		if (!isReachable(loc))
-			throw new InvalidIndexException(
-					"The location indexes is out of bound!");
+	public boolean updateBoard(BoardLocation loc, boolean first) {
+		if (!isValidLocation(loc))
+			return false;
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
-		if (this.isOccupied(loc))
-			return false;
 		int marker;
 		if (first)
 			marker = FIRST_PLAYER;
@@ -423,7 +417,10 @@ public class Board {
 			this.getULDiags().get(indexULDiag)[row_num] = marker;
 		this.player1Stone.add(loc);
 		return true;
+	}
 
+	public boolean isValidLocation(BoardLocation loc){
+		return !(!isReachable(loc) || this.isOccupied(loc));
 	}
 
 	/**

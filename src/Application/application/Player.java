@@ -81,7 +81,10 @@ public class Player implements IPlayer{
 	}
 
 	private static int translateLetter(String letter) {
-		return letter.toLowerCase().toCharArray()[0] - 96;
+		if (letter.length() < 1)
+			return 0;
+		else
+			return letter.toLowerCase().toCharArray()[0] - 96;
 	}
 
 	private static boolean isAlpha(String string){
