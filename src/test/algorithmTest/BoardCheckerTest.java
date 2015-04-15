@@ -166,19 +166,27 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(6, 4), false);
 
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 5);
-		board.updateBoard(new BoardLocation(7,5), false);
+		board.updateBoard(new BoardLocation(7, 5), false);
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 7);
-		board.updateBoard(new BoardLocation(8,7), false);
+		board.updateBoard(new BoardLocation(8, 7), false);
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 7);
 		board.updateBoard(new BoardLocation(5, 7), false);
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 8);
 		board.reset();
-		board.updateBoard(new BoardLocation(12,11), true);
-		board.updateBoard(new BoardLocation(13,10), true);
+		board.updateBoard(new BoardLocation(12, 11), true);
+		board.updateBoard(new BoardLocation(13, 10), true);
 		board.updateBoard(new BoardLocation(14, 9), true);
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, true);
+		ArrayList<Pattern> patterns = BoardChecker
+				.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 1);
-
+		board.reset();
+		board.updateBoard(new BoardLocation(2, 5), true);
+		board.updateBoard(new BoardLocation(3, 6), true);
+		board.updateBoard(new BoardLocation(5, 8), true);
+		board.updateBoard(new BoardLocation(6, 9), true);
+		board.updateBoard(new BoardLocation(1, 4), false);
+		patterns = BoardChecker.checkAllPatterns(board, true);
+		assertEquals(patterns.size(), 1);
 	}
 
 	@Test

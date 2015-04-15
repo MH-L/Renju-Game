@@ -72,14 +72,8 @@ public abstract class Algorithm {
 			if (Board.findDistance(loc, firstStone) == desiredDist)
 				candidates.add(loc);
 		}
-		int maxIndex = 0;
-		for (int i = 0; i < candidates.size(); i++) {
-			if (Board.findTotalDistToSides(candidates.get(maxIndex)) < Board
-					.findTotalDistToSides(candidates.get(i)))
-				maxIndex = i;
-		}
 
-		return candidates.get(maxIndex);
+		return Board.getLocationWithLargestDist(candidates);
 
 	}
 
@@ -90,6 +84,8 @@ public abstract class Algorithm {
 			return makeFirstMoveFirst();
 		else if (board.getTotalStones() == 2)
 			return makeSecondMoveFirst();
+		else if (board.getTotalStones() == 3)
+			return makeSecondMoveSecond();
 		else {
 			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
 					true);
@@ -97,20 +93,75 @@ public abstract class Algorithm {
 				return patterns.get(0).getBlockingLocs().get(0);
 			}
 		}
-		return board.findEmptyLocSpiral();
+		ArrayList<BoardLocation> result = board.filterOccupied(Board
+				.findAdjacentLocs(board.getPlayer2Stone().get(
+						board.getPlayer2Stone().size() - 1)));
+		if (result.size() == 0)
+			return board.findEmptyLocSpiral();
+		else {
+			int randSeed = getRandNum(result.size()) - 1;
+			return result.get(randSeed);
+		}
 	}
 
-	private BoardLocation makeSecondMoveFirst() {
+	public BoardLocation makeSecondMoveFirst() {
 		// TODO Auto-generated method stub
-		return board.findEmptyLocSpiral();
+		BoardLocation firstMove = board.getPlayer1Stone().get(0);
+		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
+		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
+			int randSeed = getRandNum(8);
+			return Board.findAdjacentLocs(firstMove).get(randSeed);
+		}
+		int randSeed = getRandNum(2);
+		int desiredDist = randSeed == 1 ? 2 : 3;
+		ArrayList<BoardLocation> result = filterWithDesiredDist(
+				otherPlayerFirstMove, desiredDist,
+				Board.findAdjacentLocs(firstMove));
+		randSeed = getRandNum(result.size());
+		return result.get(randSeed - 1);
+	}
+
+	public BoardLocation makeSecondMoveSecond() {
+		BoardLocation firstMove = board.getPlayer2Stone().get(0);
+		BoardLocation firstMoveOther = board.getPlayer1Stone().get(0);
+		BoardLocation secondMoveOther = board.getPlayer1Stone().get(1);
+		if (Board.findDistance(firstMoveOther, secondMoveOther) >= 4) {
+			int randSeed = getRandNum(2);
+			ArrayList<BoardLocation> result = filterWithDesiredDist(firstMove,
+					randSeed, Board.findAdjacentLocs(firstMove));
+			BoardLocation retVal;
+			do {
+				randSeed = getRandNum(result.size());
+				retVal = result.get(randSeed - 1);
+			} while (board.isOccupied(retVal));
+			return retVal;
+		} else {
+			ArrayList<BoardLocation> result = board.filterOccupied(Board
+					.findAdjacentLocs(firstMove));
+			int randSeed = getRandNum(result.size());
+			return result.get(randSeed - 1);
+		}
 	}
 
 	public BoardLocation makeMoveEnd() {
 		// TODO Auto-generated method stub
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, true);
+		ArrayList<Pattern> patterns = BoardChecker
+				.checkAllPatterns(board, true);
 		if (patterns.size() != 0) {
 			return patterns.get(0).getBlockingLocs().get(0);
 		}
 		return board.findEmptyLocSpiral();
+	}
+
+	public static ArrayList<BoardLocation> filterWithDesiredDist(
+			BoardLocation comparer, int desiredDist,
+			ArrayList<BoardLocation> candidate) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (BoardLocation loc : candidate) {
+			if (Board.findDistance(loc, comparer) == desiredDist)
+				retVal.add(loc);
+		}
+		return retVal;
+
 	}
 }

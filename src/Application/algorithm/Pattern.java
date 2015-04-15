@@ -160,4 +160,18 @@ public abstract class Pattern {
 			return false;
 		return true;
 	}
+
+	public boolean isColinear(BoardLocation loc1, BoardLocation loc2) {
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+			return false;
+		return loc1.getXPos() == loc2.getXPos() || loc1.getYPos() == loc2.getYPos();
+	}
+
+	public boolean isOnSameDiag(BoardLocation loc1, BoardLocation loc2) {
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+			return false;
+		int xDiff = Math.abs(loc1.getXPos() - loc2.getXPos());
+		int yDiff = Math.abs(loc1.getYPos() - loc2.getYPos());
+		return xDiff == yDiff;
+	}
 }

@@ -631,6 +631,16 @@ public class Board {
 			break;
 
 		}
+		if (Pattern.findBubbleIndex(locations, type) != -1
+				&& locations.size() == 4) {
+			int bubbleIndex = Pattern.findBubbleIndex(locations, type);
+			ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+			retVal.add(new BoardLocation(locations.get(0).getYPos()
+					+ firstIncrement * bubbleIndex, locations.get(0).getXPos()
+					+ secondIncrement * bubbleIndex));
+			return retVal;
+		}
+
 		for (int i = 0; i < locations.size(); i++) {
 			BoardLocation candidate = new BoardLocation(locations.get(i)
 					.getYPos() + firstIncrement, locations.get(i).getXPos()
@@ -639,20 +649,15 @@ public class Board {
 					.getYPos() - firstIncrement, locations.get(i).getXPos()
 					- secondIncrement);
 			if (!locations.contains(candidate) && isReachable(candidate))
-				if (this.basicGrid[candidate.getYPos()][candidate.getXPos()] == Board.EMPTY_SPOT)
+				if (this.basicGrid[candidate.getYPos()][candidate.getXPos()] == Board.EMPTY_SPOT
+						&& !retLocs.contains(candidate))
 					retLocs.add(candidate);
 			if (!locations.contains(anotherCandidate)
 					&& isReachable(anotherCandidate))
 				if (this.basicGrid[anotherCandidate.getYPos()][anotherCandidate
-						.getXPos()] == Board.EMPTY_SPOT)
+						.getXPos()] == Board.EMPTY_SPOT
+						&& !retLocs.contains(candidate))
 					retLocs.add(anotherCandidate);
-		}
-		if (retLocs.size() == 0) {
-			System.err.println("The Pattern's start stone is ("
-					+ locations.get(0).getXPos() + ", "
-					+ locations.get(0).getYPos() + "). And it has "
-					+ locations.size() + " elements." + "It has type " + type
-					+ ".");
 		}
 		return retLocs;
 	}
@@ -1203,5 +1208,27 @@ public class Board {
 				curLoc = new BoardLocation(y_coord + curIncY, x_coord + curIncX);
 			}
 		return Board.getInvalidBoardLocation();
+	}
+
+	public static BoardLocation getLocationWithLargestDist(
+			ArrayList<BoardLocation> locations) {
+		if (locations.size() == 0)
+			return null;
+		int maxIndex = 0;
+		for (int i = 0; i < locations.size(); i++) {
+			if (Board.findTotalDistToSides(locations.get(maxIndex)) < Board
+					.findTotalDistToSides(locations.get(i)))
+				maxIndex = i;
+		}
+		return locations.get(maxIndex);
+	}
+
+	public ArrayList<BoardLocation> filterOccupied(
+			ArrayList<BoardLocation> locations) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (BoardLocation loc : locations)
+			if (!isOccupied(loc))
+				retVal.add(loc);
+		return retVal;
 	}
 }

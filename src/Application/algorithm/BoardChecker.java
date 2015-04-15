@@ -486,23 +486,28 @@ public class BoardChecker {
 						if (temp.get(0) == blocker) {
 							switch (type) {
 							case Pattern.ON_ROW:
-								firstStone = new BoardLocation(arrayIndex, i);
+								firstStone = new BoardLocation(arrayIndex,
+										i + 1);
 								break;
 							case Pattern.ON_COL:
-								firstStone = new BoardLocation(i, arrayIndex);
+								firstStone = new BoardLocation(i + 1,
+										arrayIndex);
 								break;
 							case Pattern.ON_ULDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i, true);
+										i + 1, true);
 								break;
 							case Pattern.ON_URDIAG:
 								firstStone = Board.convertDiagToXY(arrayIndex,
-										i, false);
+										i + 1, false);
 								break;
 							default:
 								firstStone = Board.getInvalidBoardLocation();
 								break;
 							}
+							patterns.add(makeDiscPattern(firstStone, type,
+									temp.indexOf(Board.EMPTY_SPOT) - 1, num, true,
+									board));
 						} else {
 							switch (type) {
 							case Pattern.ON_ROW:
@@ -523,10 +528,10 @@ public class BoardChecker {
 								firstStone = Board.getInvalidBoardLocation();
 								break;
 							}
+							patterns.add(makeDiscPattern(firstStone, type,
+									temp.indexOf(Board.EMPTY_SPOT), num, true,
+									board));
 						}
-						patterns.add(makeDiscPattern(firstStone, type,
-								temp.indexOf(Board.EMPTY_SPOT), num, true,
-								board));
 					}
 				}
 			}
