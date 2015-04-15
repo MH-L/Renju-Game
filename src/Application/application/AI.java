@@ -77,6 +77,8 @@ public class AI implements IPlayer {
 
 	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
+		// start to check for patterns after three moves.
+		// which is five or six stones on the board.
 		BoardLocation nextMove = null;
 		if (board.getTotalStones() < 10)
 			nextMove = solver.makeMoveBeginning();

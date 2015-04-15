@@ -10,6 +10,7 @@ import model.BoardLocation;
  * four
  *
  * @author Minghao Liu
+ * @Date 2015/4/14
  *
  */
 public abstract class Pattern {
@@ -42,6 +43,7 @@ public abstract class Pattern {
 
 	public Pattern(ArrayList<BoardLocation> locations, int type) {
 		this.constituent = locations;
+		this.type = type;
 		this.blockingLocs = Board.findBlockingLocs(locations, type);
 	}
 

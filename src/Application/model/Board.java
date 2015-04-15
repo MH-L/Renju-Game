@@ -410,8 +410,8 @@ public class Board {
 		this.basicGrid[row_num][col_num] = marker;
 		this.getColumns().get(col_num)[row_num] = marker;
 		this.getRows().get(row_num)[col_num] = marker;
-		int indexURDiag = getULDiagIndex(loc);
-		int indexULDiag = getURDiagIndex(loc);
+		int indexURDiag = getURDiagIndex(loc);
+		int indexULDiag = getULDiagIndex(loc);
 		if (indexURDiag >= width)
 			this.getURDiags().get(indexURDiag)[width - 1 - col_num] = marker;
 		else
@@ -837,11 +837,11 @@ public class Board {
 		return false;
 	}
 
-	public static int getULDiagIndex(BoardLocation loc) {
+	public static int getURDiagIndex(BoardLocation loc) {
 		return loc.getXPos() + loc.getYPos();
 	}
 
-	public static int getURDiagIndex(BoardLocation loc) {
+	public static int getULDiagIndex(BoardLocation loc) {
 		return loc.getYPos() - loc.getXPos() + width - 1;
 	}
 
@@ -1054,63 +1054,63 @@ public class Board {
 		if (loc == null || !Board.isReachable(loc))
 			return new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
-		int x_coord = loc.getXPos();
-		int y_coord = loc.getYPos();
+		int y_coor = loc.getYPos();
+		int x_cord = loc.getXPos();
 		if (!isInCorner(loc) && !isOnSide(loc)) {
-			retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
-			retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
-			retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
-			retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
-			retVal.add(new BoardLocation(x_coord + 1, y_coord));
-			retVal.add(new BoardLocation(x_coord - 1, y_coord));
-			retVal.add(new BoardLocation(x_coord, y_coord + 1));
-			retVal.add(new BoardLocation(x_coord, y_coord - 1));
+			retVal.add(new BoardLocation(y_coor + 1, x_cord - 1));
+			retVal.add(new BoardLocation(y_coor + 1, x_cord + 1));
+			retVal.add(new BoardLocation(y_coor - 1, x_cord - 1));
+			retVal.add(new BoardLocation(y_coor - 1, x_cord + 1));
+			retVal.add(new BoardLocation(y_coor + 1, x_cord));
+			retVal.add(new BoardLocation(y_coor - 1, x_cord));
+			retVal.add(new BoardLocation(y_coor, x_cord + 1));
+			retVal.add(new BoardLocation(y_coor, x_cord - 1));
 		} else if (isOnSide(loc)) {
-			if (x_coord == 0) {
-				retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord));
-				retVal.add(new BoardLocation(x_coord, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord, y_coord - 1));
-			} else if (y_coord == 0) {
-				retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord - 1, y_coord));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord));
-			} else if (x_coord == width - 1) {
-				retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
-				retVal.add(new BoardLocation(x_coord - 1, y_coord));
-				retVal.add(new BoardLocation(x_coord, y_coord + 1));
-				retVal.add(new BoardLocation(x_coord, y_coord - 1));
+			if (y_coor == 0) {
+				retVal.add(new BoardLocation(y_coor + 1, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord - 1));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord));
+				retVal.add(new BoardLocation(y_coor, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor, x_cord - 1));
+			} else if (x_cord == 0) {
+				retVal.add(new BoardLocation(y_coor - 1, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor - 1, x_cord));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord));
+			} else if (y_coor == height - 1) {
+				retVal.add(new BoardLocation(y_coor - 1, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor - 1, x_cord - 1));
+				retVal.add(new BoardLocation(y_coor - 1, x_cord));
+				retVal.add(new BoardLocation(y_coor, x_cord + 1));
+				retVal.add(new BoardLocation(y_coor, x_cord - 1));
 			} else {
-				retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
-				retVal.add(new BoardLocation(x_coord, y_coord - 1));
-				retVal.add(new BoardLocation(x_coord - 1, y_coord));
-				retVal.add(new BoardLocation(x_coord + 1, y_coord));
+				retVal.add(new BoardLocation(y_coor - 1, x_cord - 1));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord - 1));
+				retVal.add(new BoardLocation(y_coor, x_cord - 1));
+				retVal.add(new BoardLocation(y_coor - 1, x_cord));
+				retVal.add(new BoardLocation(y_coor + 1, x_cord));
 			}
 		} else if (isInCorner(loc)) {
-			if (x_coord == 0) {
-				if (y_coord == 0) {
-					retVal.add(new BoardLocation(x_coord + 1, y_coord + 1));
-					retVal.add(new BoardLocation(x_coord, y_coord + 1));
-					retVal.add(new BoardLocation(x_coord + 1, y_coord));
+			if (y_coor == 0) {
+				if (x_cord == 0) {
+					retVal.add(new BoardLocation(y_coor + 1, x_cord + 1));
+					retVal.add(new BoardLocation(y_coor, x_cord + 1));
+					retVal.add(new BoardLocation(y_coor + 1, x_cord));
 				} else {
-					retVal.add(new BoardLocation(x_coord + 1, y_coord - 1));
-					retVal.add(new BoardLocation(x_coord, y_coord - 1));
-					retVal.add(new BoardLocation(x_coord + 1, y_coord));
+					retVal.add(new BoardLocation(y_coor + 1, x_cord - 1));
+					retVal.add(new BoardLocation(y_coor, x_cord - 1));
+					retVal.add(new BoardLocation(y_coor + 1, x_cord));
 				}
 			} else {
-				if (y_coord == 0) {
-					retVal.add(new BoardLocation(x_coord - 1, y_coord + 1));
-					retVal.add(new BoardLocation(x_coord, y_coord + 1));
-					retVal.add(new BoardLocation(x_coord - 1, y_coord));
+				if (x_cord == 0) {
+					retVal.add(new BoardLocation(y_coor - 1, x_cord + 1));
+					retVal.add(new BoardLocation(y_coor, x_cord + 1));
+					retVal.add(new BoardLocation(y_coor - 1, x_cord));
 				} else {
-					retVal.add(new BoardLocation(x_coord - 1, y_coord - 1));
-					retVal.add(new BoardLocation(x_coord, y_coord - 1));
-					retVal.add(new BoardLocation(x_coord - 1, y_coord));
+					retVal.add(new BoardLocation(y_coor - 1, x_cord - 1));
+					retVal.add(new BoardLocation(y_coor, x_cord - 1));
+					retVal.add(new BoardLocation(y_coor - 1, x_cord));
 				}
 			}
 		}
