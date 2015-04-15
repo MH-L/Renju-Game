@@ -9,8 +9,8 @@ public abstract class ClosedPattern extends Pattern {
 	private ArrayList<BoardLocation> blockedStones;
 
 	public ClosedPattern(ArrayList<BoardLocation> locations, int type,
-			ArrayList<BoardLocation> blockedStones) {
-		super(locations, type);
+			ArrayList<BoardLocation> blockedStones, ArrayList<BoardLocation> blockingLocs) {
+		super(locations, type, blockingLocs);
 		this.blockedStones = blockedStones;
 	}
 

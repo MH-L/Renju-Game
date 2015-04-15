@@ -344,9 +344,11 @@ public class BoardChecker {
 		if (isClosed) {
 			ArrayList<BoardLocation> stones = board.getBlockedStones(locations,
 					type);
-			return new DiscClosedPattern(locations, type, stones, bubbleIndex);
+			return new DiscClosedPattern(locations, type, stones, bubbleIndex,
+					board.findBlockingLocs(locations, type));
 		} else
-			return new DiscOpenPattern(locations, type, bubbleIndex);
+			return new DiscOpenPattern(locations, type, bubbleIndex,
+					board.findBlockingLocs(locations, type));
 
 	}
 
@@ -731,9 +733,11 @@ public class BoardChecker {
 		if (isClosed) {
 			ArrayList<BoardLocation> blockedStones = board.getBlockedStones(
 					locations, type);
-			pat = new ContClosedPattern(locations, type, blockedStones);
+			pat = new ContClosedPattern(locations, type, blockedStones,
+					board.findBlockingLocs(locations, type));
 		} else
-			pat = new ContOpenPattern(locations, type);
+			pat = new ContOpenPattern(locations, type, board.findBlockingLocs(
+					locations, type));
 		return pat;
 
 	}

@@ -41,10 +41,10 @@ public abstract class Pattern {
 	 */
 	public static final int ON_URDIAG = 4;
 
-	public Pattern(ArrayList<BoardLocation> locations, int type) {
+	public Pattern(ArrayList<BoardLocation> locations, int type, ArrayList<BoardLocation> blockingLocs) {
 		this.constituent = locations;
 		this.type = type;
-		this.blockingLocs = Board.findBlockingLocs(locations, type);
+		this.blockingLocs = blockingLocs;
 	}
 
 	public ArrayList<BoardLocation> getBlockingLocs() {

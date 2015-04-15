@@ -604,8 +604,14 @@ public class Board {
 	 *            diagonal/upper-right diagonal.
 	 * @return The list of all proper blocking locations of the given pattern.
 	 */
-	public static ArrayList<BoardLocation> findBlockingLocs(
+	public ArrayList<BoardLocation> findBlockingLocs(
 			ArrayList<BoardLocation> locations, int type) {
+		BoardLocation firstStone = locations.get(0);
+		int blocker;
+		if (basicGrid[firstStone.getYPos()][firstStone.getXPos()] == Board.FIRST_PLAYER)
+			blocker = Board.SECOND_PLAYER;
+		else
+			blocker = Board.FIRST_PLAYER;
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		int firstIncrement;
 		int secondIncrement;
@@ -640,10 +646,12 @@ public class Board {
 					.getYPos() - firstIncrement, locations.get(i).getXPos()
 					- secondIncrement);
 			if (!locations.contains(candidate) && isReachable(candidate))
-				retLocs.add(candidate);
+				if (this.basicGrid[candidate.getYPos()][candidate.getXPos()] == blocker)
+					retLocs.add(candidate);
 			if (!locations.contains(anotherCandidate)
 					&& isReachable(anotherCandidate))
-				retLocs.add(anotherCandidate);
+				if (this.basicGrid[anotherCandidate.getYPos()][anotherCandidate.getXPos()] == blocker)
+					retLocs.add(anotherCandidate);
 		}
 
 		return retLocs;

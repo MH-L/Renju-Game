@@ -238,16 +238,19 @@ public class BoardTest {
 		bd.updateBoard(new BoardLocation(0, 1), true);
 		bd.updateBoard(new BoardLocation(0, 2), true);
 		bd.updateBoard(new BoardLocation(0, 3), true);
-		Pattern test = new ContOpenPattern(locations, Pattern.ON_ROW);
+		Pattern test = new ContOpenPattern(locations, Pattern.ON_ROW,
+				bd.findBlockingLocs(locations, Pattern.ON_ROW));
 		assertFalse(bd.isPatternDead(test, true));
 		bd.updateBoard(new BoardLocation(0, 4), false);
 		ArrayList<BoardLocation> blockedStones = new ArrayList<BoardLocation>();
 		blockedStones.add(new BoardLocation(0, 4));
-		test = new ContClosedPattern(locations, Pattern.ON_ROW, blockedStones);
+		test = new ContClosedPattern(locations, Pattern.ON_ROW, blockedStones,
+				bd.findBlockingLocs(locations, Pattern.ON_ROW));
 		assertTrue(bd.isPatternDead(test, true));
 		locations.remove(3);
 		bd.withdrawMove(new BoardLocation(0, 3));
-		test = new ContOpenPattern(locations, Pattern.ON_ROW);
+		test = new ContOpenPattern(locations, Pattern.ON_ROW,
+				bd.findBlockingLocs(locations, Pattern.ON_ROW));
 		assertTrue(bd.isPatternDead(test, true));
 		locations.clear();
 		bd.reset();
@@ -257,7 +260,8 @@ public class BoardTest {
 		bd.updateBoard(new BoardLocation(5, 8), true);
 		bd.updateBoard(new BoardLocation(6, 9), true);
 		bd.updateBoard(new BoardLocation(7, 10), true);
-		test = new ContOpenPattern(locations, Pattern.ON_ULDIAG);
+		test = new ContOpenPattern(locations, Pattern.ON_ULDIAG,
+				bd.findBlockingLocs(locations, Pattern.ON_ULDIAG));
 		assertFalse(bd.isPatternDead(test, true));
 		locations.clear();
 		bd.reset();
@@ -267,7 +271,8 @@ public class BoardTest {
 		bd.updateBoard(new BoardLocation(0, 3), true);
 		bd.updateBoard(new BoardLocation(1, 2), true);
 		bd.updateBoard(new BoardLocation(2, 1), true);
-		test = new ContOpenPattern(locations, Pattern.ON_URDIAG);
+		test = new ContOpenPattern(locations, Pattern.ON_URDIAG,
+				bd.findBlockingLocs(locations, Pattern.ON_URDIAG));
 		assertTrue(bd.isPatternDead(test, true));
 	}
 
@@ -277,5 +282,22 @@ public class BoardTest {
 		assertEquals(Board.findTotalDistToSides(new BoardLocation(1, 0)), 1);
 		assertEquals(Board.findTotalDistToSides(new BoardLocation(14, 14)), 2);
 		assertEquals(Board.findTotalDistToSides(new BoardLocation(15, 15)), 0);
+	}
+
+	@Test
+	public void testFindBlockingLocs() throws InvalidIndexException {
+		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
+		locations.add(new BoardLocation(4, 4));
+		locations.add(new BoardLocation(4, 5));
+		locations.add(new BoardLocation(4, 6));
+		locations.add(new BoardLocation(4, 7));
+		bd.updateBoard(new BoardLocation(4, 4), true);
+		bd.updateBoard(new BoardLocation(4, 5), true);
+		bd.updateBoard(new BoardLocation(4, 6), true);
+		bd.updateBoard(new BoardLocation(4, 7), true);
+		bd.updateBoard(new BoardLocation(4, 8), false);
+		ArrayList<BoardLocation> blockers = bd.findBlockingLocs(locations,
+				Pattern.ON_ROW);
+		assertEquals(blockers.size(), 1);
 	}
 }

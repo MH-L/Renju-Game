@@ -90,8 +90,14 @@ public abstract class Algorithm {
 			return makeFirstMoveFirst();
 		else if (board.getTotalStones() == 2)
 			return makeSecondMoveFirst();
-		else
-			return board.findEmptyLocSpiral();
+		else {
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
+					true);
+			if (patterns.size() != 0) {
+				return patterns.get(0).getBlockingLocs().get(0);
+			}
+		}
+		return board.findEmptyLocSpiral();
 	}
 
 	private BoardLocation makeSecondMoveFirst() {
