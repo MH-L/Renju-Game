@@ -75,7 +75,9 @@ public class Game {
 	 * 		Thrown if the chosen move is invalid
 	 */
 	public void makeMove() throws InvalidIndexException {
-		board.updateBoard(activePlayer.makeMove(), isPlayer1Active());
+		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))
+			throw new InvalidIndexException("The index you entered is not valid!");
+
 	}
 
 	public Board getBoard(){

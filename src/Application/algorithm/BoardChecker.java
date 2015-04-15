@@ -203,16 +203,14 @@ public class BoardChecker {
 		if (array.length <= numLocs)
 			return patterns;
 		int prev = Board.EMPTY_SPOT;
-		int checker;
-		if (first)
-			checker = Board.FIRST_PLAYER;
-		else
-			checker = Board.SECOND_PLAYER;
+		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
 		for (int i = 0; i < array.length - numLocs; i++) {
 			for (int j = 0; j <= numLocs; j++)
 				temp.add(array[i + j]);
-			if (prev != Board.EMPTY_SPOT)
+			if (prev != Board.EMPTY_SPOT) {
+				prev = array[i];
 				continue;
+			}
 			int playerFreq = Collections.frequency(temp, checker);
 			int emptyFreq = Collections.frequency(temp, Board.EMPTY_SPOT);
 			if (playerFreq == numLocs && emptyFreq == 1) {
@@ -273,6 +271,7 @@ public class BoardChecker {
 					}
 				}
 			}
+			prev = array[i];
 			temp.clear();
 		}
 
@@ -376,15 +375,8 @@ public class BoardChecker {
 			return patterns;
 		int prev = Board.EMPTY_SPOT;
 		int count = 0;
-		int checker;
-		int blocker;
-		if (first) {
-			checker = Board.FIRST_PLAYER;
-			blocker = Board.SECOND_PLAYER;
-		} else {
-			checker = Board.SECOND_PLAYER;
-			blocker = Board.FIRST_PLAYER;
-		}
+		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
 		boolean blocked = false;
 		for (int i = 0; i < array.length; i++) {
 			int cur = array[i];
@@ -473,15 +465,8 @@ public class BoardChecker {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		if (array.length < num + 2)
 			return patterns;
-		int checker;
-		int blocker;
-		if (first) {
-			checker = Board.FIRST_PLAYER;
-			blocker = Board.SECOND_PLAYER;
-		} else {
-			checker = Board.SECOND_PLAYER;
-			blocker = Board.FIRST_PLAYER;
-		}
+		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 		for (int i = 0; i < array.length - num - 1; i++) {
 			for (int j = 0; j <= num + 1; j++) {
@@ -573,11 +558,7 @@ public class BoardChecker {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		if (array.length < num)
 			return patterns;
-		int checker;
-		if (first)
-			checker = Board.FIRST_PLAYER;
-		else
-			checker = Board.SECOND_PLAYER;
+		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
 		if (array.length < 2)
 			return patterns;
 		else {
@@ -590,6 +571,8 @@ public class BoardChecker {
 					}
 				} else if (array[i] == checker) {
 					count++;
+				} else {
+					count = 0;
 				}
 
 				if (count == num) {
@@ -620,9 +603,9 @@ public class BoardChecker {
 							break;
 						case Pattern.ON_URDIAG:
 							firstStone = Board.convertDiagToXY(arrayIndex, i
-									- num + 1, true);
+									- num + 1, false);
 							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_ULDIAG, num, false, board);
+									Pattern.ON_URDIAG, num, false, board);
 							patterns.add(candidate);
 							break;
 						default:
@@ -655,9 +638,9 @@ public class BoardChecker {
 							break;
 						case Pattern.ON_URDIAG:
 							firstStone = Board.convertDiagToXY(arrayIndex, i
-									- num + 1, true);
+									- num + 1, false);
 							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_ULDIAG, num, false, board);
+									Pattern.ON_URDIAG, num, false, board);
 							patterns.add(candidate);
 							break;
 						default:

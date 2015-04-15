@@ -104,4 +104,13 @@ public abstract class Algorithm {
 		// TODO Auto-generated method stub
 		return board.findEmptyLocSpiral();
 	}
+
+	public BoardLocation makeMoveEnd() {
+		// TODO Auto-generated method stub
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, true);
+		if (patterns.size() != 0) {
+			return patterns.get(0).getBlockingLocs().get(0);
+		}
+		return board.findEmptyLocSpiral();
+	}
 }

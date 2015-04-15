@@ -402,11 +402,7 @@ public class Board {
 		int row_num = loc.getYPos();
 		if (this.isOccupied(loc))
 			return false;
-		int marker;
-		if (first)
-			marker = FIRST_PLAYER;
-		else
-			marker = SECOND_PLAYER;
+		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
 
 		this.basicGrid[row_num][col_num] = marker;
 		this.getColumns().get(col_num)[row_num] = marker;
@@ -421,7 +417,10 @@ public class Board {
 			this.getULDiags().get(indexULDiag)[col_num] = marker;
 		else
 			this.getULDiags().get(indexULDiag)[row_num] = marker;
-		this.player1Stone.add(loc);
+		if (first)
+			this.player1Stone.add(loc);
+		else
+			this.player2Stone.add(loc);
 		return true;
 
 	}
@@ -606,12 +605,6 @@ public class Board {
 	 */
 	public ArrayList<BoardLocation> findBlockingLocs(
 			ArrayList<BoardLocation> locations, int type) {
-		BoardLocation firstStone = locations.get(0);
-		int blocker;
-		if (basicGrid[firstStone.getYPos()][firstStone.getXPos()] == Board.FIRST_PLAYER)
-			blocker = Board.SECOND_PLAYER;
-		else
-			blocker = Board.FIRST_PLAYER;
 		ArrayList<BoardLocation> retLocs = new ArrayList<BoardLocation>();
 		int firstIncrement;
 		int secondIncrement;
@@ -646,14 +639,21 @@ public class Board {
 					.getYPos() - firstIncrement, locations.get(i).getXPos()
 					- secondIncrement);
 			if (!locations.contains(candidate) && isReachable(candidate))
-				if (this.basicGrid[candidate.getYPos()][candidate.getXPos()] == blocker)
+				if (this.basicGrid[candidate.getYPos()][candidate.getXPos()] == Board.EMPTY_SPOT)
 					retLocs.add(candidate);
 			if (!locations.contains(anotherCandidate)
 					&& isReachable(anotherCandidate))
-				if (this.basicGrid[anotherCandidate.getYPos()][anotherCandidate.getXPos()] == blocker)
+				if (this.basicGrid[anotherCandidate.getYPos()][anotherCandidate
+						.getXPos()] == Board.EMPTY_SPOT)
 					retLocs.add(anotherCandidate);
 		}
-
+		if (retLocs.size() == 0) {
+			System.err.println("The Pattern's start stone is ("
+					+ locations.get(0).getXPos() + ", "
+					+ locations.get(0).getYPos() + "). And it has "
+					+ locations.size() + " elements." + "It has type " + type
+					+ ".");
+		}
 		return retLocs;
 	}
 
@@ -685,18 +685,12 @@ public class Board {
 			if (diagIndex < height)
 				return new BoardLocation(subIndex, diagIndex - subIndex);
 			else
-				return new BoardLocation(width - 1 - diagIndex - subIndex, 2
-						* diagIndex + subIndex - width + 1);
+				return new BoardLocation(diagIndex + subIndex - width + 1,
+						width - 1 - subIndex);
 		}
 
 	}
 
-	// TODO make a static method to determine if a pattern is dead
-	// i.e. if there is no chance to win
-	// Uhhhhhhh... must first know the logic...
-	// the logic is not that obvious though
-	// Finished the first part.... that is sooo good.
-	// But testing is still needed lol...
 	/**
 	 * Determines whether the pattern has potential to form five in a row.
 	 * Special case if the pattern belongs to the first player, then more than
@@ -707,11 +701,7 @@ public class Board {
 	 * @return True if the pattern has potential, false otherwise.
 	 */
 	public boolean isPatternDead(Pattern pat, boolean first) {
-		int blocker;
-		if (first)
-			blocker = Board.SECOND_PLAYER;
-		else
-			blocker = Board.FIRST_PLAYER;
+		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
 		if (pat.getClass().equals(ContOpenPattern.class)
 				|| pat.getClass().equals(ContClosedPattern.class)) {
 			if (pat.getClass().equals(ContOpenPattern.class)) {
@@ -1174,7 +1164,8 @@ public class Board {
 				if (x_coord == y_coord && x_coord < width / 2) {
 					curIncX = firstIncX;
 					curIncY = 0;
-				} else if (x_coord + y_coord == width - 1 && y_coord < height / 2) {
+				} else if (x_coord + y_coord == width - 1
+						&& y_coord < height / 2) {
 					curIncX = 0;
 					curIncY = 1;
 				} else if (x_coord == y_coord && x_coord >= width / 2) {
@@ -1204,7 +1195,8 @@ public class Board {
 				} else if (x_coord == y_coord && x_coord > width / 2) {
 					curIncX = thirdIncX;
 					curIncY = 0;
-				} else if (x_coord + y_coord == width - 1 && y_coord > height / 2) {
+				} else if (x_coord + y_coord == width - 1
+						&& y_coord > height / 2) {
 					curIncX = 0;
 					curIncY = fourthIncY;
 				}

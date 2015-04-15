@@ -84,7 +84,7 @@ public class AI implements IPlayer {
 			nextMove = solver.makeMoveBeginning();
 		// TODO
 		else
-			nextMove = board.findEmptyLocSpiral();
+			nextMove = solver.makeMoveEnd();
 		return nextMove;
 	}
 }
