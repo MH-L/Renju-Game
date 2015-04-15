@@ -4,6 +4,7 @@ import Exceptions.InvalidIndexException;
 import Exceptions.WithdrawException;
 import Model.Board;
 
+import java.io.IOException;
 import java.util.Scanner;
 /**
  * The start point of the application.
@@ -14,29 +15,46 @@ import java.util.Scanner;
 public class Main {
 	private static Game game;
 	private static Scanner reader;
+	private static int dispMode;
+	private static boolean host;
 
 	public static void main(String[] args) {
 		// Get initializations
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
-		int dispMode = getDisplayMode();
+		dispMode = getDisplayMode();
 		game = Game.getInstance();
 		printInstruction();
 
 		// Initialize game mode
-		if (mode == Game.SINGLEPLAYER_GAME_MODE) {
-			int diff = getDifficulty();
-			if (Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY){
-				// This would be better if initSinglePlayer handled this input
-				// but creating a new exception might be overkill for something
-				// that likely isn't going to change
-				game.initSinglePlayer(diff);
-			} else {
-				System.err.println("Internal Error!");
+		switch (mode) {
+			case Game.SINGLEPLAYER_GAME_MODE:
+				int diff = getDifficulty();
+				if (Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY){
+					// This would be better if initSinglePlayer handled this input
+					// but creating a new exception might be overkill for something
+					// that likely isn't going to change
+					game.initSinglePlayer(diff);
+				} else {
+					System.err.println("Internal Error!");
+					return;
+				}
+				break;
+			case Game.MULTIPLAYER_GAME_MODE:
+				game.initMultiplayer();
+				break;
+			case Game.NETWORK_GAME_MODE:
+				host = getHost();
+				try {
+					NetworkGame g = new NetworkGame(host);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return;
+				}
+				break;
+			default:
+				System.err.println("Invalid game mode. Exiting");
 				return;
-			}
-		} else {
-			game.initMultiplayer();
 		}
 
 		System.out.println("The match is set as " + getModeAsString() + " in a " +
@@ -44,48 +62,72 @@ public class Main {
 		game.getBoard().renderBoard(dispMode);
 
 		// Play the game
-		while (!Game.boardFull() && !Game.isWinning()) {
-			if (game.getActivePlayer() == null){
-				throw new RuntimeException("There is no player!");
-			}
-			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
-			try {
-				game.makeMove();
-				game.getBoard().renderBoard(dispMode);
-			} catch (InvalidIndexException e) {
-				switch (e.getMessage()){
-					case "x":
-						actionGameOver();
-						return;
-					case "w":
-						try {
-							actionWithdraw();
-						} catch (WithdrawException e1) {
-							// Redo this turn since the player is out of withdrawals
-							continue;
-						}
-					case "i":
-						printInstruction();
-						break;
-					default:
-						// TODO fix this since Board also throws the exception which doesn't
-						// return the command issued as the message
-						// Could just give a generic response rather than returning the issued command
-						System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
-				}
-				continue;
-			}
+		if (mode == Game.NETWORK_GAME_MODE) {
+			playNetwork();
+		} else {
+			playLocal();
+		}
+	}
 
-			game.toggleActivePlayer();
-		}
+	private static void playNetwork() {
+	}
+
+	private static void playLocal() {
+		while (!Game.boardFull() && !Game.isWinning()) {
+            if (game.getActivePlayer() == null) {
+                throw new RuntimeException("There is no player!");
+            }
+            System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+            try {
+                game.makeMove();
+                game.getBoard().renderBoard(dispMode);
+            } catch (InvalidIndexException e) {
+                switch (e.getMessage()) {
+                    case "x":
+                        actionGameOver();
+                        return;
+                    case "w":
+                        try {
+                            actionWithdraw();
+                        } catch (WithdrawException e1) {
+                            // Redo this turn since the player is out of withdrawals
+                            continue;
+                        }
+                    case "i":
+                        printInstruction();
+                        break;
+                    default:
+                        // TODO fix this since Board also throws the exception which doesn't
+                        // return the command issued as the message
+                        // Could just give a generic response rather than returning the issued command
+                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
+                }
+                continue;
+            }
+
+            game.toggleActivePlayer();
+        }
 		if (Game.isWinning()) {
-			// get inactive player because the current player was toggled at the end of the round
-			System.out.println("Player " + getInactivePlayerAsString() + ", You won!");
-		} else if (Game.boardFull()) {
-			System.out.println("There are no more moves left. You both lose!");
-		}
+            // get inactive player because the current player was toggled at the end of the round
+            System.out.println("Player " + getInactivePlayerAsString() + ", You won!");
+        } else if (Game.boardFull()) {
+            System.out.println("There are no more moves left. You both lose!");
+        }
 
 		reader.close();
+	}
+
+	private static boolean getHost() {
+		System.out.println(" Are you host or client?\n"
+				+ " (" + NetworkGame.HOST + ") Host\n"
+				+ " (" + NetworkGame.CLIENT+ ") Client\n");
+		String host = reader.next();
+		while (!host.equals(String.valueOf(NetworkGame.HOST)) &&
+				!host.equals(String.valueOf(NetworkGame.CLIENT))) {
+			System.out.println("Invalid input. Please re-enter your choice.");
+			host = reader.next();
+		}
+		return host.equals("1");
 	}
 
 	private static void actionWithdraw() throws WithdrawException {
@@ -114,10 +156,12 @@ public class Main {
 	private static int getGameMode() {
 		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
 				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
-				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
+				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player" +
+				"\n (" + Game.NETWORK_GAME_MODE + ") Network");
 		String gameMode = reader.next();
 		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
-				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
+				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE)) &&
+				!gameMode.equals(String.valueOf(Game.NETWORK_GAME_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			gameMode = reader.nextLine();
 		}

@@ -7,6 +7,7 @@ import Model.Board;
 public class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
 	public static final int SINGLEPLAYER_GAME_MODE = 2;
+	public static final int NETWORK_GAME_MODE = 3;
 
 	public static final int NOVICE_DIFFICULTY = 1;
 	public static final int INTERMEDIATE_DIFFICULTY = 2;
