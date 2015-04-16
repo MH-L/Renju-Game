@@ -3,8 +3,11 @@ package model;
 import java.util.ArrayList;
 
 import exceptions.InvalidIndexException;
+import algorithm.BoardChecker;
 import algorithm.ContClosedPattern;
 import algorithm.ContOpenPattern;
+import algorithm.DiscClosedPattern;
+import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
 import application.Game;
 
@@ -1230,5 +1233,93 @@ public class Board {
 			if (!isOccupied(loc))
 				retVal.add(loc);
 		return retVal;
+	}
+
+	public boolean isPatternWinning(Pattern pat) {
+		BoardLocation firstStone = pat.getLocations().get(0);
+		int checker = basicGrid[firstStone.getYPos()][firstStone.getXPos()];
+		int blocker = checker == Board.FIRST_PLAYER ? Board.SECOND_PLAYER
+				: Board.FIRST_PLAYER;
+		if (pat.getClass() == ContOpenPattern.class) {
+			if (pat.getLocations().size() == 4) {
+				switch (pat.getType()) {
+				case Pattern.ON_ROW:
+					if (firstStone.getXPos() == 0) {
+						if (basicGrid[firstStone.getYPos()][5] == blocker)
+							return false;
+					} else if (firstStone.getXPos() == width - 3)
+						if (basicGrid[firstStone.getYPos()][width - 5] == blocker)
+							return false;
+					break;
+				case Pattern.ON_COL:
+					if (firstStone.getYPos() == 0) {
+						if (basicGrid[5][firstStone.getXPos()] == blocker)
+							return false;
+					} else if (firstStone.getYPos() == height - 3)
+						if (basicGrid[height - 5][firstStone.getXPos()] == blocker)
+							return false;
+					break;
+				case Pattern.ON_ULDIAG:
+					int ULIndex = Board.getULDiagIndex(firstStone);
+					int ULSubIndex = Board.getULDiagSubIndex(firstStone);
+					int[] ulDiag = this.getULDiagByIndex(ULIndex);
+					if (ulDiag.length <= 5)
+						return false;
+					else if (ULSubIndex == 0) {
+						if (ulDiag[5] == blocker)
+							return false;
+					} else if (ULSubIndex == ulDiag.length - 3) {
+						if (ulDiag[ulDiag.length - 5] == blocker)
+							return false;
+					}
+					break;
+				case Pattern.ON_URDIAG:
+					int URIndex = Board.getURDiagIndex(firstStone);
+					int URSubIndex = Board.getURDiagSubIndex(firstStone);
+					int[] urDiag = this.getURDiagByIndex(ULIndex);
+					if (urDiag.length <= 5)
+						return false;
+					else if (URSubIndex == 0) {
+						if (urDiag[5] == blocker)
+							return false;
+					} else if (URSubIndex == urDiag.length - 3) {
+						if (urDiag[urDiag.length - 5] == blocker)
+							return false;
+					}
+					break;
+				default:
+					break;
+				}
+				return true;
+			}
+		} else if (pat.getClass() == DiscOpenPattern.class
+				|| pat.getClass() == DiscClosedPattern.class) {
+			int[] array;
+			ArrayList<Pattern> patternsFound;
+			switch (pat.getType()) {
+			case Pattern.ON_ROW:
+				array = this.getRowByIndex(firstStone.getYPos());
+				break;
+			case Pattern.ON_COL:
+				array = this.getColumnByIndex(firstStone.getXPos());
+				break;
+			case Pattern.ON_ULDIAG:
+				array = this.getULDiagByIndex(Board.getULDiagIndex(firstStone));
+				break;
+			case Pattern.ON_URDIAG:
+				array = this.getURDiagByIndex(Board.getURDiagIndex(firstStone));
+				break;
+			default:
+				break;
+			}
+			patternsFound = BoardChecker.checkOpenPatCont(array, 0,
+					pat.getType(), true, 4, this);
+			if (patternsFound.size() != 0
+					&& pat.getLocations().contains(
+							patternsFound.get(0).getLocations().get(0)))
+				return true;
+		}
+
+		return false;
 	}
 }
