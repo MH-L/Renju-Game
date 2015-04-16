@@ -3,6 +3,7 @@ package test.algorithmTest;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+
 import model.Board;
 import model.BoardLocation;
 
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import exceptions.InvalidIndexException;
 import algorithm.BoardChecker;
+import algorithm.ContOpenPattern;
 import algorithm.Pattern;
 
 public class BoardCheckerTest {
@@ -242,5 +244,22 @@ public class BoardCheckerTest {
 		assertEquals(new BoardLocation(5, 3), newPat.getLocations().get(1));
 		assertEquals(new BoardLocation(7, 1), newPat.getLocations().get(2));
 		assertEquals(new BoardLocation(8, 0), newPat.getLocations().get(3));
+	}
+
+	@Test
+	public void testPatternInControl() throws InvalidIndexException {
+		board.updateBoard(new BoardLocation(4, 5), true);
+		board.updateBoard(new BoardLocation(4, 6), true);
+		board.updateBoard(new BoardLocation(4, 7), true);
+		board.updateBoard(new BoardLocation(4, 9), false);
+		board.updateBoard(new BoardLocation(4, 3), false);
+		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
+		locations.add(new BoardLocation(4, 5));
+		locations.add(new BoardLocation(4, 6));
+		locations.add(new BoardLocation(4, 7));
+		ContOpenPattern checker = new ContOpenPattern(locations, Pattern.ON_ROW, null);
+		assertTrue(BoardChecker.isOpenPatInControl(board, checker, true));
+		board.withdrawMove(new BoardLocation(4, 9));
+		assertFalse(BoardChecker.isOpenPatInControl(board, checker, true));
 	}
 }

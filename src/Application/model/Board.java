@@ -1346,4 +1346,15 @@ public class Board {
 			return true;
 		return false;
 	}
+
+	public boolean checkTwoFour() {
+		ArrayList<Pattern> results = BoardChecker.checkBoardClosedPatCont(this,
+				true, 4);
+		results.addAll(BoardChecker.checkBoardClosedPatDisc(this, true, 4));
+		results.addAll(BoardChecker.checkBoardOpenPatDisc(this, true, 4));
+		results.addAll(BoardChecker.checkBoardOpenPatCont(this, true, 4));
+		if (results.size() >= 2)
+			return true;
+		return false;
+	}
 }
