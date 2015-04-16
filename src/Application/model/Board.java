@@ -1276,7 +1276,7 @@ public class Board {
 				case Pattern.ON_URDIAG:
 					int URIndex = Board.getURDiagIndex(firstStone);
 					int URSubIndex = Board.getURDiagSubIndex(firstStone);
-					int[] urDiag = this.getURDiagByIndex(ULIndex);
+					int[] urDiag = this.getURDiagByIndex(URIndex);
 					if (urDiag.length <= 5)
 						return false;
 					else if (URSubIndex == 0) {
@@ -1310,6 +1310,7 @@ public class Board {
 				array = this.getURDiagByIndex(Board.getURDiagIndex(firstStone));
 				break;
 			default:
+				array = new int[1];
 				break;
 			}
 			patternsFound = BoardChecker.checkOpenPatCont(array, 0,
@@ -1320,6 +1321,29 @@ public class Board {
 				return true;
 		}
 
+		return false;
+	}
+
+	/**
+	 * This method checks if the first player has two open threes on the board.
+	 *
+	 * @return True if there is, false if there is not.
+	 */
+	public boolean checkTwoOpenThree() {
+		ArrayList<Pattern> results = BoardChecker.checkBoardOpenPatCont(this,
+				true, 3);
+		results.addAll(BoardChecker.checkBoardOpenPatDisc(this, true, 3));
+		ArrayList<Pattern> checker = new ArrayList<Pattern>();
+		for (Pattern pat : results) {
+			if (pat.getClass() == ContOpenPattern.class) {
+				if (BoardChecker.isOpenPatInControl(this,
+						(ContOpenPattern) pat, true))
+					continue;
+			}
+			checker.add(pat);
+		}
+		if (checker.size() >= 2)
+			return true;
 		return false;
 	}
 }

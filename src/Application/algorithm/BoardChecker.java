@@ -506,8 +506,8 @@ public class BoardChecker {
 								break;
 							}
 							patterns.add(makeDiscPattern(firstStone, type,
-									temp.indexOf(Board.EMPTY_SPOT) - 1, num, true,
-									board));
+									temp.indexOf(Board.EMPTY_SPOT) - 1, num,
+									true, board));
 						} else {
 							switch (type) {
 							case Pattern.ON_ROW:
@@ -728,6 +728,49 @@ public class BoardChecker {
 					locations, type));
 		return pat;
 
+	}
+
+	public static boolean isOpenPatInControl(Board board, ContOpenPattern pat, boolean first) {
+		if (pat.getLocations().size() != 3)
+			return false;
+		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		BoardLocation firstStone = pat.getLocations().get(0);
+		int[][] grid = board.getGrids();
+		switch (pat.getType()) {
+		case Pattern.ON_ROW:
+			int[] row = board.getRowByIndex(firstStone.getYPos());
+			int rowIndex = firstStone.getXPos();
+			if (rowIndex >= 2 && row[rowIndex - 2] == blocker)
+				if (rowIndex + 2 <= Board.getWidth() - 2 && row[rowIndex + 4] == blocker)
+					return true;
+			break;
+		case Pattern.ON_COL:
+			int[] column = board.getColumnByIndex(firstStone.getYPos());
+			int colIndex = firstStone.getXPos();
+			if (colIndex >= 2 && column[colIndex - 2] == blocker)
+				if (colIndex + 2 <= Board.getHeight() - 2 && column[colIndex + 4] == blocker)
+					return true;
+			break;
+		case Pattern.ON_ULDIAG:
+			int diagIndex = Board.getULDiagIndex(firstStone);
+			int[] ulDiag = board.getULDiagByIndex(diagIndex);
+			int subIndex = Board.getULDiagSubIndex(firstStone);
+			if (subIndex >= 2 && ulDiag[subIndex - 2] == blocker)
+				if (subIndex + 2 <= Board.getHeight() - 2 && ulDiag[subIndex + 4] == blocker)
+					return true;
+			break;
+		case Pattern.ON_URDIAG:
+			int urdiagIndex = Board.getURDiagIndex(firstStone);
+			int[] urDiag = board.getURDiagByIndex(urdiagIndex);
+			int ursubIndex = Board.getURDiagSubIndex(firstStone);
+			if (ursubIndex >= 2 && urDiag[ursubIndex - 2] == blocker)
+				if (ursubIndex + 2 <= Board.getHeight() - 2 && urDiag[ursubIndex + 4] == blocker)
+					return true;
+			break;
+		default:
+			break;
+		}
+		return false;
 	}
 
 }
