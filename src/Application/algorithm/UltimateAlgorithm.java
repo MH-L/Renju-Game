@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
 
 public class UltimateAlgorithm extends Algorithm {
+	private VirtualBoard vBoard;
 
 	public UltimateAlgorithm(Board board) {
 		super(board);
@@ -22,6 +24,10 @@ public class UltimateAlgorithm extends Algorithm {
 	public BoardLocation findBestLocation() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public VirtualBoard getVirtualBoard() {
+		return this.vBoard;
 	}
 
 }

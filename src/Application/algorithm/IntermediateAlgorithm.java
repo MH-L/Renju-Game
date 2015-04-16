@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
+	private VirtualBoard vBoard;
+	public static final int calculationSteps = 2;
 
 	public IntermediateAlgorithm(Board board) {
 		super(board);
@@ -22,6 +25,10 @@ public class IntermediateAlgorithm extends Algorithm {
 	public BoardLocation findBestLocation() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public VirtualBoard getVirtualBoard() {
+		return this.vBoard;
 	}
 
 }
