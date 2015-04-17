@@ -110,7 +110,7 @@ public abstract class Algorithm {
 		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
 		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
 			int randSeed = getRandNum(8);
-			return Board.findAdjacentLocs(firstMove).get(randSeed);
+			return Board.findAdjacentLocs(firstMove).get(randSeed - 1);
 		}
 		int randSeed = getRandNum(2);
 		int desiredDist = randSeed == 1 ? 2 : 3;

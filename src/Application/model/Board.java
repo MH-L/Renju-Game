@@ -550,7 +550,7 @@ public class Board {
 		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
 		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
 		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
-		if (this.player1Stone.size() > this.player2Stone.size())
+		if (player1Stone.contains(lastMove))
 			this.player1Stone.remove(lastMove);
 		else
 			this.player2Stone.remove(lastMove);

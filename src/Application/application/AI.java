@@ -62,6 +62,7 @@ public class AI implements IPlayer {
 	public boolean withdraw() throws WithdrawException {
 		// TODO Auto-generated method stub
 		// Since AI will never withdraw, just do not do anything.
+		this.lastMove = Board.getInvalidBoardLocation();
 		return false;
 	}
 
@@ -73,6 +74,7 @@ public class AI implements IPlayer {
 		} catch (InvalidIndexException e) {
 			e.printStackTrace();
 		}
+		lastMove = Board.getInvalidBoardLocation();
 	}
 
 	@Override
@@ -85,6 +87,12 @@ public class AI implements IPlayer {
 		// TODO
 		else
 			nextMove = solver.makeMoveEnd();
+		lastMove = nextMove;
 		return nextMove;
+	}
+
+	@Override
+	public BoardLocation getLastMove() {
+		return lastMove;
 	}
 }

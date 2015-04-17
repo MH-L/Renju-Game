@@ -49,7 +49,10 @@ public class Game {
 		player1 = new Player();
 		player2 = application.AI.getInstance();
 		AI.initAI(difficulty, board);
-		activePlayer = player1;
+	}
+
+	public void setFirst(boolean playerFirst) {
+		activePlayer = playerFirst ? player1 : player2;
 	}
 
 	public static Game getInstance() {
@@ -59,7 +62,9 @@ public class Game {
 		return instance;
 	}
 
-	public void withdraw() throws WithdrawException{
+	public void withdraw() throws WithdrawException, InvalidIndexException{
+		board.withdrawMove(getActivePlayer().getLastMove());
+		board.withdrawMove(getInactivePlayer().getLastMove());
 		getActivePlayer().withdraw();
 		getInactivePlayer().forceWithdraw();
 	}
@@ -77,6 +82,7 @@ public class Game {
 	public void makeMove() throws InvalidIndexException {
 		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))
 			throw new InvalidIndexException("The index you entered is not valid!");
+		toggleActivePlayer();
 
 	}
 
@@ -98,21 +104,20 @@ public class Game {
 
 	public IPlayer getInactivePlayer(){
 		if (isPlayer1Active()){
-			return player1;
-		} else return player2;
+			return player2;
+		} else return player1;
 	}
 
 	public boolean isPlayer1Active(){
 		return activePlayer.equals(player1);
 	}
 
-	public IPlayer toggleActivePlayer(){
+	public void toggleActivePlayer(){
 		if (activePlayer.equals(player1)){
 			activePlayer = player2;
 		} else {
 			activePlayer = player1;
 		}
-		return activePlayer;
 	}
 
 	public static boolean isWinning() {

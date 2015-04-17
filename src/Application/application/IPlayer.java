@@ -8,5 +8,6 @@ public interface IPlayer {
 	BoardLocation makeMove() throws InvalidIndexException;
 	boolean withdraw() throws WithdrawException;
 	void forceWithdraw();
+	public BoardLocation getLastMove();
 
 }

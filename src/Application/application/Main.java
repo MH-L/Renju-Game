@@ -42,6 +42,9 @@ public class Main {
 			game.initMultiplayer();
 		}
 
+		boolean playerFirst = getIfFirst(reader);
+		game.setFirst(playerFirst);
+
 		System.out.println("The match is set as " + getModeAsString()
 				+ " in a " + Board.getWidth() + "x" + Board.getHeight()
 				+ " board as shown:");
@@ -64,9 +67,20 @@ public class Main {
 					return;
 				case "w":
 					try {
-						actionWithdraw();
+						try {
+							actionWithdraw();
+							System.out.format("You have %d withdrawals left.\n",
+									((Player) game.getActivePlayer())
+											.getRegrets());
+							System.out.println("Now the board is shown below.");
+							game.getBoard().renderBoard(dispMode);
+							continue;
+						} catch (InvalidIndexException e1) {
+							System.out.println(e1.getMessage());
+						}
 					} catch (WithdrawException e1) {
 						// Redo this turn since the player is out of withdrawals
+						System.out.println("You are out of withdrawals!");
 						continue;
 					}
 				case "i":
@@ -83,8 +97,6 @@ public class Main {
 				}
 				continue;
 			}
-
-			game.toggleActivePlayer();
 		}
 		if (Game.isWinning()) {
 			// get inactive player because the current player was toggled at the
@@ -98,7 +110,8 @@ public class Main {
 		reader.close();
 	}
 
-	private static void actionWithdraw() throws WithdrawException {
+	private static void actionWithdraw() throws WithdrawException,
+			InvalidIndexException {
 		game.withdraw();
 	}
 
@@ -200,7 +213,7 @@ public class Main {
 	}
 
 	/**
-	 * Retusn the game mode as a string
+	 * Return the game mode as a string
 	 *
 	 * @return "single player" if the mode is SINGLEPLAYER_GAME_MODE
 	 *         "multi-player" if the mode is MULTIPLAYER_GAME_MODE
@@ -211,5 +224,20 @@ public class Main {
 		} else {
 			return "multiplayer";
 		}
+	}
+
+	private static boolean getIfFirst(Scanner reader) {
+		System.out.println("Do you want to make move first?\n"
+				+ "(1) Yes\n(2) No");
+		String input = reader.nextLine();
+		while (!input.equals("1") && !input.equals("2")) {
+			System.out
+					.println("The choice you entered is invalid. Please re-enter.");
+			input = reader.nextLine();
+		}
+		if (Integer.parseInt(input) == 1)
+			return true;
+		else
+			return false;
 	}
 }
