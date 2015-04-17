@@ -3,6 +3,7 @@ package algorithm;
 import java.util.ArrayList;
 import java.util.Random;
 
+import exceptions.InvalidIndexException;
 import model.Board;
 import model.BoardLocation;
 import model.VirtualBoard;
@@ -11,6 +12,7 @@ public abstract class Algorithm {
 	private static Board board;
 	private static final Random rand = new Random();
 	protected VirtualBoard vBoard;
+	boolean isFirst;
 
 	public Algorithm(Board board) {
 		this.board = board;
@@ -18,6 +20,58 @@ public abstract class Algorithm {
 
 	public ArrayList<BoardLocation> calculateAttack() {
 		vBoard = (VirtualBoard) board;
+		ArrayList<BoardLocation> previousStones = isFirst ? board
+				.getPlayer1Stone() : board.getPlayer2Stone();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		for (BoardLocation stone : previousStones) {
+			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
+			curCandidates.addAll(Board.getJumpLocations(stone));
+			for (BoardLocation loc : curCandidates) {
+				if (!candidates.contains(loc))
+					candidates.add(loc);
+			}
+		}
+		this.vBoard = new VirtualBoard(this.board);
+		for (BoardLocation adjacentLoc : candidates) {
+			try {
+				vBoard.updateBoard(adjacentLoc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() == 0)
+				candidates.remove(adjacentLoc);
+			try {
+				vBoard.withdrawMove(adjacentLoc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+
+		if (candidates.isEmpty())
+			candidates.add(board.findEmptyLocSpiral());
+		return candidates;
+	}
+
+	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
+		if (locations.size() == 1)
+			return locations.get(0);
+		if (locations.isEmpty())
+			return board.findEmptyLocSpiral();
+		this.vBoard = new VirtualBoard(this.board);
+		for (BoardLocation location : locations) {
+			try {
+				vBoard.updateBoard(location, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			for (Pattern pat : patterns) {
+				if (board.isPatternWinning(pat))
+					return location;
+			}
+		}
+
+		return locations.get(getRandNum(locations.size()) - 1);
 	}
 
 	public static int getRandNum(int modulo) {
