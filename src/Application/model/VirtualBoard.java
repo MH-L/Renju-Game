@@ -14,6 +14,19 @@ public class VirtualBoard extends Board {
 	private ArrayList<BoardLocation> additionalP2stones;
 	private int stepsToFuture;
 
+	public VirtualBoard(Board board) {
+		this.basicGrid = board.basicGrid;
+		this.columns = board.columns;
+		this.diagonals_Uleft = board.diagonals_Uleft;
+		this.diagonals_Uright = board.diagonals_Uright;
+		this.rows = board.rows;
+		this.player1Stone = board.player1Stone;
+		this.player2Stone = board.player2Stone;
+		this.stepsToFuture = 0;
+		this.additionalP1stones = new ArrayList<BoardLocation>();
+		this.additionalP2stones = new ArrayList<BoardLocation>();
+	}
+
 	public ArrayList<BoardLocation> getAdditionalP1stones() {
 		return additionalP1stones;
 	}

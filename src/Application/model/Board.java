@@ -24,46 +24,46 @@ public class Board {
 	 * spot is empty, 1 if occupied by a stone belongs to the first player, 2 if
 	 * occupied by a stone belongs to the second player.
 	 */
-	private int[][] basicGrid;
+	protected int[][] basicGrid;
 	/**
 	 * All rows on the board. A row's index on board equals its index in the
 	 * array list.
 	 */
-	private ArrayList<int[]> rows;
+	protected ArrayList<int[]> rows;
 	/**
 	 * All columns on the board. A column's index on board equals its index in
 	 * the array list.
 	 */
-	private ArrayList<int[]> columns;
+	protected ArrayList<int[]> columns;
 	/**
 	 * All upper-left diagonals on the board.
 	 */
-	private ArrayList<int[]> diagonals_Uleft;
+	protected ArrayList<int[]> diagonals_Uleft;
 	/**
 	 * All upper-right diagonals on the board.
 	 */
-	private ArrayList<int[]> diagonals_Uright;
+	protected ArrayList<int[]> diagonals_Uright;
 	/**
 	 * This is the width of the board. It is always 16.
 	 */
-	private static int width = 16;
+	protected static int width = 16;
 	/**
 	 * This is the height of the board. It is always 16.
 	 */
-	private static int height = 16;
+	protected static int height = 16;
 	/**
 	 * The number of diagonals on board. Note that there are the same number of
 	 * upper-left diagonals and upper-right diagonals.
 	 */
-	private static int diag = 31;
+	protected static int diag = 31;
 	/**
 	 * Player 1's stones on board.
 	 */
-	private ArrayList<BoardLocation> player1Stone;
+	protected ArrayList<BoardLocation> player1Stone;
 	/**
 	 * Player 2's stones on board.
 	 */
-	private ArrayList<BoardLocation> player2Stone;
+	protected ArrayList<BoardLocation> player2Stone;
 	/**
 	 * Number of stones in a row in order to win.
 	 */
@@ -1357,4 +1357,68 @@ public class Board {
 			return true;
 		return false;
 	}
+
+	public static ArrayList<BoardLocation> getJumpLocations(BoardLocation loc) {
+		ArrayList<BoardLocation> returnVal = new ArrayList<BoardLocation>();
+		int y = loc.getYPos();
+		int x = loc.getXPos();
+		if (x - 2 < 0) {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			}
+		} else if (x + 2 >= width) {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			}
+		} else {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+			}
+		}
+		return returnVal;
+	}
+
 }

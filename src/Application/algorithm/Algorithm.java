@@ -5,13 +5,19 @@ import java.util.Random;
 
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
 
 public abstract class Algorithm {
 	private static Board board;
 	private static final Random rand = new Random();
+	protected VirtualBoard vBoard;
 
 	public Algorithm(Board board) {
 		this.board = board;
+	}
+
+	public ArrayList<BoardLocation> calculateAttack() {
+		vBoard = (VirtualBoard) board;
 	}
 
 	public static int getRandNum(int modulo) {
@@ -162,6 +168,5 @@ public abstract class Algorithm {
 				retVal.add(loc);
 		}
 		return retVal;
-
 	}
 }
