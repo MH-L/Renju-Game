@@ -99,10 +99,12 @@ public class Main {
 		if (Game.isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
+			if (game.getBoard().getTotalStones() <= 8)
+				System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
 		} else if (Game.boardFull()) {
-			System.out.println("There are no more moves left. You both lose!");
+			System.out.println("There are no more moves left. You both came to a draw!");
 		}
 
 		reader.close();

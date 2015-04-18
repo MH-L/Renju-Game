@@ -26,16 +26,20 @@ public abstract class Algorithm {
 				.getPlayer1Stone() : board.getPlayer2Stone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		for (BoardLocation stone : previousStones) {
-			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
+			ArrayList<BoardLocation> curCandidates = Board
+					.findAdjacentLocs(stone);
 			curCandidates.addAll(Board.getJumpLocations(stone));
 			for (BoardLocation loc : curCandidates) {
-				if (!candidates.contains(loc) && Board.isReachable(loc) && !board.isOccupied(loc))
+				if (!candidates.contains(loc) && Board.isReachable(loc)
+						&& !board.isOccupied(loc))
 					candidates.add(loc);
 			}
+			curCandidates.clear();
 		}
 		Board anotherBoard = (Board) DeepCopy.copy(board);
 		this.vBoard = VirtualBoard.getVBoard(anotherBoard);
 		Iterator<BoardLocation> iter = candidates.iterator();
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		while (iter.hasNext()) {
 			BoardLocation adjacentLoc = iter.next();
 			try {
@@ -43,8 +47,16 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() == 0)
-				iter.remove();
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
+					isFirst);
+			for (Pattern pat : patterns)
+				if (board.isPatternWinning(pat)) {
+					retVal.clear();
+					retVal.add(adjacentLoc);
+					return retVal;
+				}
+			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() != 0)
+				retVal.add(adjacentLoc);
 			try {
 				vBoard.withdrawMove(adjacentLoc);
 			} catch (InvalidIndexException e) {
@@ -52,9 +64,9 @@ public abstract class Algorithm {
 			}
 		}
 
-		if (candidates.isEmpty())
-			candidates.add(board.findEmptyLocSpiral());
-		return candidates;
+		if (retVal.isEmpty())
+			retVal.add(board.findEmptyLocSpiral());
+		return retVal;
 	}
 
 	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
@@ -69,7 +81,8 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
+					!isFirst);
 			for (Pattern pat : patterns) {
 				if (board.isPatternWinning(pat))
 					return location;
@@ -151,9 +164,13 @@ public abstract class Algorithm {
 		else if (board.getTotalStones() == 3)
 			return makeSecondMoveSecond();
 		else {
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
+					isFirst);
 			if (patterns.size() != 0) {
-				return patterns.get(0).getBlockingLocs().get(0);
+				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+				if (result.size() != 0)
+					return result.get(getRandNum(result.size() - 1));
 			}
 			ArrayList<BoardLocation> locations = calculateAttack();
 			return processLocs(locations);
@@ -161,7 +178,6 @@ public abstract class Algorithm {
 	}
 
 	public BoardLocation makeSecondMoveFirst() {
-		// TODO Auto-generated method stub
 		BoardLocation firstMove = board.getPlayer1Stone().get(0);
 		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
 		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
@@ -200,13 +216,16 @@ public abstract class Algorithm {
 	}
 
 	public BoardLocation makeMoveEnd() {
-		// TODO Auto-generated method stub
-		ArrayList<Pattern> patterns = BoardChecker
-				.checkAllPatterns(board, true);
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
+				isFirst);
 		if (patterns.size() != 0) {
-			return patterns.get(0).getBlockingLocs().get(0);
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0)
+				return result.get(getRandNum(result.size() - 1));
 		}
-		return board.findEmptyLocSpiral();
+		ArrayList<BoardLocation> locations = calculateAttack();
+		return processLocs(locations);
 	}
 
 	public static ArrayList<BoardLocation> filterWithDesiredDist(
@@ -216,6 +235,65 @@ public abstract class Algorithm {
 		for (BoardLocation loc : candidate) {
 			if (Board.findDistance(loc, comparer) == desiredDist)
 				retVal.add(loc);
+		}
+		return retVal;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	/**
+	 * Filter blocking locations in terms of being able to attack.
+	 *
+	 * @param blockingLocs
+	 *            The list of blocking locations to filter.
+	 * @return An arrayList of board locations which can form a pattern with
+	 *         previous stones.
+	 */
+	public ArrayList<BoardLocation> filterBlockingLocsAtk(
+			ArrayList<BoardLocation> blockingLocs) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		int prevSize = BoardChecker.checkAllPatterns(board, isFirst).size();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (BoardLocation blockingloc : blockingLocs) {
+			if (retVal.contains(blockingloc))
+				continue;
+			try {
+				vBoard.updateBoard(blockingloc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> pats = BoardChecker.checkAllPatterns(vBoard,
+					isFirst);
+			if (pats.size() > prevSize) {
+				retVal.add(blockingloc);
+				continue;
+			}
+			for (Pattern patt : pats) {
+				if (board.isPatternWinning(patt)) {
+					retVal.clear();
+					retVal.add(blockingloc);
+				}
+			}
+			try {
+				vBoard.withdrawMove(blockingloc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return retVal;
+	}
+
+	public ArrayList<BoardLocation> extractBlockingLocs(
+			ArrayList<Pattern> patterns) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (Pattern pat : patterns) {
+			ArrayList<BoardLocation> candidates = pat.getBlockingLocs();
+			for (BoardLocation loc : candidates) {
+				if (!retVal.contains(loc))
+					retVal.add(loc);
+			}
 		}
 		return retVal;
 	}

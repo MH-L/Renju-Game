@@ -1246,7 +1246,7 @@ public class Board implements Serializable {
 	 * @return The first empty spot found on board.
 	 */
 	public BoardLocation findEmptyLocSpiral() {
-		if (Game.boardFull())
+		if (boardFull())
 			return Board.getInvalidBoardLocation();
 		BoardLocation firstLoc;
 		if (width % 2 == 0)
