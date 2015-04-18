@@ -33,7 +33,8 @@ public class Main {
 				// This would be better if initSinglePlayer handled this input
 				// but creating a new exception might be overkill for something
 				// that likely isn't going to change
-				game.initSinglePlayer(diff);
+				boolean playerFirst = getIfFirst(reader);
+				game.initSinglePlayer(diff, playerFirst);
 			} else {
 				System.err.println("Internal Error!");
 				return;
@@ -41,9 +42,6 @@ public class Main {
 		} else {
 			game.initMultiplayer();
 		}
-
-		boolean playerFirst = getIfFirst(reader);
-		game.setFirst(playerFirst);
 
 		System.out.println("The match is set as " + getModeAsString()
 				+ " in a " + Board.getWidth() + "x" + Board.getHeight()

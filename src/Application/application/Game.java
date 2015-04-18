@@ -42,17 +42,15 @@ public class Game {
 	 * Initialize the game to single-player of difficulty <code>difficulty</code>
 	 * @param difficulty
 	 * 		The difficulty of the game
+	 * @param playerFirst
 	 */
-	public void initSinglePlayer(int difficulty){
+	public void initSinglePlayer(int difficulty, boolean playerFirst){
 		this.mode = SINGLEPLAYER_GAME_MODE;
 		board = new Board();
-		player1 = new Player();
-		player2 = application.AI.getInstance();
-		AI.initAI(difficulty, board);
-	}
-
-	public void setFirst(boolean playerFirst) {
-		activePlayer = playerFirst ? player1 : player2;
+		player1 = playerFirst ? new Player() : application.AI.getInstance();
+		player2 = playerFirst ? application.AI.getInstance() : new Player();
+		AI.initAI(difficulty, board, !playerFirst);
+		activePlayer = player1;
 	}
 
 	public static Game getInstance() {

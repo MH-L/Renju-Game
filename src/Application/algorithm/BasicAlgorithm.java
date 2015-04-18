@@ -7,8 +7,8 @@ import model.BoardLocation;
 
 public class BasicAlgorithm extends Algorithm {
 
-	public BasicAlgorithm(Board board) {
-		super(board);
+	public BasicAlgorithm(Board board, boolean isFirst) {
+		super(board, isFirst);
 	}
 
 	@Override

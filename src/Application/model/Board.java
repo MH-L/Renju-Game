@@ -1,6 +1,8 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import exceptions.InvalidIndexException;
 import algorithm.BoardChecker;
@@ -18,52 +20,56 @@ import application.Game;
  * @Date 2015/4/9
  *
  */
-public class Board {
+public class Board implements Serializable {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 5164712316412329207L;
 	/**
 	 * A height-by-width grid representing the board. Grid value is zero if the
 	 * spot is empty, 1 if occupied by a stone belongs to the first player, 2 if
 	 * occupied by a stone belongs to the second player.
 	 */
-	protected int[][] basicGrid;
+	private int[][] basicGrid;
 	/**
 	 * All rows on the board. A row's index on board equals its index in the
 	 * array list.
 	 */
-	protected ArrayList<int[]> rows;
+	private ArrayList<int[]> rows;
 	/**
 	 * All columns on the board. A column's index on board equals its index in
 	 * the array list.
 	 */
-	protected ArrayList<int[]> columns;
+	private ArrayList<int[]> columns;
 	/**
 	 * All upper-left diagonals on the board.
 	 */
-	protected ArrayList<int[]> diagonals_Uleft;
+	private ArrayList<int[]> diagonals_Uleft;
 	/**
 	 * All upper-right diagonals on the board.
 	 */
-	protected ArrayList<int[]> diagonals_Uright;
+	private ArrayList<int[]> diagonals_Uright;
 	/**
 	 * This is the width of the board. It is always 16.
 	 */
-	protected static int width = 16;
+	private static int width = 16;
 	/**
 	 * This is the height of the board. It is always 16.
 	 */
-	protected static int height = 16;
+	private static int height = 16;
 	/**
 	 * The number of diagonals on board. Note that there are the same number of
 	 * upper-left diagonals and upper-right diagonals.
 	 */
-	protected static int diag = 31;
+	private static int diag = 31;
 	/**
 	 * Player 1's stones on board.
 	 */
-	protected ArrayList<BoardLocation> player1Stone;
+	private ArrayList<BoardLocation> player1Stone;
 	/**
 	 * Player 2's stones on board.
 	 */
-	protected ArrayList<BoardLocation> player2Stone;
+	private ArrayList<BoardLocation> player2Stone;
 	/**
 	 * Number of stones in a row in order to win.
 	 */
@@ -197,6 +203,34 @@ public class Board {
 		}
 
 		return this.getURDiags().get(index);
+	}
+
+	protected void setBasicGrid(int[][] basicGrid) {
+		this.basicGrid = basicGrid;
+	}
+
+	protected void setRows(ArrayList<int[]> rows) {
+		this.rows = rows;
+	}
+
+	protected void setColumns(ArrayList<int[]> columns) {
+		this.columns = columns;
+	}
+
+	protected void setDiagonals_Uleft(ArrayList<int[]> diagonals_Uleft) {
+		this.diagonals_Uleft = diagonals_Uleft;
+	}
+
+	protected void setDiagonals_Uright(ArrayList<int[]> diagonals_Uright) {
+		this.diagonals_Uright = diagonals_Uright;
+	}
+
+	protected void setPlayer1Stone(ArrayList<BoardLocation> player1Stone) {
+		this.player1Stone = player1Stone;
+	}
+
+	protected void setPlayer2Stone(ArrayList<BoardLocation> player2Stone) {
+		this.player2Stone = player2Stone;
 	}
 
 	/**
@@ -460,8 +494,8 @@ public class Board {
 			secondPlayerChar = 'O';
 			emptyLocChar = '-';
 		} else {
-			firstPlayerChar = '\u25CB';
-			secondPlayerChar = '\u25CF';
+			firstPlayerChar = '\u25CF';
+			secondPlayerChar = '\u25CB';
 			emptyLocChar = '\u25A1';
 		}
 
@@ -663,6 +697,69 @@ public class Board {
 					retLocs.add(anotherCandidate);
 		}
 		return retLocs;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(basicGrid);
+		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+		result = prime * result
+				+ ((diagonals_Uleft == null) ? 0 : diagonals_Uleft.hashCode());
+		result = prime
+				* result
+				+ ((diagonals_Uright == null) ? 0 : diagonals_Uright.hashCode());
+		result = prime * result
+				+ ((player1Stone == null) ? 0 : player1Stone.hashCode());
+		result = prime * result
+				+ ((player2Stone == null) ? 0 : player2Stone.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Board other = (Board) obj;
+		if (!Arrays.deepEquals(basicGrid, other.basicGrid))
+			return false;
+		if (columns == null) {
+			if (other.columns != null)
+				return false;
+		} else if (!columns.equals(other.columns))
+			return false;
+		if (diagonals_Uleft == null) {
+			if (other.diagonals_Uleft != null)
+				return false;
+		} else if (!diagonals_Uleft.equals(other.diagonals_Uleft))
+			return false;
+		if (diagonals_Uright == null) {
+			if (other.diagonals_Uright != null)
+				return false;
+		} else if (!diagonals_Uright.equals(other.diagonals_Uright))
+			return false;
+		if (player1Stone == null) {
+			if (other.player1Stone != null)
+				return false;
+		} else if (!player1Stone.equals(other.player1Stone))
+			return false;
+		if (player2Stone == null) {
+			if (other.player2Stone != null)
+				return false;
+		} else if (!player2Stone.equals(other.player2Stone))
+			return false;
+		if (rows == null) {
+			if (other.rows != null)
+				return false;
+		} else if (!rows.equals(other.rows))
+			return false;
+		return true;
 	}
 
 	/**

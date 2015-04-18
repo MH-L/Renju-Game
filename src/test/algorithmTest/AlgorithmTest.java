@@ -14,7 +14,7 @@ public class AlgorithmTest {
 
 	@Before
 	public void initialize() {
-		alg = new UltimateAlgorithm(new Board());
+		alg = new UltimateAlgorithm(new Board(), true);
 	}
 
 	@Test

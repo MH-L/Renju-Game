@@ -16,8 +16,7 @@ public class GameTest {
 	@Before
 	public void init() {
 		game = Game.getInstance();
-		game.initSinglePlayer(Game.NOVICE_DIFFICULTY);
-		game.setFirst(true);
+		game.initSinglePlayer(Game.NOVICE_DIFFICULTY, true);
 	}
 
 	@Test
@@ -31,7 +30,6 @@ public class GameTest {
 		assertEquals(game.getBoard().getPlayer1Stone().size(), 1);
 		assertEquals(game.getBoard().getPlayer2Stone().size(), 1);
 		game.withdraw();
-		BoardLocation AILM = game.getInactivePlayer().getLastMove();
 		assertEquals(game.getBoard().getTotalStones(), 0);
 	}
 }

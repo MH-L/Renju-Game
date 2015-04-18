@@ -1,8 +1,10 @@
 package algorithm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
+import utils.DeepCopy;
 import exceptions.InvalidIndexException;
 import model.Board;
 import model.BoardLocation;
@@ -14,12 +16,12 @@ public abstract class Algorithm {
 	protected VirtualBoard vBoard;
 	boolean isFirst;
 
-	public Algorithm(Board board) {
-		this.board = board;
+	public Algorithm(Board board, boolean isFirst) {
+		Algorithm.board = board;
+		this.isFirst = isFirst;
 	}
 
 	public ArrayList<BoardLocation> calculateAttack() {
-		vBoard = (VirtualBoard) board;
 		ArrayList<BoardLocation> previousStones = isFirst ? board
 				.getPlayer1Stone() : board.getPlayer2Stone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
@@ -27,19 +29,22 @@ public abstract class Algorithm {
 			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
 			curCandidates.addAll(Board.getJumpLocations(stone));
 			for (BoardLocation loc : curCandidates) {
-				if (!candidates.contains(loc))
+				if (!candidates.contains(loc) && Board.isReachable(loc) && !board.isOccupied(loc))
 					candidates.add(loc);
 			}
 		}
-		this.vBoard = new VirtualBoard(this.board);
-		for (BoardLocation adjacentLoc : candidates) {
+		Board anotherBoard = (Board) DeepCopy.copy(board);
+		this.vBoard = VirtualBoard.getVBoard(anotherBoard);
+		Iterator<BoardLocation> iter = candidates.iterator();
+		while (iter.hasNext()) {
+			BoardLocation adjacentLoc = iter.next();
 			try {
 				vBoard.updateBoard(adjacentLoc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
 			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() == 0)
-				candidates.remove(adjacentLoc);
+				iter.remove();
 			try {
 				vBoard.withdrawMove(adjacentLoc);
 			} catch (InvalidIndexException e) {
@@ -57,20 +62,19 @@ public abstract class Algorithm {
 			return locations.get(0);
 		if (locations.isEmpty())
 			return board.findEmptyLocSpiral();
-		this.vBoard = new VirtualBoard(this.board);
+		this.vBoard = VirtualBoard.getVBoard(board);
 		for (BoardLocation location : locations) {
 			try {
 				vBoard.updateBoard(location, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
 			for (Pattern pat : patterns) {
 				if (board.isPatternWinning(pat))
 					return location;
 			}
 		}
-
 		return locations.get(getRandNum(locations.size()) - 1);
 	}
 
@@ -147,20 +151,12 @@ public abstract class Algorithm {
 		else if (board.getTotalStones() == 3)
 			return makeSecondMoveSecond();
 		else {
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-					true);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, isFirst);
 			if (patterns.size() != 0) {
 				return patterns.get(0).getBlockingLocs().get(0);
 			}
-		}
-		ArrayList<BoardLocation> result = board.filterOccupied(Board
-				.findAdjacentLocs(board.getPlayer2Stone().get(
-						board.getPlayer2Stone().size() - 1)));
-		if (result.size() == 0)
-			return board.findEmptyLocSpiral();
-		else {
-			int randSeed = getRandNum(result.size()) - 1;
-			return result.get(randSeed);
+			ArrayList<BoardLocation> locations = calculateAttack();
+			return processLocs(locations);
 		}
 	}
 

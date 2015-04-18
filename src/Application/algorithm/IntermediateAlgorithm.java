@@ -9,8 +9,8 @@ import model.VirtualBoard;
 public class IntermediateAlgorithm extends Algorithm {
 	public static final int calculationSteps = 2;
 
-	public IntermediateAlgorithm(Board board) {
-		super(board);
+	public IntermediateAlgorithm(Board board, boolean isFirst) {
+		super(board, isFirst);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -36,24 +36,24 @@ public class AI implements IPlayer {
 		return instance;
 	}
 
-	public static void initAI(int difficulty, Board board) {
+	public static void initAI(int difficulty, Board board, boolean isFirst) {
 		// TODO Board param may not be needed if game board is static
 		AI.difficulty = difficulty;
 		AI.board = board;
 		switch (difficulty) {
 		case Game.NOVICE_DIFFICULTY:
-			AI.solver = new BasicAlgorithm(board);
+			AI.solver = new BasicAlgorithm(board, isFirst);
 			break;
 		case Game.INTERMEDIATE_DIFFICULTY:
-			AI.solver = new IntermediateAlgorithm(board);
+			AI.solver = new IntermediateAlgorithm(board, isFirst);
 			break;
 		case Game.ADVANCED_DIFFICULTY:
-			AI.solver = new AdvancedAlgorithm(board);
+			AI.solver = new AdvancedAlgorithm(board, isFirst);
 			break;
 		case Game.ULTIMATE_DIFFICULTY:
-			AI.solver = new UltimateAlgorithm(board);
+			AI.solver = new UltimateAlgorithm(board, isFirst);
 		default:
-			AI.solver = new UltimateAlgorithm(board);
+			AI.solver = new UltimateAlgorithm(board, isFirst);
 			break;
 		}
 	}
