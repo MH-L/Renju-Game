@@ -19,6 +19,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		// Get initializations
+		printHeader();
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
 		int dispMode = getDisplayMode();
@@ -67,7 +68,8 @@ public class Main {
 					try {
 						try {
 							actionWithdraw();
-							System.out.format("You have %d withdrawals left.\n",
+							System.out.format(
+									"You have %d withdrawals left.\n",
 									((Player) game.getActivePlayer())
 											.getRegrets());
 							System.out.println("Now the board is shown below.");
@@ -99,15 +101,21 @@ public class Main {
 		if (Game.isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
-			if (game.getBoard().getTotalStones() <= 8)
-				System.err.println("Fuck! This is not even possible!");
+			// if (game.getBoard().getTotalStones() <= 8)
+			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
 		} else if (Game.boardFull()) {
-			System.out.println("There are no more moves left. You both came to a draw!");
+			System.out
+					.println("There are no more moves left. You both came to a draw!");
 		}
 
 		reader.close();
+	}
+
+	private static void printHeader() {
+		System.out.println("Renju Game. First Release. 2015/4/18.");
+		System.out.println("Created By: Minghao Liu. Refactor: Kelvin Yip.");
 	}
 
 	private static void actionWithdraw() throws WithdrawException,
@@ -130,7 +138,9 @@ public class Main {
 						+ "The first one to do so wins!"
 						+ "\nTo place a stone, enter the letter and number corresponding to the column and row respectively."
 						+ "\nSeparate the two by a comma."
-						+ "\n  For example: A,1 or 3,B."
+						+ "\n  For example: A,1 or 3,B are all valid inputs."
+						+ "\nHowever, inputs such as \"13,12\", \"A,G\", \"B\""
+						+ "\nare not valid ones."
 						+ "\n\nYou are allowed to undo your last move up to "
 						+ Player.NUM_REGRETS_LIMIT
 						+ " times."
@@ -162,7 +172,7 @@ public class Main {
 						+ " ("
 						+ Board.FANCY_MODE
 						+ ") Fancy mode\n"
-						+ " (Note that the fancy mode may require unicode plugin for your cmd.)");
+						+ " (Note that the fancy mode may require unicode setup for your cmd.)");
 		String displayMode = reader.next();
 		while (!displayMode.equals(String.valueOf(Board.CLASSIC_MODE))
 				&& !displayMode.equals(String.valueOf(Board.FANCY_MODE))) {
@@ -173,11 +183,15 @@ public class Main {
 	}
 
 	private static int getDifficulty() {
+		// TODO change here in future releases. since now we cannot set up more
+		// difficult versions.
 		System.out.println(" Please enter the AI difficulty:\n" + " ("
 				+ Game.NOVICE_DIFFICULTY + ") Novice\n" + " ("
-				+ Game.INTERMEDIATE_DIFFICULTY + ") Intermediate\n" + " ("
-				+ Game.ADVANCED_DIFFICULTY + ") Advanced\n" + " ("
-				+ Game.ULTIMATE_DIFFICULTY + ") Ultimate\n");
+				+ Game.INTERMEDIATE_DIFFICULTY
+				+ ") Intermediate (coming soon) \n" + " ("
+				+ Game.ADVANCED_DIFFICULTY + ") Advanced (coming soon) \n"
+				+ " (" + Game.ULTIMATE_DIFFICULTY
+				+ ") Ultimate (coming soon) \n");
 		String difficulty = reader.next();
 
 		while (!difficulty.equals(String.valueOf(Game.NOVICE_DIFFICULTY))

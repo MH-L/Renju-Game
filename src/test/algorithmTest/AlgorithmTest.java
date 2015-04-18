@@ -38,7 +38,7 @@ public class AlgorithmTest {
 		ArrayList<BoardLocation> locs = alg.calculateAttack();
 		assertEquals(alg.getBoard().getPlayer1Stone().size(), 1);
 		assertEquals(alg.getBoard().getPlayer2Stone().size(), 1);
-		assertEquals(locs.size(), 1);
+		assertEquals(locs.size(), 0);
 		bd.updateBoard(new BoardLocation(2, 2), true);
 		bd.updateBoard(new BoardLocation(2, 1), true);
 		bd.renderBoard(2);

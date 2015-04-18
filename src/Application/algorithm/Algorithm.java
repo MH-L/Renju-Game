@@ -63,18 +63,13 @@ public abstract class Algorithm {
 				continue;
 			}
 		}
-
-		if (retVal.isEmpty())
-			retVal.add(board.findEmptyLocSpiral());
 		return retVal;
 	}
 
 	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
-		if (locations.size() == 1)
-			return locations.get(0);
 		if (locations.isEmpty())
 			return board.findEmptyLocSpiral();
-		this.vBoard = VirtualBoard.getVBoard(board);
+		this.vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		for (BoardLocation location : locations) {
 			try {
 				vBoard.updateBoard(location, isFirst);
@@ -87,8 +82,16 @@ public abstract class Algorithm {
 				if (board.isPatternWinning(pat))
 					return location;
 			}
+			try {
+				vBoard.withdrawMove(location);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
 		}
-		return locations.get(getRandNum(locations.size()) - 1);
+		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
+//		System.out.format("The return value I gave is (%d, %d).\n",
+//				retVal.getXPos(), retVal.getYPos());
+		return retVal;
 	}
 
 	public static int getRandNum(int modulo) {
@@ -128,7 +131,7 @@ public abstract class Algorithm {
 			return new BoardLocation(Board.getHeight() / 2,
 					Board.getWidth() / 2);
 		}
-		return null;
+		return new BoardLocation(8, 8);
 	}
 
 	public BoardLocation makeFirstMoveSecond() {
@@ -165,12 +168,24 @@ public abstract class Algorithm {
 			return makeSecondMoveSecond();
 		else {
 			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-					isFirst);
+					!isFirst);
 			if (patterns.size() != 0) {
 				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-				if (result.size() != 0)
-					return result.get(getRandNum(result.size() - 1));
+				if (result.size() != 0) {
+					BoardLocation blockAttack = result.get(getRandNum(result
+							.size() - 1));
+//					System.out
+//							.format("The value I gave (for blocking attack) is (%d, %d).\n",
+//									blockAttack.getXPos(),
+//									blockAttack.getYPos());
+					return blockAttack;
+				}
+//				System.out
+//						.format("Special case: The value I gave (for blocking attack) is (%d, %d).\n",
+//								tofilter.get(0).getXPos(), tofilter.get(0)
+//										.getYPos());
+				return tofilter.get(0);
 			}
 			ArrayList<BoardLocation> locations = calculateAttack();
 			return processLocs(locations);
@@ -217,12 +232,15 @@ public abstract class Algorithm {
 
 	public BoardLocation makeMoveEnd() {
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-				isFirst);
+				!isFirst);
 		if (patterns.size() != 0) {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
 			if (result.size() != 0)
-				return result.get(getRandNum(result.size() - 1));
+				return result.get(getRandNum(result.size()) - 1);
+//			System.out.format("The blocking location I get is (%d, %d).\n",
+//					tofilter.get(0).getXPos(), tofilter.get(0).getYPos());
+			return tofilter.get(0);
 		}
 		ArrayList<BoardLocation> locations = calculateAttack();
 		return processLocs(locations);

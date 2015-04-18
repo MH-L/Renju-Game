@@ -84,10 +84,11 @@ public class AI implements IPlayer {
 		BoardLocation nextMove = null;
 		if (board.getTotalStones() < 10)
 			nextMove = solver.makeMoveBeginning();
-		// TODO
+		// TODO modify this function since it is not complete.
 		else
 			nextMove = solver.makeMoveEnd();
 		lastMove = nextMove;
+		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getXPos(), nextMove.getYPos());
 		return nextMove;
 	}
 
