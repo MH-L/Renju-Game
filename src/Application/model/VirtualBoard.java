@@ -2,6 +2,8 @@ package model;
 
 import java.util.ArrayList;
 
+import exceptions.InvalidIndexException;
+
 /**
  * Defines a virtual board. A virtual board is for calculating optimal locations
  * for AI to place its next stone.
@@ -47,6 +49,17 @@ public class VirtualBoard extends Board {
 
 	public int getStepsToFuture() {
 		return stepsToFuture;
+	}
+
+	@Override
+	public boolean updateBoard(BoardLocation location, boolean isFirst)
+			throws InvalidIndexException {
+		stepsToFuture++;
+		if (isFirst)
+			additionalP1stones.add(location);
+		else
+			additionalP2stones.add(location);
+		return super.updateBoard(location, isFirst);
 	}
 
 }

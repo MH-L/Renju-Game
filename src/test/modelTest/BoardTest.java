@@ -383,4 +383,32 @@ public class BoardTest {
 		assertFalse(Board.isInCorner(new BoardLocation(1, 0)));
 		assertFalse(Board.isInCorner(new BoardLocation(2, 3)));
 	}
+
+	@Test
+	public void testGetBlockedStones() throws InvalidIndexException {
+		ArrayList<BoardLocation> patLocs = new ArrayList<BoardLocation>();
+		patLocs.add(new BoardLocation(2, 3));
+		patLocs.add(new BoardLocation(3, 4));
+		patLocs.add(new BoardLocation(4, 5));
+		patLocs.add(new BoardLocation(5, 6));
+		bd.updateBoard(new BoardLocation(2, 3), true);
+		bd.updateBoard(new BoardLocation(3, 4), true);
+		bd.updateBoard(new BoardLocation(4, 5), true);
+		bd.updateBoard(new BoardLocation(5, 6), true);
+		bd.updateBoard(new BoardLocation(6, 7), false);
+		ArrayList<BoardLocation> blocked = bd.getBlockedStones(patLocs,
+				Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 1);
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+		bd.updateBoard(new BoardLocation(1, 2), false);
+		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 2);
+		assertTrue(blocked.contains(new BoardLocation(1, 2)));
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+		bd.withdrawMove(new BoardLocation(1, 2));
+		bd.updateBoard(new BoardLocation(7, 7), false);
+		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 1);
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+	}
 }

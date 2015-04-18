@@ -1323,6 +1323,13 @@ public class Board implements Serializable {
 		return locations.get(maxIndex);
 	}
 
+	/**
+	 * Filter out those board locations which are already occupied.
+	 *
+	 * @param locations
+	 *            The locations to be filtered.
+	 * @return A list of locations which are empty.
+	 */
 	public ArrayList<BoardLocation> filterOccupied(
 			ArrayList<BoardLocation> locations) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -1332,6 +1339,14 @@ public class Board implements Serializable {
 		return retVal;
 	}
 
+	/**
+	 * Check if a pattern is a must-win pattern. A pattern is a must-win if the
+	 * pattern consists of four board locations and cannot be blocked
+	 * efficiently (open four).
+	 *
+	 * @param pat
+	 * @return
+	 */
 	public boolean isPatternWinning(Pattern pat) {
 		BoardLocation firstStone = pat.getLocations().get(0);
 		int checker = basicGrid[firstStone.getYPos()][firstStone.getXPos()];
@@ -1444,6 +1459,12 @@ public class Board implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Check if the one moved first has two fours on board. This is not allowed
+	 * in formal games.
+	 *
+	 * @return True if there is, false otherwise.
+	 */
 	public boolean checkTwoFour() {
 		ArrayList<Pattern> results = BoardChecker.checkBoardClosedPatCont(this,
 				true, 4);
@@ -1455,6 +1476,14 @@ public class Board implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Get BoardLocations which are not directly associated with the given
+	 * location but with a jump.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return A list of BoardLocations with one jump to loc.
+	 */
 	public static ArrayList<BoardLocation> getJumpLocations(BoardLocation loc) {
 		ArrayList<BoardLocation> returnVal = new ArrayList<BoardLocation>();
 		int y = loc.getYPos();
