@@ -220,9 +220,10 @@ public abstract class Algorithm {
 		}
 	}
 
-	private BoardLocation extendToWinning(Pattern pat) {
+	public BoardLocation extendToWinning(Pattern pat) {
+		// TODO if the pattern is blocked on one side, then
+		// this method might not work.
 		ArrayList<BoardLocation> boardLocs = pat.getLocations();
-		int checker;
 		int firstInc = 0;
 		int secondInc = 0;
 		switch (pat.getType()) {
@@ -245,116 +246,52 @@ public abstract class Algorithm {
 		default:
 			break;
 		}
-		if (pat.getClass() == ContOpenPattern.class)
-			for (BoardLocation loc : boardLocs) {
-				BoardLocation first = new BoardLocation(loc.getYPos()
-						+ firstInc, loc.getXPos() + secondInc);
-				BoardLocation second = new BoardLocation(loc.getYPos()
-						- firstInc, loc.getXPos() - secondInc);
-				if (Board.isReachable(first) && !board.isOccupied(first)
-						&& !boardLocs.contains(first)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(first);
-					Pattern newPat = new ContOpenPattern(newLocs,
-							pat.getType(), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (int j = 0; j < boardLocs.size(); j++) {
+			BoardLocation loc = boardLocs.get(j);
+			BoardLocation first = new BoardLocation(loc.getYPos() + firstInc,
+					loc.getXPos() + secondInc);
+			BoardLocation second = new BoardLocation(loc.getYPos() - firstInc,
+					loc.getXPos() - secondInc);
+			if (Board.isReachable(first) && !board.isOccupied(first)
+					&& !boardLocs.contains(first)) {
+				try {
+					vBoard.updateBoard(first, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
 						return first;
 				}
-				if (Board.isReachable(second) && !board.isOccupied(second)
-						&& !boardLocs.contains(second)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(second);
-					Pattern newPat = new ContOpenPattern(newLocs,
-							pat.getType(), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return second;
+				try {
+					vBoard.withdrawMove(first);
+				} catch (InvalidIndexException e) {
+					continue;
 				}
 			}
-		else if (pat.getClass() == ContClosedPattern.class)
-			for (BoardLocation loc : boardLocs) {
-				BoardLocation first = new BoardLocation(loc.getYPos()
-						+ firstInc, loc.getXPos() + secondInc);
-				BoardLocation second = new BoardLocation(loc.getYPos()
-						- firstInc, loc.getXPos() - secondInc);
-				if (Board.isReachable(first) && !board.isOccupied(first)
-						&& !boardLocs.contains(first)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(first);
-					Pattern newPat = new ContClosedPattern(newLocs,
-							pat.getType(), board.getBlockedStones(newLocs,
-									pat.getType()), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return first;
+			if (Board.isReachable(second) && !board.isOccupied(second)
+					&& !boardLocs.contains(second)) {
+				try {
+					vBoard.updateBoard(second, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
 				}
-				if (Board.isReachable(second) && !board.isOccupied(second)
-						&& !boardLocs.contains(second)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(second);
-					Pattern newPat = new ContClosedPattern(newLocs,
-							pat.getType(), board.getBlockedStones(newLocs,
-									pat.getType()), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
 						return second;
 				}
-			}
-		else if (pat.getClass() == DiscOpenPattern.class)
-			for (BoardLocation loc : boardLocs) {
-				BoardLocation first = new BoardLocation(loc.getYPos()
-						+ firstInc, loc.getXPos() + secondInc);
-				BoardLocation second = new BoardLocation(loc.getYPos()
-						- firstInc, loc.getXPos() - secondInc);
-				if (Board.isReachable(first) && !board.isOccupied(first)
-						&& !boardLocs.contains(first)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(first);
-					Pattern newPat = new DiscOpenPattern(newLocs,
-							pat.getType(), Pattern.findBubbleIndex(newLocs,
-									pat.getType()), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return first;
-				}
-				if (Board.isReachable(second) && !board.isOccupied(second)
-						&& !boardLocs.contains(second)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(second);
-					Pattern newPat = new DiscOpenPattern(newLocs,
-							pat.getType(), Pattern.findBubbleIndex(newLocs,
-									pat.getType()), pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return second;
+				try {
+					vBoard.withdrawMove(second);
+				} catch (InvalidIndexException e) {
+					continue;
 				}
 			}
-		else
-			for (BoardLocation loc : boardLocs) {
-				BoardLocation first = new BoardLocation(loc.getYPos()
-						+ firstInc, loc.getXPos() + secondInc);
-				BoardLocation second = new BoardLocation(loc.getYPos()
-						- firstInc, loc.getXPos() - secondInc);
-				if (Board.isReachable(first) && !board.isOccupied(first)
-						&& !boardLocs.contains(first)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(first);
-					Pattern newPat = new DiscClosedPattern(newLocs,
-							pat.getType(), board.getBlockedStones(newLocs,
-									pat.getType()), Pattern.findBubbleIndex(
-									newLocs, pat.getType()),
-							pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return first;
-				}
-				if (Board.isReachable(second) && !board.isOccupied(second)
-						&& !boardLocs.contains(second)) {
-					ArrayList<BoardLocation> newLocs = pat.getLocations();
-					newLocs.add(second);
-					Pattern newPat = new DiscClosedPattern(newLocs,
-							pat.getType(), board.getBlockedStones(newLocs,
-									pat.getType()), Pattern.findBubbleIndex(
-									newLocs, pat.getType()),
-							pat.getBlockingLocs());
-					if (board.isPatternWinning(newPat))
-						return second;
-				}
-			}
+		}
 		return null;
 	}
 
@@ -471,8 +408,8 @@ public abstract class Algorithm {
 	}
 
 	public BoardLocation makeMoveEnd() {
-		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(
-				board, isFirst);
+		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board,
+				isFirst);
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
@@ -503,8 +440,8 @@ public abstract class Algorithm {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
 			if (result.size() != 0) {
-				BoardLocation blockAttack = result.get(getRandNum(result
-						.size() - 1));
+				BoardLocation blockAttack = result
+						.get(getRandNum(result.size()) - 1);
 				// System.out
 				// .format("The value I gave (for blocking attack) is (%d, %d).\n",
 				// blockAttack.getXPos(),

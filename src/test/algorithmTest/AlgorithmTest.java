@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import exceptions.InvalidIndexException;
 import algorithm.Algorithm;
+import algorithm.ContOpenPattern;
+import algorithm.Pattern;
 import algorithm.UltimateAlgorithm;
 
 public class AlgorithmTest {
@@ -44,5 +46,36 @@ public class AlgorithmTest {
 		bd.renderBoard(2);
 		locs = alg.calculateAttack();
 		assertEquals(locs.size(), 1);
+	}
+
+	@Test
+	public void testExtendToWinning() throws InvalidIndexException {
+		Board board = alg.getBoard();
+		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
+		locations.add(new BoardLocation(5, 5));
+		locations.add(new BoardLocation(5, 6));
+		locations.add(new BoardLocation(5, 7));
+		Pattern test = new ContOpenPattern(locations, Pattern.ON_ROW,
+				board.findBlockingLocs(locations, Pattern.ON_ROW));
+		board.updateBoard(new BoardLocation(5, 5), true);
+		board.updateBoard(new BoardLocation(5, 6), true);
+		board.updateBoard(new BoardLocation(5, 7), true);
+		BoardLocation testVal = alg.extendToWinning(test);
+		assertTrue(testVal != null);
+		assertTrue(testVal.equals(new BoardLocation(5, 4))
+				|| testVal.equals(new BoardLocation(5, 8)));
+		board.reset();
+		board.updateBoard(new BoardLocation(2, 2), true);
+		board.updateBoard(new BoardLocation(3, 3), true);
+		board.updateBoard(new BoardLocation(5, 5), true);
+		locations.clear();
+		locations.add(new BoardLocation(2, 2));
+		locations.add(new BoardLocation(3, 3));
+		locations.add(new BoardLocation(5, 5));
+		test = new ContOpenPattern(locations, Pattern.ON_ULDIAG,
+				board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
+		testVal = alg.extendToWinning(test);
+		assertTrue(testVal != null);
+		assertTrue(testVal.equals(new BoardLocation(4,4)));
 	}
 }

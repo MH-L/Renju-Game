@@ -174,4 +174,12 @@ public abstract class Pattern {
 		int yDiff = Math.abs(loc1.getYPos() - loc2.getYPos());
 		return xDiff == yDiff;
 	}
+
+	public static boolean checkIsCompositeUrgent(ArrayList<Pattern> patterns) {
+		for (Pattern pat : patterns) {
+			if (pat.getLocations().size() >= 4)
+				return true;
+		}
+		return false;
+	}
 }

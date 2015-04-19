@@ -568,10 +568,11 @@ public class BoardChecker {
 			return patterns;
 		else {
 			int prev = Board.EMPTY_SPOT;
+			int prev2 = Board.EMPTY_SPOT;
 			int count = 0;
 			for (int i = 0; i < array.length; i++) {
 				if (count == 0) {
-					if (prev == Board.EMPTY_SPOT && array[i] == checker) {
+					if (prev == Board.EMPTY_SPOT && array[i] == checker && prev2 != checker) {
 						count++;
 					}
 				} else if (array[i] == checker) {
@@ -580,43 +581,17 @@ public class BoardChecker {
 					count = 0;
 				}
 
+				boolean predicate = false;
 				if (count == num) {
 					if (i == array.length - 1) {
-						BoardLocation firstStone;
-						Pattern candidate;
-						switch (type) {
-						case Pattern.ON_ROW:
-							firstStone = new BoardLocation(arrayIndex, i - num
-									+ 1);
-							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_ROW, num, false, board);
-							patterns.add(candidate);
-							break;
-						case Pattern.ON_COL:
-							firstStone = new BoardLocation(i - num + 1,
-									arrayIndex);
-							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_COL, num, false, board);
-							patterns.add(candidate);
-							break;
-						case Pattern.ON_ULDIAG:
-							firstStone = Board.convertDiagToXY(arrayIndex, i
-									- num + 1, true);
-							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_ULDIAG, num, false, board);
-							patterns.add(candidate);
-							break;
-						case Pattern.ON_URDIAG:
-							firstStone = Board.convertDiagToXY(arrayIndex, i
-									- num + 1, false);
-							candidate = makeContiguousPattern(firstStone,
-									Pattern.ON_URDIAG, num, false, board);
-							patterns.add(candidate);
-							break;
-						default:
-							break;
-						}
-					} else if (array[i + 1] == Board.EMPTY_SPOT) {
+						if (prev2 != checker)
+							predicate = true;
+					} else if (i == array.length - 2) {
+						if (array[i + 1] == Board.EMPTY_SPOT)
+							predicate = true;
+					} else if (array[i + 1] == Board.EMPTY_SPOT && array[i + 2] != checker)
+						predicate = true;
+					if (predicate) {
 						BoardLocation firstStone;
 						Pattern candidate;
 						switch (type) {
@@ -654,6 +629,7 @@ public class BoardChecker {
 					}
 					count = 0;
 				}
+				prev2 = prev;
 				prev = array[i];
 			}
 		}

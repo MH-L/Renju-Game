@@ -56,6 +56,29 @@ public class BoardCheckerTest {
 		assertEquals(
 				algorithm.BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
 						2, Pattern.ON_COL, true, 4, board).size(), 1);
+		board.reset();
+		board.updateBoard(new BoardLocation(4, 4), true);
+		board.updateBoard(new BoardLocation(5, 5), true);
+		board.updateBoard(new BoardLocation(6, 6), true);
+		board.updateBoard(new BoardLocation(8, 8), true);
+		board.updateBoard(new BoardLocation(9, 9), false);
+		assertEquals(
+				algorithm.BoardChecker.checkOpenPatCont(
+						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
+						true, 3, board).size(), 0);
+		assertEquals(
+				algorithm.BoardChecker.checkOpenPatCont(
+						board.getULDiagByIndex(14), 16, Pattern.ON_ULDIAG,
+						true, 3, board).size(), 0);
+		assertEquals(
+				algorithm.BoardChecker.checkOpenPatCont(
+						board.getULDiagByIndex(16), 16, Pattern.ON_ULDIAG,
+						true, 3, board).size(), 0);
+		assertEquals(
+				algorithm.BoardChecker.checkOpenPatCont(
+						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
+						true, 4, board).size(), 0);
+		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
 	}
 
 	@Test
@@ -160,6 +183,7 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(4, 8), true);
 		board.updateBoard(new BoardLocation(5, 8), true);
 		board.updateBoard(new BoardLocation(6, 8), true);
+		board.renderBoard(2);
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 3);
 		board.updateBoard(new BoardLocation(5, 4), false);
 		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 4);
@@ -257,7 +281,8 @@ public class BoardCheckerTest {
 		locations.add(new BoardLocation(4, 5));
 		locations.add(new BoardLocation(4, 6));
 		locations.add(new BoardLocation(4, 7));
-		ContOpenPattern checker = new ContOpenPattern(locations, Pattern.ON_ROW, null);
+		ContOpenPattern checker = new ContOpenPattern(locations,
+				Pattern.ON_ROW, null);
 		assertTrue(BoardChecker.isOpenPatInControl(board, checker, true));
 		board.withdrawMove(new BoardLocation(4, 9));
 		assertFalse(BoardChecker.isOpenPatInControl(board, checker, true));
