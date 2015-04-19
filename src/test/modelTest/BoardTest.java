@@ -411,4 +411,28 @@ public class BoardTest {
 		assertEquals(blocked.size(), 1);
 		assertTrue(blocked.contains(new BoardLocation(6, 7)));
 	}
+
+	@Test
+	public void testPatternWinning() throws InvalidIndexException {
+		ArrayList<BoardLocation> testLocations = new ArrayList<BoardLocation>();
+		testLocations.add(new BoardLocation(9, 9));
+		testLocations.add(new BoardLocation(10, 10));
+		testLocations.add(new BoardLocation(11, 11));
+		bd.updateBoard(new BoardLocation(9, 9), true);
+		bd.updateBoard(new BoardLocation(10, 10), true);
+		bd.updateBoard(new BoardLocation(11, 11), true);
+		Pattern pat = new ContOpenPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertFalse(bd.isPatternWinning(pat));
+		testLocations.add(new BoardLocation(12, 12));
+		bd.updateBoard(new BoardLocation(12, 12), true);
+		pat = new ContOpenPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertTrue(bd.isPatternWinning(pat));
+		bd.updateBoard(new BoardLocation(13, 13), false);
+		pat = new ContClosedPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.getBlockedStones(testLocations, Pattern.ON_ULDIAG),
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertFalse(bd.isPatternWinning(pat));
+	}
 }

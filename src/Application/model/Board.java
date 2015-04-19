@@ -1124,6 +1124,13 @@ public class Board implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Check if a location is in the middle part of the board.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return True if the location is in the middle, false otherwise.
+	 */
 	public static boolean isMiddleLocation(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
@@ -1132,6 +1139,13 @@ public class Board implements Serializable {
 		return !(x_coord < 3 || x_coord > width - 4 || y_coord < 3 || y_coord > width - 4);
 	}
 
+	/**
+	 * Check if a location is in the corner.
+	 *
+	 * @param loc
+	 *            Location to be checked.
+	 * @return True if the location is in the corner, false otherwise.
+	 */
 	public static boolean isInCorner(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
@@ -1139,6 +1153,13 @@ public class Board implements Serializable {
 				&& (loc.getYPos() == 0 || loc.getYPos() == height - 1);
 	}
 
+	/**
+	 * Check if a location is on a side of the board.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return True if the location is on a side. False otherwise.
+	 */
 	public static boolean isOnSide(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
