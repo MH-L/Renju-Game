@@ -16,7 +16,7 @@ public abstract class Algorithm {
 	private static Board board;
 	private static final Random rand = new Random();
 	protected VirtualBoard vBoard;
-	boolean isFirst;
+	protected boolean isFirst;
 
 	public Algorithm(Board board, boolean isFirst) {
 		Algorithm.board = board;
@@ -202,7 +202,7 @@ public abstract class Algorithm {
 				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
 				if (result.size() != 0) {
 					BoardLocation blockAttack = result.get(getRandNum(result
-							.size() - 1));
+							.size()) - 1);
 					// System.out
 					// .format("The value I gave (for blocking attack) is (%d, %d).\n",
 					// blockAttack.getXPos(),
@@ -537,4 +537,6 @@ public abstract class Algorithm {
 		}
 		return retVal;
 	}
+
+
 }
