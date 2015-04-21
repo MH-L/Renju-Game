@@ -538,5 +538,13 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	public ArrayList<BoardLocation> getSelfStone() {
+		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
+	}
+
+	public ArrayList<BoardLocation> getOtherStone() {
+		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
+	}
+
 
 }

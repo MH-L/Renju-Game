@@ -1,6 +1,8 @@
 package algorithm;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 import model.Board;
 import model.BoardLocation;
@@ -91,7 +93,7 @@ public abstract class Pattern {
 	public boolean isDifferent(Pattern pat) {
 		for (BoardLocation loc1 : pat.getLocations())
 			for (BoardLocation loc2 : this.constituent)
-				if (!loc1.compare(loc2))
+				if (!loc1.equals(loc2))
 					return true;
 		return false;
 	}
@@ -181,5 +183,15 @@ public abstract class Pattern {
 				return true;
 		}
 		return false;
+	}
+
+	public static void removeDuplicates(ArrayList<Pattern> patterns) {
+		Iterator<Pattern> iter = patterns.iterator();
+		while (iter.hasNext()) {
+			Pattern pat = iter.next();
+			if (Collections.frequency(patterns, pat) > 1) {
+				patterns.remove(pat);
+			}
+		}
 	}
 }

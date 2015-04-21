@@ -31,14 +31,6 @@ public class IntermediateAlgorithm extends Algorithm {
 		return this.vBoard;
 	}
 
-	public ArrayList<BoardLocation> getSelfStone() {
-		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
-	}
-
-	public ArrayList<BoardLocation> getOtherStone() {
-		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
-	}
-
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
 		ArrayList<BoardLocation> otherPlayer = getOtherStone();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
