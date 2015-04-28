@@ -82,7 +82,7 @@ public class Main {
 			throw new RuntimeException("There is no player!");
 		}
 		while (!Game.isWinning() && !Game.boardFull()) {
-			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+			System.out.println("Computer " + (game.isPlayer1Active() ? "one" : "two")+ ", it is your turn.");
 			try {
 				game.makeMove();
 				game.getBoard().renderBoard(dispMode);
@@ -120,7 +120,7 @@ public class Main {
 			throw new RuntimeException("There is no player!");
 		}
 		while (!Game.isWinning() && !Game.boardFull()) {
-            System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+            System.out.println(getActivePlayerID() + ", it is your turn.");
             try {
                 game.makeMove();
                 game.getBoard().renderBoard(dispMode);
@@ -275,16 +275,15 @@ public class Main {
 	}
 
 	/**
-	 * Returns the active player as a string of either "one" if player 1 is active
-	 * and "two" if player two is active
+	 * If the active player is a Player, then return their user ID.
+	 * Else, return the string "Computer".
 	 * @return
-	 * 		"one" if player 1 is active.
-	 * 		"two if player 2 is active.
+	 * 		The active player's user ID
 	 */
-	private static String getActivePlayerAsString(){
-		if (game.isPlayer1Active()){
-			return "one";
-		} else return "two";
+	private static String getActivePlayerID(){
+		if (game.getActivePlayer() instanceof Player)
+			return ((Player) game.getActivePlayer()).getId();
+		else return "Computer";
 	}
 
 	private static String getInactivePlayerAsString(){
@@ -309,9 +308,9 @@ public class Main {
 	}
 
 	private static boolean getIfFirst() {
-		System.out.println("Do you want to make move first?\n"
+		System.out.println("Do you want to make the first move?\n"
 				+ "(1) Yes\n(2) No");
-		String input = reader.nextLine();
+		String input = reader.next();
 		while (!input.equals("1") && !input.equals("2")) {
 			System.out
 					.println("The choice you entered is invalid. Please re-enter.");

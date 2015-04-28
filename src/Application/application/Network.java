@@ -15,9 +15,11 @@ public class Network extends Game {
     public static final int HOST = 1;
     public static final int CLIENT = 2;
 
-    private Game game;
     private Host host;
     private Client client;
+
+    public static final String OP_MOVE = "M";       // place new stone. msg: board location
+    public static final String OP_WITHDRAW = "W";   // withdraw player's last stone
 
     /**
      * Create a new game between two players on separate networks.
@@ -26,30 +28,36 @@ public class Network extends Game {
      *      false if this player is the client
      */
     public Network(boolean host) {
-        player1 = new Player();
-        player2 = new Player();
-        activePlayer = player1;
-
+        super();
         boolean connectionSuccess = false;
         while (!connectionSuccess){
             try {
                 if (host) {
                     this.host = new Host();
                     this.host.listen();
-                    // TODO get player2
                 } else {
                     client = new Client();
                     System.out.println("What is the host address?");
                     Scanner reader = new Scanner(System.in);
                     String addr = reader.nextLine();
                     client.connect(addr);
-                    // TODO get player1
                 }
                 connectionSuccess = true;
             } catch (IOException e) {
                 System.out.println("Connection failed. Please try again");
             }
         }
+    }
+
+    private void addPlayer(String userID) {
+    }
+
+    private void receiveMessage(String userID, Object message) {
+        // apply message to the board
+    }
+
+    private void playerDisconnected(String userID, Object message) {
+        // run when a player disconnects
     }
 
 }

@@ -19,11 +19,24 @@ public class Player implements IPlayer{
 	private BoardLocation lastMove;
 	private int num_hints;
 	private int num_regrets;
+	private String id;
 
 	public Player() {
 		this.num_hints = NUM_HINTS_LIMIT;
 		this.num_regrets = NUM_REGRETS_LIMIT;
 		this.lastMove = null;
+		System.out.println("What is your User ID?");
+		Scanner reader = new Scanner(System.in);
+		setId(reader.nextLine());
+		System.out.println("Hello, " + getId());
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	@Override

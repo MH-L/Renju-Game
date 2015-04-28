@@ -36,8 +36,6 @@ public abstract class Game {
 	 * Prompts the player to make their next move.
 	 * Toggles the active player at the end of their successful turn.
 	 *
-	 * @return
-	 * 		state of if there's a valid next move to make
 	 * @throws InvalidIndexException
 	 * 		thrown if the move chosen is invalid
 	 */

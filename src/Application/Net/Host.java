@@ -1,6 +1,5 @@
 package Net;
 
-import application.IPlayer;
 import application.Network;
 import application.Player;
 
@@ -11,13 +10,12 @@ import java.net.ServerSocket;
 /**
  * Created by kelvin on 14/04/15.
  */
-public class Host {
+public class Host extends Player {
     private ServerSocket socket;
-    private IPlayer player;
 
     public Host () throws IOException {
+        super();
         socket = new ServerSocket(Network.PORT);
-        this.player = new Player();
     }
 
     public void listen() throws IOException {
@@ -28,9 +26,5 @@ public class Host {
         System.out.println("Give this address to your opponent.");
         System.out.println("\n.... Listening for a connection ....");
         socket.accept();
-    }
-
-    public IPlayer getPlayer() {
-        return player;
     }
 }

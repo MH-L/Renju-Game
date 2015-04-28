@@ -1,6 +1,5 @@
 package Net;
 
-import application.IPlayer;
 import application.Network;
 import application.Player;
 
@@ -11,22 +10,17 @@ import java.net.Socket;
 /**
  * Created by kelvin on 14/04/15.
  */
-public class Client {
+public class Client extends Player {
     private static final int CONNECTION_TIME_OUT = 30000;
     private Socket socket;
-    private IPlayer player;
 
     public Client() {
+        super();
         socket = new Socket();
-        this.player = new Player();
     }
 
     public void connect(String addr) throws IOException {
         socket.connect(new InetSocketAddress(addr, Network.PORT), CONNECTION_TIME_OUT);
-    }
-
-    public IPlayer getPlayer() {
-        return player;
     }
 
 }
