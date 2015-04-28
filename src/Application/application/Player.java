@@ -1,14 +1,14 @@
 package application;
 
-import java.util.Scanner;
-
-import model.BoardLocation;
 import exceptions.*;
+import model.BoardLocation;
+
+import java.util.Scanner;
 
 /**
  * This class records the recent moves of the player.
  * @author Minghao Liu
- * @RecreatedBy Kelvin Yip
+ * @author Kelvin Yip
  *
  */
 public class Player implements IPlayer{
@@ -82,7 +82,10 @@ public class Player implements IPlayer{
 	}
 
 	private static int translateLetter(String letter) {
-		return letter.toLowerCase().toCharArray()[0] - 96;
+		if (letter.length() < 1)
+			return 0;
+		else
+			return letter.toLowerCase().toCharArray()[0] - 96;
 	}
 
 	private static boolean isAlpha(String string){

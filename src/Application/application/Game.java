@@ -7,6 +7,7 @@ import exceptions.WithdrawException;
 public class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
 	public static final int SINGLEPLAYER_GAME_MODE = 2;
+	public static final int NETWORK_GAME_MODE = 3;
 
 	public static final int NOVICE_DIFFICULTY = 1;
 	public static final int INTERMEDIATE_DIFFICULTY = 2;
@@ -53,6 +54,14 @@ public class Game {
 		activePlayer = player1;
 	}
 
+	public void initNetwork(IPlayer player1, IPlayer player2) {
+		this.mode = NETWORK_GAME_MODE;
+		board = new Board();
+		this.player1 = player1;
+		this.player2 = player2;
+		activePlayer = player1;
+	}
+
 	public static Game getInstance() {
 		if (instance == null) {
 			instance = new Game();
@@ -72,10 +81,13 @@ public class Game {
 	}
 
 	/**
-	 * Prompts the player to make their next move
+	 * Prompts the player to make their next move.
+	 * Toggles the active player at the end of their successful turn.
 	 *
+	 * @return
+	 * 		state of if there's a valid next move to make
 	 * @throws InvalidIndexException
-	 * 		Thrown if the chosen move is invalid
+	 * 		thrown if the move chosen is invalid
 	 */
 	public void makeMove() throws InvalidIndexException {
 		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))

@@ -12,6 +12,10 @@ import algorithm.DiscClosedPattern;
 import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
 import application.Game;
+import exceptions.InvalidIndexException;
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
+import java.util.ArrayList;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -424,21 +428,17 @@ public class Board implements Serializable {
 	 *
 	 * @param loc
 	 *            Indicates the board location to place the stone
-	 * @param player
-	 *            True means it is player's stone, otherwise it is computer's
-	 *            stone.
+	 * @param first
+	 *            true means it is player1's stone, otherwise it is player2's
 	 * @return false if it did not succeed. true if succeeded
-	 * @throws InvalidIndexException
 	 */
-	public boolean updateBoard(BoardLocation loc, boolean first)
-			throws InvalidIndexException {
+	public boolean updateBoard(BoardLocation loc, boolean first) throws InvalidIndexException {
 		if (!isReachable(loc))
-			throw new InvalidIndexException(
-					"The location indexes is out of bound!");
+			throw new InvalidIndexException("This location is invalid!");
 		int col_num = loc.getXPos();
 		int row_num = loc.getYPos();
 		if (this.isOccupied(loc))
-			return false;
+			throw new InvalidIndexException("This location is already occupied");
 		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
 
 		this.basicGrid[row_num][col_num] = marker;
@@ -459,7 +459,6 @@ public class Board implements Serializable {
 		else
 			this.player2Stone.add(loc);
 		return true;
-
 	}
 
 	/**
