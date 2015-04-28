@@ -4,7 +4,6 @@ import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 import model.Board;
 
-import java.io.IOException;
 import java.util.Scanner;
 /**
  * The start point of the application.
@@ -24,7 +23,6 @@ public class Main {
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
 		dispMode = getDisplayMode();
-		game = Game.getInstance();
 		printInstruction();
 
 		// Initialize game mode
@@ -36,30 +34,24 @@ public class Main {
 					// but creating a new exception might be overkill for something
 					// that likely isn't going to change
 					boolean playerFirst = getIfFirst();
-					game.initSinglePlayer(diff, playerFirst);
+					game = new SinglePlayer(diff, playerFirst);
 				} else {
 					System.err.println("Internal Error!");
 					return;
 				}
 				break;
 			case Game.MULTIPLAYER_GAME_MODE:
-				game.initMultiplayer();
+				game = new MultiPlayer();
 				break;
 			case Game.NETWORK_GAME_MODE:
 				host = getHost();
-				try {
-					NetworkGame ng = new NetworkGame(host);
-					game.initNetwork(ng.getPlayer1(), ng.getPlayer2());
-				} catch (IOException e) {
-					e.printStackTrace();
-					return;
-				}
+				game = new Network(host);
 				break;
 			case Game.AI_VERSUS_AI_GAME_MODE:
 				int diff1 = getDifficulty();
 				int diff2 = getDifficulty();
 				if (isValidDifficulty(diff1) && isValidDifficulty(diff2)){
-					game.initAiVAi(diff1, diff2);
+					game = new AiVersusAi(diff1, diff2);
 				} else {
 					System.err.println("Internal Error!");
 					return;
@@ -193,11 +185,11 @@ public class Main {
 
 	private static boolean getHost() {
 		System.out.println(" Are you host or client?\n"
-				+ " (" + NetworkGame.HOST + ") Host\n"
-				+ " (" + NetworkGame.CLIENT + ") Client\n");
+				+ " (" + Network.HOST + ") Host\n"
+				+ " (" + Network.CLIENT + ") Client\n");
 		String host = reader.next();
-		while (!host.equals(String.valueOf(NetworkGame.HOST)) &&
-				!host.equals(String.valueOf(NetworkGame.CLIENT))) {
+		while (!host.equals(String.valueOf(Network.HOST)) &&
+				!host.equals(String.valueOf(Network.CLIENT))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			host = reader.next();
 		}
@@ -309,7 +301,7 @@ public class Main {
 	 * 		"multi-player" if the mode is MULTIPLAYER_GAME_MODE
 	 */
 	private static String getModeAsString(){
-		if (game.getMode()== Game.SINGLEPLAYER_GAME_MODE){
+		if (game instanceof SinglePlayer){
 			return "single player";
 		} else {
 			return "multiplayer";

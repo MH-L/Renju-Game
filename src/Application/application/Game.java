@@ -4,7 +4,7 @@ import model.Board;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 
-public class Game {
+public abstract class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
 	public static final int SINGLEPLAYER_GAME_MODE = 2;
 	public static final int NETWORK_GAME_MODE = 3;
@@ -15,66 +15,14 @@ public class Game {
 	public static final int ADVANCED_DIFFICULTY = 3;
 	public static final int ULTIMATE_DIFFICULTY = 4;
 
-	private int mode;
-	private static Game instance = null;
-	private IPlayer player2;
-	private IPlayer player1;
+	protected IPlayer player2;
+	protected IPlayer player1;
+	protected IPlayer activePlayer;
 
 	private static Board board;
-	private IPlayer activePlayer;
 
-	private Game() {
+	public Game() {
 		board = new Board();
-		// initialize as multiplayer by default
-		initMultiplayer();
-	}
-
-	/**
-	 * Initialize the game to a local multiplayer game with two Players
-	 */
-	public void initMultiplayer(){
-		this.mode = MULTIPLAYER_GAME_MODE;
-		board = new Board();
-		player1 = new Player();
-		player2 = new Player();
-		activePlayer = player1;
-	}
-
-	/**
-	 * Initialize the game to single-player of difficulty <code>difficulty</code>
-	 * @param difficulty
-	 * 		The difficulty of the game
-	 * @param playerFirst
-	 */
-	public void initSinglePlayer(int difficulty, boolean playerFirst){
-		this.mode = SINGLEPLAYER_GAME_MODE;
-		board = new Board();
-		player1 = playerFirst ? new Player() : new AI(difficulty, board, !playerFirst);
-		player2 = playerFirst ? new AI(difficulty, board, !playerFirst) : new Player();
-		activePlayer = player1;
-	}
-
-	public void initNetwork(IPlayer player1, IPlayer player2) {
-		this.mode = NETWORK_GAME_MODE;
-		board = new Board();
-		this.player1 = player1;
-		this.player2 = player2;
-		activePlayer = player1;
-	}
-
-	public void initAiVAi(int Ai1Difficulty, int Ai2Difficulty) {
-		this.mode = AI_VERSUS_AI_GAME_MODE;
-		board = new Board();
-		player1 = new AI (Ai1Difficulty, board, true);
-		player2 = new AI (Ai2Difficulty, board, false);
-		activePlayer = player1;
-	}
-
-	public static Game getInstance() {
-		if (instance == null) {
-			instance = new Game();
-		}
-		return instance;
 	}
 
 	public void withdraw() throws WithdrawException, InvalidIndexException{
@@ -82,10 +30,6 @@ public class Game {
 		board.withdrawMove(getInactivePlayer().getLastMove());
 		getActivePlayer().withdraw();
 		getInactivePlayer().forceWithdraw();
-	}
-
-	public int getMode() {
-		return mode;
 	}
 
 	/**

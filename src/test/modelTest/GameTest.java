@@ -1,22 +1,21 @@
 package test.modelTest;
 
-import static org.junit.Assert.*;
-import model.BoardLocation;
-
+import application.Game;
+import application.SinglePlayer;
+import exceptions.InvalidIndexException;
+import exceptions.WithdrawException;
 import org.junit.Before;
 import org.junit.Test;
 
-import exceptions.InvalidIndexException;
-import exceptions.WithdrawException;
-import application.Game;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GameTest {
 	private Game game;
 
 	@Before
 	public void init() {
-		game = Game.getInstance();
-		game.initSinglePlayer(Game.NOVICE_DIFFICULTY, true);
+		game = new SinglePlayer(Game.NOVICE_DIFFICULTY, true);
 	}
 
 	@Test

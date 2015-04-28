@@ -1,7 +1,7 @@
 package Net;
 
 import application.IPlayer;
-import application.NetworkGame;
+import application.Network;
 import application.Player;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Client {
     }
 
     public void connect(String addr) throws IOException {
-        socket.connect(new InetSocketAddress(addr, NetworkGame.PORT), CONNECTION_TIME_OUT);
+        socket.connect(new InetSocketAddress(addr, Network.PORT), CONNECTION_TIME_OUT);
     }
 
     public IPlayer getPlayer() {

@@ -1,7 +1,7 @@
 package Net;
 
 import application.IPlayer;
-import application.NetworkGame;
+import application.Network;
 import application.Player;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class Host {
     private IPlayer player;
 
     public Host () throws IOException {
-        socket = new ServerSocket(NetworkGame.PORT);
+        socket = new ServerSocket(Network.PORT);
         this.player = new Player();
     }
 
