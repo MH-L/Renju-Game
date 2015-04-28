@@ -8,6 +8,7 @@ public class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
 	public static final int SINGLEPLAYER_GAME_MODE = 2;
 	public static final int NETWORK_GAME_MODE = 3;
+	public static final int AI_VERSUS_AI_GAME_MODE = 9;
 
 	public static final int NOVICE_DIFFICULTY = 1;
 	public static final int INTERMEDIATE_DIFFICULTY = 2;
@@ -48,9 +49,8 @@ public class Game {
 	public void initSinglePlayer(int difficulty, boolean playerFirst){
 		this.mode = SINGLEPLAYER_GAME_MODE;
 		board = new Board();
-		player1 = playerFirst ? new Player() : application.AI.getInstance();
-		player2 = playerFirst ? application.AI.getInstance() : new Player();
-		AI.initAI(difficulty, board, !playerFirst);
+		player1 = playerFirst ? new Player() : new AI(difficulty, board, !playerFirst);
+		player2 = playerFirst ? new AI(difficulty, board, !playerFirst) : new Player();
 		activePlayer = player1;
 	}
 
@@ -59,6 +59,14 @@ public class Game {
 		board = new Board();
 		this.player1 = player1;
 		this.player2 = player2;
+		activePlayer = player1;
+	}
+
+	public void initAiVAi(int Ai1Difficulty, int Ai2Difficulty) {
+		this.mode = AI_VERSUS_AI_GAME_MODE;
+		board = new Board();
+		player1 = new AI (Ai1Difficulty, board, true);
+		player2 = new AI (Ai2Difficulty, board, false);
 		activePlayer = player1;
 	}
 

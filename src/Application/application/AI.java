@@ -20,41 +20,31 @@ import algorithm.UltimateAlgorithm;
 public class AI implements IPlayer {
 
 	private static final int DEFAULT_DIFFICULTY = Game.ULTIMATE_DIFFICULTY;
-	private static AI instance = null;
-	private static int difficulty = DEFAULT_DIFFICULTY;
-	private static Board board;
+	private int difficulty = DEFAULT_DIFFICULTY;
+	private Board board;
 	private BoardLocation lastMove;
-	private static Algorithm solver;
+	private Algorithm solver;
 
-	private AI() {
+	public AI(int difficulty, Board board, boolean isFirst) {
 		this.lastMove = model.Board.getInvalidBoardLocation();
-	}
-
-	public static AI getInstance() {
-		if (instance == null)
-			instance = new AI();
-		return instance;
-	}
-
-	public static void initAI(int difficulty, Board board, boolean isFirst) {
 		// TODO Board param may not be needed if game board is static
-		AI.difficulty = difficulty;
-		AI.board = board;
-		switch (difficulty) {
-		case Game.NOVICE_DIFFICULTY:
-			AI.solver = new BasicAlgorithm(board, isFirst);
-			break;
-		case Game.INTERMEDIATE_DIFFICULTY:
-			AI.solver = new IntermediateAlgorithm(board, isFirst);
-			break;
-		case Game.ADVANCED_DIFFICULTY:
-			AI.solver = new AdvancedAlgorithm(board, isFirst);
-			break;
-		case Game.ULTIMATE_DIFFICULTY:
-			AI.solver = new UltimateAlgorithm(board, isFirst);
-		default:
-			AI.solver = new UltimateAlgorithm(board, isFirst);
-			break;
+		this.difficulty = difficulty;
+		this.board = board;
+		switch (this.difficulty) {
+			case Game.NOVICE_DIFFICULTY:
+				solver = new BasicAlgorithm(board, isFirst);
+				break;
+			case Game.INTERMEDIATE_DIFFICULTY:
+				solver = new IntermediateAlgorithm(board, isFirst);
+				break;
+			case Game.ADVANCED_DIFFICULTY:
+				solver = new AdvancedAlgorithm(board, isFirst);
+				break;
+			case Game.ULTIMATE_DIFFICULTY:
+				solver = new UltimateAlgorithm(board, isFirst);
+			default:
+				solver = new UltimateAlgorithm(board, isFirst);
+				break;
 		}
 	}
 

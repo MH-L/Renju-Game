@@ -31,11 +31,11 @@ public class Main {
 		switch (mode) {
 			case Game.SINGLEPLAYER_GAME_MODE:
 				int diff = getDifficulty();
-				if (Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY){
+				if (isValidDifficulty(diff)){
 					// This would be better if initSinglePlayer handled this input
 					// but creating a new exception might be overkill for something
 					// that likely isn't going to change
-					boolean playerFirst = getIfFirst(reader);
+					boolean playerFirst = getIfFirst();
 					game.initSinglePlayer(diff, playerFirst);
 				} else {
 					System.err.println("Internal Error!");
@@ -55,6 +55,16 @@ public class Main {
 					return;
 				}
 				break;
+			case Game.AI_VERSUS_AI_GAME_MODE:
+				int diff1 = getDifficulty();
+				int diff2 = getDifficulty();
+				if (isValidDifficulty(diff1) && isValidDifficulty(diff2)){
+					game.initAiVAi(diff1, diff2);
+				} else {
+					System.err.println("Internal Error!");
+					return;
+				}
+				break;
 			default:
 				System.err.println("Invalid game mode. Exiting");
 				return;
@@ -67,9 +77,47 @@ public class Main {
 		// Play the game
 		if (mode == Game.NETWORK_GAME_MODE) {
 			playNetwork();
-		} else {
+		} else if (mode == Game.AI_VERSUS_AI_GAME_MODE) {
+			playAiVAi();
+		}
+		else {
 			playLocal();
 		}
+	}
+
+	private static void playAiVAi() {
+		if (game.getActivePlayer() == null) {
+			throw new RuntimeException("There is no player!");
+		}
+		while (!Game.isWinning() && !Game.boardFull()) {
+			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+			try {
+				game.makeMove();
+				game.getBoard().renderBoard(dispMode);
+				Thread.sleep(1000);
+			} catch (InvalidIndexException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if (Game.isWinning()) {
+			// get inactive player because the current player was toggled at the
+			// end of the round
+			// if (game.getBoard().getTotalStones() <= 8)
+			// System.err.println("Fuck! This is not even possible!");
+			System.out.println("Player " + getInactivePlayerAsString()
+					+ ", You won!");
+		} else if (Game.boardFull()) {
+			System.out
+					.println("There are no more moves left. You both came to a draw!");
+		}
+
+		reader.close();
+	}
+
+	private static boolean isValidDifficulty(int diff) {
+		return Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY;
 	}
 
 	private static void playNetwork() {
@@ -187,11 +235,13 @@ public class Main {
 		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
 				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
 				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player" +
-				"\n (" + Game.NETWORK_GAME_MODE + ") Network");
+				"\n (" + Game.NETWORK_GAME_MODE + ") Network" +
+				"\n (" + Game.AI_VERSUS_AI_GAME_MODE + ") AI v AI" );
 		String gameMode = reader.next();
 		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
 				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE)) &&
-				!gameMode.equals(String.valueOf(Game.NETWORK_GAME_MODE))) {
+				!gameMode.equals(String.valueOf(Game.NETWORK_GAME_MODE)) &&
+				!gameMode.equals(String.valueOf(Game.AI_VERSUS_AI_GAME_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			gameMode = reader.nextLine();
 		}
@@ -266,7 +316,7 @@ public class Main {
 		}
 	}
 
-	private static boolean getIfFirst(Scanner reader) {
+	private static boolean getIfFirst() {
 		System.out.println("Do you want to make move first?\n"
 				+ "(1) Yes\n(2) No");
 		String input = reader.nextLine();
@@ -275,9 +325,6 @@ public class Main {
 					.println("The choice you entered is invalid. Please re-enter.");
 			input = reader.nextLine();
 		}
-		if (Integer.parseInt(input) == 1)
-			return true;
-		else
-			return false;
+		return Integer.parseInt(input) == 1;
 	}
 }
