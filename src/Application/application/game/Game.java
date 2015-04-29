@@ -5,13 +5,13 @@ import application.command.Command;
 import application.command.Move;
 import application.command.Quit;
 import application.command.Withdraw;
-import exceptions.GameException;
 import exceptions.InvalidIndexException;
 import model.Board;
 import model.BoardLocation;
 
-import java.util.ArrayList;
-
+/**
+ * Created by kelvin on 4/29/15.
+ */
 public abstract class Game {
 	public static final int NUM_HINTS_LIMIT = 3;
 	public static final int NUM_REGRETS_LIMIT = 3;
@@ -29,54 +29,32 @@ public abstract class Game {
 		ULTIMATE
 	}
 
-	protected IPlayer player2;
 	protected IPlayer player1;
-	protected IPlayer activePlayer;
+	protected IPlayer player2;
+
+	protected GameState state;
 
 	private Board board;
-	private boolean gameInProgress;
-	private boolean isGameTie;
-	private IPlayer winner;
-
-	// Number of withdrawals player 1 and 2 have remaining, respectively.
-	private int regrets1;
-	private int regrets2;
-	private ArrayList<BoardLocation> lastMove1;
-	private ArrayList<BoardLocation> lastMove2;
 
 	public Game() {
-		startGame();
-	}
-
-	public void startNewGame() throws GameException {
-		if (player1 != null && player2 !=null){
-			startGame();
-		} else {
-			throw new GameException("You need two players!");
-		}
-	}
-
-	private void startGame() {
 		board = new Board();
-		gameInProgress = true;
-		isGameTie = false;
-		winner = null;
-		lastMove1 = new ArrayList<BoardLocation>();
-		lastMove2 = new ArrayList<BoardLocation>();
-		regrets1 = 3;
-		regrets2 = 3;
+		state = new GameState();
+	}
+
+	public GameState getState(){
+		return state;
 	}
 
 	private void withdraw(IPlayer sender) {
-		if (gameInProgress && sender.equals(activePlayer)) {
-			if (getPlayerRegrets(getActivePlayer()) > 0) {
+		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
+			if (state.getPlayerRegrets(state.getActivePlayer()) > 0) {
 				try {
-					board.withdrawMove(removeLastMove(getActivePlayer()));
-					decreasePlayerRegrets(getActivePlayer());
-					System.out.println("You only have " + getPlayerRegrets(getActivePlayer()) + " withdrawals remaining.");
+					board.withdrawMove(state.removeLastMove(state.getActivePlayer()));
+					state.decreasePlayerRegrets(state.getActivePlayer());
+					System.out.println("You only have " + state.getPlayerRegrets(state.getActivePlayer()) + " withdrawals remaining.");
 					// Force withdraw the inactive player
-					if (getLastMove(getInactivePlayer()) != null) {
-						board.withdrawMove(removeLastMove(getInactivePlayer()));
+					if (state.getLastMove(state.getInactivePlayer()) != null) {
+						board.withdrawMove(state.removeLastMove(state.getInactivePlayer()));
 					}
 				} catch (InvalidIndexException e) {
 					System.out.println(e.getMessage());
@@ -101,27 +79,22 @@ public abstract class Game {
 	 *
 	 */
 	private void makeMove(IPlayer sender, BoardLocation loc) throws InvalidIndexException {
-		if (gameInProgress && sender.equals(activePlayer)) {
-			board.updateBoard(loc, isPlayer1Active());
-			setLastMove(sender, loc);
+		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
+			board.updateBoard(loc, state.isPlayerOne(sender));
+			state.setLastMove(sender, loc);
 			if (checkWinning()) {
-				winner = activePlayer;
-				gameInProgress = false;
-				isGameTie = false;
+				state.setWinner(sender);
 			}
 			else if (boardFull()) {
-				gameInProgress = false;
-				isGameTie = true;
+				state.setTieGame();
 			}
-			else toggleActivePlayer();
+			else state.toggleActivePlayer();
 		}
 	}
 
 	private void quit(IPlayer sender) {
-		if (gameInProgress && (sender.equals(activePlayer) || sender.equals(getInactivePlayer()))) {
-			winner = sender.equals(activePlayer) ? getInactivePlayer() : activePlayer;
-			isGameTie = false;
-			gameInProgress = false;
+		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
+			state.setWinner(state.getInactivePlayer());
 		}
 	}
 
@@ -129,7 +102,7 @@ public abstract class Game {
 		if (c == null) {
 			return;
 		}
-		if (gameInProgress && (c.getSender().equals(activePlayer) || c.getSender().equals(getInactivePlayer()))) {
+		if (state.isGameInProgress() && c.getSender().equals(state.getActivePlayer())) {
 			if (c instanceof Move) {
 				try {
 					makeMove(c.getSender(), ((Move) c).getLocation());
@@ -152,90 +125,8 @@ public abstract class Game {
 		return player1;
 	}
 
-	public IPlayer getPlayer2() {
-		return player2;
-	}
-
-	public IPlayer getActivePlayer() {
-		return activePlayer;
-	}
-
-	public IPlayer getInactivePlayer(){
-		if (isPlayer1Active()){
-			return player2;
-		} else return player1;
-	}
-
-	private void setLastMove(IPlayer sender, BoardLocation loc) {
-		if (sender.equals(player1)) {
-			lastMove1.add(loc);
-		} else if (sender.equals(player2)) {
-			lastMove2.add(loc);
-		}
-	}
-
-	public BoardLocation getLastMove(IPlayer player) {
-		BoardLocation lastMove = null;
-		if (player.equals(player1) && lastMove1.size() > 0) {
-			lastMove = lastMove1.get(lastMove1.size()-1);
-		} else if (player.equals(player2) && lastMove2.size() > 0) {
-			lastMove = lastMove2.get(lastMove2.size()-1);
-		}
-		return lastMove;
-	}
-
-	public BoardLocation removeLastMove(IPlayer player) {
-		BoardLocation lastMove = null;
-		if (player.equals(player1) && lastMove1.size() > 0) {
-			lastMove = lastMove1.remove(lastMove1.size() - 1);
-		} else if (player.equals(player2) && lastMove2.size() > 0) {
-			lastMove = lastMove2.remove(lastMove2.size() - 1);
-		}
-		return lastMove;
-	}
-
-	public int getPlayerRegrets(IPlayer player) {
-		if (player.equals(player1)) {
-			return regrets1;
-		} else if (player.equals(player2)) {
-			return regrets2;
-		} else return 0;
-	}
-
-	private void decreasePlayerRegrets(IPlayer player) {
-		if (player.equals(player1)) {
-			regrets1--;
-		} else if (player.equals(player2)) {
-			regrets2--;
-		}
-	}
-
-	public boolean isPlayer1Active(){
-		return activePlayer.equals(player1);
-	}
-
-	public void toggleActivePlayer(){
-		activePlayer = (activePlayer.equals(player1)) ? player2 : player1;
-	}
-
-	public boolean isWinning() {
-		return winner != null;
-	}
-
 	private boolean checkWinning(){
 		return board.checkrow() || board.checkcol() || board.checkdiag();
-	}
-
-	public boolean isGameInProgress() {
-		return gameInProgress;
-	}
-
-	public boolean isGameTie() {
-		return isGameTie;
-	}
-
-	public IPlayer getWinner() {
-		return winner;
 	}
 
 	private boolean boardFull(){

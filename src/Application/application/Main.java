@@ -66,37 +66,34 @@ public class Main {
 		}
 
 		// Check end of game status
-		if (game.isWinning()) {
+		if (game.getState().isGameEndInWin()) {
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
-			System.out.println(getPlayerID(game.getWinner()) + ", You won!");
-		} else if (game.isGameTie()) {
+			System.out.println(getPlayerID(game.getState().getWinner()) + ", You won!");
+		} else if (game.getState().isGameEndInTie()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
 	}
 
 	private static void playNetwork() {
-		if (host){
-			while (game.isGameInProgress()) {
-				// if game current turn is host, then make move
-				// if not, then recieve message from client until it's host's turn
-				// when game state changes, send to client.
-			}
-		} else {
-			// render the board received from host
-			// pick a boardlocation and write to host
-		}
+//		if (host){
+//			while (game.isGameInProgress()) {
+//				// if game current turn is host, then make move
+//				// if not, then recieve message from client until it's host's turn
+//				// when game state changes, send to client.
+//			}
+//		} else {
+//			// render the board received from host
+//			// pick a boardlocation and write to host
+//		}
 	}
 
 	private static void playLocal(int delay) {
-		if (game.getActivePlayer() == null) {
-			throw new RuntimeException("There is no player!");
-		}
-		while (game.isGameInProgress()) {
-            System.out.println(getPlayerID(game.getActivePlayer()) + ", it is your turn.");
+		while (game.getState().isGameInProgress()) {
+            System.out.println(getPlayerID(game.getState().getActivePlayer()) + ", it is your turn.");
             try {
-				game.doCommand(game.getActivePlayer().getCommand());
+				game.doCommand(game.getState().getActivePlayer().getCommand());
                 game.getBoard().renderBoard(dispMode);
 				Thread.sleep(delay);
             } catch (InterruptedException e) {
@@ -121,11 +118,6 @@ public class Main {
 			host = reader.next();
 		}
 		return host.equals("1");
-	}
-
-	private static void actionGameOver() {
-		System.out.println("Game Over!");
-		reader.close();
 	}
 
 	private static void printInstruction() {
@@ -200,25 +192,6 @@ public class Main {
 			}
 		}
 		return Difficulty.values()[selection-1];
-	}
-
-	/**
-	 * Returns the active player as a string of either "one" if player 1 is active
-	 * and "two" if player two is active
-	 * @return
-	 * 		"one" if player 1 is active.
-	 * 		"two if player 2 is active.
-	 */
-	private static String getActivePlayerAsString(){
-		if (game.isPlayer1Active()){
-			return "one";
-		} else return "two";
-	}
-
-	private static String getInactivePlayerAsString(){
-		if(game.isPlayer1Active()){
-			return "two";
-		} else return "one";
 	}
 
 	private static boolean getIfFirst() {

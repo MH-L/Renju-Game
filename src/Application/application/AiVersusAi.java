@@ -14,6 +14,6 @@ public class AiVersusAi extends Game {
         super();
         player1 = new AI (ai1Difficulty, getBoard(), true);
         player2 = new AI (ai2Difficulty, getBoard(), false);
-        activePlayer = player1;
+        getState().startNewGame(player1, player2);
     }
 }
