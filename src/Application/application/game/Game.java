@@ -7,9 +7,10 @@ import application.command.Quit;
 import application.command.Withdraw;
 import exceptions.GameException;
 import exceptions.InvalidIndexException;
-import exceptions.WithdrawException;
 import model.Board;
 import model.BoardLocation;
+
+import java.util.ArrayList;
 
 public abstract class Game {
 	public static final int MULTIPLAYER_GAME_MODE = 1;
@@ -31,6 +32,12 @@ public abstract class Game {
 	private boolean isGameTie;
 	private IPlayer winner;
 
+	// Number of withdrawals player 1 and 2 have remaining, respectively.
+	private int regrets1;
+	private int regrets2;
+	private ArrayList<BoardLocation> lastMove1;
+	private ArrayList<BoardLocation> lastMove2;
+
 	public Game() {
 		startGame();
 	}
@@ -48,14 +55,29 @@ public abstract class Game {
 		gameInProgress = true;
 		isGameTie = false;
 		winner = null;
+		lastMove1 = new ArrayList<BoardLocation>();
+		lastMove2 = new ArrayList<BoardLocation>();
+		regrets1 = 3;
+		regrets2 = 3;
 	}
 
-	private void withdraw(IPlayer sender) throws WithdrawException, InvalidIndexException{
+	private void withdraw(IPlayer sender) {
 		if (gameInProgress && sender.equals(activePlayer)) {
-			board.withdrawMove(getActivePlayer().getLastMove());
-			board.withdrawMove(getInactivePlayer().getLastMove());
-			getActivePlayer().withdraw();
-			getInactivePlayer().forceWithdraw();
+			if (getPlayerRegrets(getActivePlayer()) > 0) {
+				try {
+					board.withdrawMove(removeLastMove(getActivePlayer()));
+					decreasePlayerRegrets(getActivePlayer());
+					System.out.println("You only have " + getPlayerRegrets(getActivePlayer()) + " withdrawals remaining.");
+					// Force withdraw the inactive player
+					if (getLastMove(getInactivePlayer()) != null) {
+						board.withdrawMove(removeLastMove(getInactivePlayer()));
+					}
+				} catch (InvalidIndexException e) {
+					System.out.println(e.getMessage());
+				}
+			} else {
+				System.out.println("You have no more withdrawals");
+			}
 		}
 	}
 
@@ -74,8 +96,8 @@ public abstract class Game {
 	 */
 	private void makeMove(IPlayer sender, BoardLocation loc) throws InvalidIndexException {
 		if (gameInProgress && sender.equals(activePlayer)) {
-			if (!board.updateBoard(loc, isPlayer1Active()))
-				throw new InvalidIndexException("The index you entered is not valid!");
+			board.updateBoard(loc, isPlayer1Active());
+			setLastMove(sender, loc);
 			if (checkWinning()) {
 				winner = activePlayer;
 				gameInProgress = false;
@@ -106,18 +128,12 @@ public abstract class Game {
 				try {
 					makeMove(c.getSender(), ((Move) c).getLocation());
 				} catch (InvalidIndexException e) {
-					// TODO tell sender his move is invalid
+					System.out.println(e.getMessage());
 				}
 			} else if (c instanceof Quit) {
 				quit(c.getSender());
 			} else if (c instanceof Withdraw) {
-				try {
-					withdraw(c.getSender());
-				} catch (WithdrawException e) {
-					e.printStackTrace();
-				} catch (InvalidIndexException e) {
-					e.printStackTrace();
-				}
+				withdraw(c.getSender());
 			}
 		}
 	}
@@ -142,6 +158,50 @@ public abstract class Game {
 		if (isPlayer1Active()){
 			return player2;
 		} else return player1;
+	}
+
+	private void setLastMove(IPlayer sender, BoardLocation loc) {
+		if (sender.equals(player1)) {
+			lastMove1.add(loc);
+		} else if (sender.equals(player2)) {
+			lastMove2.add(loc);
+		}
+	}
+
+	public BoardLocation getLastMove(IPlayer player) {
+		BoardLocation lastMove = null;
+		if (player.equals(player1) && lastMove1.size() > 0) {
+			lastMove = lastMove1.get(lastMove1.size()-1);
+		} else if (player.equals(player2) && lastMove2.size() > 0) {
+			lastMove = lastMove2.get(lastMove2.size()-1);
+		}
+		return lastMove;
+	}
+
+	public BoardLocation removeLastMove(IPlayer player) {
+		BoardLocation lastMove = null;
+		if (player.equals(player1) && lastMove1.size() > 0) {
+			lastMove = lastMove1.remove(lastMove1.size() - 1);
+		} else if (player.equals(player2) && lastMove2.size() > 0) {
+			lastMove = lastMove2.remove(lastMove2.size() - 1);
+		}
+		return lastMove;
+	}
+
+	public int getPlayerRegrets(IPlayer player) {
+		if (player.equals(player1)) {
+			return regrets1;
+		} else if (player.equals(player2)) {
+			return regrets2;
+		} else return 0;
+	}
+
+	private void decreasePlayerRegrets(IPlayer player) {
+		if (player.equals(player1)) {
+			regrets1--;
+		} else if (player.equals(player2)) {
+			regrets2--;
+		}
 	}
 
 	public boolean isPlayer1Active(){

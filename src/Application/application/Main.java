@@ -110,38 +110,6 @@ public class Main {
 				game.doCommand(game.getActivePlayer().getCommand());
                 game.getBoard().renderBoard(dispMode);
 				Thread.sleep(delay);
-//            } catch (InvalidIndexException e) {
-//                switch (e.getMessage()) {
-//                    case "x":
-//                        actionGameOver();
-//                        return;
-//                    case "w":
-//                        try {
-////                            actionWithdraw();
-//							System.out.format(
-//									"You have %d withdrawals left.\n",
-//									((Player) game.getActivePlayer())
-//											.getRegrets());
-//							System.out.println("Now the board is shown below.");
-//							game.getBoard().renderBoard(dispMode);
-////                        } catch (WithdrawException e1) {
-////                            // Redo this turn since the player is out of withdrawals
-////                            continue;
-//                        } catch (InvalidIndexException e1) {
-//							e1.printStackTrace();
-//							System.out.println(e1.getMessage());
-//							continue;
-//						}
-//						break;
-//					case "i":
-//                        printInstruction();
-//                        break;
-//                    default:
-//                        // TODO fix this since Board also throws the exception which doesn't
-//                        // return the command issued as the message
-//                        // Could just give a generic response rather than returning the issued command
-//                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
-//                }
             } catch (InterruptedException e) {
 				e.printStackTrace();
 			}
