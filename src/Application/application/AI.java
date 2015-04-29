@@ -1,5 +1,6 @@
 package application;
 
+import application.Game.Difficulty;
 import model.Board;
 import model.BoardLocation;
 import exceptions.InvalidIndexException;
@@ -10,6 +11,8 @@ import algorithm.BasicAlgorithm;
 import algorithm.IntermediateAlgorithm;
 import algorithm.UltimateAlgorithm;
 
+import static application.Game.Difficulty.*;
+
 /**
  * This is a class for the AI of the Renju game. It has different difficulty
  * levels.
@@ -19,28 +22,28 @@ import algorithm.UltimateAlgorithm;
  */
 public class AI implements IPlayer {
 
-	private static final int DEFAULT_DIFFICULTY = Game.ULTIMATE_DIFFICULTY;
-	private int difficulty = DEFAULT_DIFFICULTY;
+	private static final Difficulty DEFAULT_DIFFICULTY = ULTIMATE;
+	private Difficulty difficulty = DEFAULT_DIFFICULTY;
 	private Board board;
 	private BoardLocation lastMove;
 	private Algorithm solver;
 
-	public AI(int difficulty, Board board, boolean isFirst) {
+	public AI(Difficulty difficulty, Board board, boolean isFirst) {
 		this.lastMove = model.Board.getInvalidBoardLocation();
 		// TODO Board param may not be needed if game board is static
 		this.difficulty = difficulty;
 		this.board = board;
 		switch (this.difficulty) {
-			case Game.NOVICE_DIFFICULTY:
+			case NOVICE:
 				solver = new BasicAlgorithm(board, isFirst);
 				break;
-			case Game.INTERMEDIATE_DIFFICULTY:
+			case INTERMEDIATE:
 				solver = new IntermediateAlgorithm(board, isFirst);
 				break;
-			case Game.ADVANCED_DIFFICULTY:
+			case ADVANCED:
 				solver = new AdvancedAlgorithm(board, isFirst);
 				break;
-			case Game.ULTIMATE_DIFFICULTY:
+			case ULTIMATE:
 				solver = new UltimateAlgorithm(board, isFirst);
 			default:
 				solver = new UltimateAlgorithm(board, isFirst);

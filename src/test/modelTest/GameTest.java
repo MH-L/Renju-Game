@@ -15,7 +15,7 @@ public class GameTest {
 
 	@Before
 	public void init() {
-		game = new SinglePlayer(Game.NOVICE_DIFFICULTY, true);
+		game = new SinglePlayer(Game.Difficulty.NOVICE, true);
 	}
 
 	@Test

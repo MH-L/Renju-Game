@@ -5,6 +5,9 @@ import exceptions.WithdrawException;
 import model.Board;
 
 import java.util.Scanner;
+
+import static application.Game.*;
+
 /**
  * The start point of the application.
  * @author Minghao Liu
@@ -21,55 +24,42 @@ public class Main {
 		// Get initializations
 		printHeader();
 		reader = new Scanner(System.in);
-		int mode = getGameMode();
+		Mode mode = getGameMode();
 		dispMode = getDisplayMode();
 		printInstruction();
 
 		// Initialize game mode
 		switch (mode) {
-			case Game.SINGLEPLAYER_GAME_MODE:
-				int diff = getDifficulty();
-				if (isValidDifficulty(diff)){
-					// This would be better if initSinglePlayer handled this input
-					// but creating a new exception might be overkill for something
-					// that likely isn't going to change
-					boolean playerFirst = getIfFirst();
-					game = new SinglePlayer(diff, playerFirst);
-				} else {
-					System.err.println("Internal Error!");
-					return;
-				}
+			case SINGLEPLAYER:
+				Difficulty diff = getDifficulty();
+				boolean playerFirst = getIfFirst();
+				game = new SinglePlayer(diff, playerFirst);
 				break;
-			case Game.MULTIPLAYER_GAME_MODE:
+			case MULTIPLAYER:
 				game = new MultiPlayer();
 				break;
-			case Game.NETWORK_GAME_MODE:
+			case NETWORK:
 				host = getHost();
 				game = new Network(host);
 				break;
-			case Game.AI_VERSUS_AI_GAME_MODE:
-				int diff1 = getDifficulty();
-				int diff2 = getDifficulty();
-				if (isValidDifficulty(diff1) && isValidDifficulty(diff2)){
-					game = new AiVersusAi(diff1, diff2);
-				} else {
-					System.err.println("Internal Error!");
-					return;
-				}
+			case AIVERSUSAI:
+				Difficulty diff1 = getDifficulty();
+				Difficulty diff2 = getDifficulty();
+				game = new AiVersusAi(diff1, diff2);
 				break;
 			default:
 				System.err.println("Invalid game mode. Exiting");
 				return;
 		}
 
-		System.out.println("The match is set as " + getModeAsString() + " in a " +
+		System.out.println("The match is set as " + mode.toString() + " in a " +
 				Board.getWidth() + "x" + Board.getHeight() + " board as shown:");
 		game.getBoard().renderBoard(dispMode);
 
 		// Play the game
-		if (mode == Game.NETWORK_GAME_MODE) {
+		if (mode == Mode.NETWORK) {
 			playNetwork();
-		} else if (mode == Game.AI_VERSUS_AI_GAME_MODE) {
+		} else if (mode == Mode.AIVERSUSAI) {
 			playAiVAi();
 		}
 		else {
@@ -81,7 +71,7 @@ public class Main {
 		if (game.getActivePlayer() == null) {
 			throw new RuntimeException("There is no player!");
 		}
-		while (!Game.isWinning() && !Game.boardFull()) {
+		while (!isWinning() && !boardFull()) {
 			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
@@ -93,23 +83,19 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-		if (Game.isWinning()) {
+		if (isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
-		} else if (Game.boardFull()) {
+		} else if (boardFull()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
 
 		reader.close();
-	}
-
-	private static boolean isValidDifficulty(int diff) {
-		return Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY;
 	}
 
 	private static void playNetwork() {
@@ -119,7 +105,7 @@ public class Main {
 		if (game.getActivePlayer() == null) {
 			throw new RuntimeException("There is no player!");
 		}
-		while (!Game.isWinning() && !Game.boardFull()) {
+		while (!isWinning() && !boardFull()) {
             System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
             try {
                 game.makeMove();
@@ -158,14 +144,14 @@ public class Main {
                 }
             }
         }
-		if (Game.isWinning()) {
+		if (isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
-		} else if (Game.boardFull()) {
+		} else if (boardFull()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
@@ -203,7 +189,6 @@ public class Main {
 	}
 
 	private static void printInstruction() {
-		// TODO fix the magic number
 		System.out
 				.println("Game instruction:\nEach player takes turn to place a stone on the board."
 						+ "\nYour goal is to place "
@@ -223,21 +208,24 @@ public class Main {
 						+ "\nTo see the instructions again, enter \"i\"\n");
 	}
 
-	private static int getGameMode() {
-		System.out.println(" Welcome to the Renju Game!\n Select a game mode:" +
-				"\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player" +
-				"\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player" +
-				"\n (" + Game.NETWORK_GAME_MODE + ") Network" +
-				"\n (" + Game.AI_VERSUS_AI_GAME_MODE + ") AI v AI" );
-		String gameMode = reader.next();
-		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE)) &&
-				!gameMode.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE)) &&
-				!gameMode.equals(String.valueOf(Game.NETWORK_GAME_MODE)) &&
-				!gameMode.equals(String.valueOf(Game.AI_VERSUS_AI_GAME_MODE))) {
-			System.out.println("Invalid input. Please re-enter your choice.");
-			gameMode = reader.nextLine();
+	private static Mode getGameMode() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Select a game mode:\n");
+		for (Mode m : Mode.values()) {
+			sb.append(" (").append(m.ordinal()+1).append(") ").append(m.toString()).append("\n");
 		}
-		return Integer.parseInt(gameMode);
+		System.out.println(sb.toString());
+		int selection = 0;
+		while (selection < 1 || selection > Mode.values().length) {
+			try{
+				selection = Integer.parseInt(reader.next());
+				if (selection < 1 || selection > Difficulty.values().length)
+					System.err.println("Invalid option. Please try again");
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid option. Please try again");
+			}
+		}
+		return Mode.values()[selection-1];
 	}
 
 	private static int getDisplayMode() {
@@ -254,24 +242,24 @@ public class Main {
 		return Integer.parseInt(displayMode);
 	}
 
-	private static int getDifficulty() {
-		// TODO change here in future releases. since now we cannot set up more
-		// difficult versions.
-		System.out.println(" Please enter the AI difficulty:\n"
-				+ " (" + Game.NOVICE_DIFFICULTY + ") Novice\n"
-				+ " (" + Game.INTERMEDIATE_DIFFICULTY + ") Intermediate (coming soon)\n"
-				+ " (" + Game.ADVANCED_DIFFICULTY + ") Advanced (coming soon)\n"
-				+ " (" + Game.ULTIMATE_DIFFICULTY + ") Ultimate (coming soon)\n");
-		String difficulty = reader.next();
-
-		while (!difficulty.equals(String.valueOf(Game.NOVICE_DIFFICULTY)) &&
-				!difficulty.equals(String.valueOf(Game.INTERMEDIATE_DIFFICULTY)) &&
-				!difficulty.equals(String.valueOf(Game.ADVANCED_DIFFICULTY)) &&
-				!difficulty.equals(String.valueOf(Game.ULTIMATE_DIFFICULTY))) {
-			System.out.println("Invalid difficulty level. Please re-enter your choice.");
-			difficulty = reader.next();
+	private static Difficulty getDifficulty() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Please select the game difficulty:\n");
+		for (Difficulty d : Difficulty.values()) {
+			sb.append(" (").append(d.ordinal()+1).append(") ").append(d.toString()).append("\n");
 		}
-		return Integer.parseInt(difficulty);
+		System.out.println(sb.toString());
+		int selection = 0;
+		while (selection < 1 || selection > Difficulty.values().length) {
+			try{
+				selection = Integer.parseInt(reader.next());
+				if (selection < 1 || selection > Difficulty.values().length)
+					System.err.println("Invalid option. Please try again");
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid option. Please try again");
+			}
+		}
+		return Difficulty.values()[selection-1];
 	}
 
 	/**
@@ -291,21 +279,6 @@ public class Main {
 		if(game.isPlayer1Active()){
 			return "two";
 		} else return "one";
-	}
-
-	/**
-	 * Return the game mode as a string
-	 *
-	 * @return
-	 * 		"single player" if the mode is SINGLEPLAYER_GAME_MODE
-	 * 		"multi-player" if the mode is MULTIPLAYER_GAME_MODE
-	 */
-	private static String getModeAsString(){
-		if (game instanceof SinglePlayer){
-			return "single player";
-		} else {
-			return "multiplayer";
-		}
 	}
 
 	private static boolean getIfFirst() {
