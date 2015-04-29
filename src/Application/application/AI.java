@@ -2,9 +2,8 @@ package application;
 
 import algorithm.*;
 import application.command.Command;
+import application.command.Move;
 import application.game.Game.Difficulty;
-import exceptions.InvalidIndexException;
-import exceptions.WithdrawException;
 import model.Board;
 import model.BoardLocation;
 
@@ -20,11 +19,9 @@ public class AI implements IPlayer {
 	private static final Difficulty DEFAULT_DIFFICULTY = Difficulty.ULTIMATE;
 	private Difficulty difficulty = DEFAULT_DIFFICULTY;
 	private Board board;
-	private BoardLocation lastMove;
 	private Algorithm solver;
 
 	public AI(Difficulty difficulty, Board board, boolean isFirst) {
-		this.lastMove = model.Board.getInvalidBoardLocation();
 		// TODO Board param may not be needed if game board is static
 		this.difficulty = difficulty;
 		this.board = board;
@@ -46,27 +43,7 @@ public class AI implements IPlayer {
 		}
 	}
 
-	@Override
-	public boolean withdraw() throws WithdrawException {
-		// TODO Auto-generated method stub
-		// Since AI will never withdraw, just do not do anything.
-		this.lastMove = Board.getInvalidBoardLocation();
-		return false;
-	}
-
-	@Override
-	public void forceWithdraw() {
-		try {
-			// TODO Auto-generated method stub
-			board.withdrawMove(lastMove);
-		} catch (InvalidIndexException e) {
-			e.printStackTrace();
-		}
-		lastMove = Board.getInvalidBoardLocation();
-	}
-
-	@Override
-	public BoardLocation makeMove() throws InvalidIndexException {
+	public BoardLocation makeMove() {
 		// start to check for patterns after three moves.
 		// which is five or six stones on the board.
 		BoardLocation nextMove = null;
@@ -75,19 +52,12 @@ public class AI implements IPlayer {
 		// TODO modify this function since it is not complete.
 		else
 			nextMove = solver.makeMoveEnd();
-		lastMove = nextMove;
 		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getXPos(), nextMove.getYPos());
 		return nextMove;
 	}
 
 	@Override
-	public BoardLocation getLastMove() {
-		return lastMove;
-	}
-
-	@Override
 	public Command getCommand() {
-		// TODO
-		return null;
+		return new Move(this, makeMove());
 	}
 }

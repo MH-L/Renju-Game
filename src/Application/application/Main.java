@@ -141,7 +141,7 @@ public class Main {
 						+ "\nHowever, inputs such as \"13,12\", \"A,G\", \"B\""
 						+ "\nare not valid ones."
 						+ "\n\nYou are allowed to undo your last move up to "
-						+ Player.NUM_REGRETS_LIMIT
+						+ Game.NUM_REGRETS_LIMIT
 						+ " times."
 						+ "\nEnter \"w\" to withdraw when it is your turn."
 						+ "\nTo quit the game, enter \"x\". "

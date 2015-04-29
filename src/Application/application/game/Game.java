@@ -13,6 +13,9 @@ import model.BoardLocation;
 import java.util.ArrayList;
 
 public abstract class Game {
+	public static final int NUM_HINTS_LIMIT = 3;
+	public static final int NUM_REGRETS_LIMIT = 3;
+
 	public enum Mode {
 		SINGLEPLAYER,
 		MULTIPLAYER,

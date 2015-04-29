@@ -16,19 +16,9 @@ import java.util.Scanner;
  *
  */
 public class Player implements IPlayer {
-
-	public static final int NUM_HINTS_LIMIT = 3;
-	public static final int NUM_REGRETS_LIMIT = 3;
-
-	private BoardLocation lastMove;
-	private int num_hints;
-	private int num_regrets;
 	private String id;
 
 	public Player() {
-		this.num_hints = NUM_HINTS_LIMIT;
-		this.num_regrets = NUM_REGRETS_LIMIT;
-		this.lastMove = null;
 		System.out.println("What is your User ID?");
 		Scanner reader = new Scanner(System.in);
 		setId(reader.nextLine());
@@ -43,41 +33,26 @@ public class Player implements IPlayer {
 		return id;
 	}
 
-	@Override
-	public boolean withdraw() throws WithdrawException {
-		if (this.lastMove == null)
-			throw new NothingToWithdrawException("It is your first turn! You have nothing to withdraw!");
-		else if (model.Board.isReachable(lastMove)) {
-			if (this.num_regrets > 0) {
-				num_regrets --;
-				// TODO refactor
-				lastMove = model.Board.getInvalidBoardLocation();
-				return true;
-			}
-			else
-				throw new OverWithdrawException("You don't have any withdrawals left!");
-		} else
-			throw new MultipleWithdrawException("You cannot withdraw two times!");
-	}
+//	public boolean withdraw() throws WithdrawException {
+//		if (this.lastMove == null)
+//			throw new NothingToWithdrawException("It is your first turn! You have nothing to withdraw!");
+//		else if (model.Board.isReachable(lastMove)) {
+//			if (this.num_regrets > 0) {
+//				num_regrets --;
+//				// TODO refactor
+//				lastMove = model.Board.getInvalidBoardLocation();
+//				return true;
+//			}
+//			else
+//				throw new OverWithdrawException("You don't have any withdrawals left!");
+//		} else
+//			throw new MultipleWithdrawException("You cannot withdraw two times!");
+//	}
 
-	@Override
-	public void forceWithdraw() {
-		lastMove = model.Board.getInvalidBoardLocation();
-	}
-
-	public int getRegrets() {
-		return num_regrets;
-	}
-
-	public int getNumHints() {
-		return num_hints;
-	}
-
-	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
 		Scanner input = new Scanner(System.in);
 		String move = input.nextLine();
-		lastMove = translateBoardLocation(move);
+		BoardLocation lastMove = translateBoardLocation(move);
 		return lastMove;
 	}
 
@@ -117,10 +92,6 @@ public class Player implements IPlayer {
 			}
 		}
 		return true;
-	}
-
-	public BoardLocation getLastMove() {
-		return lastMove;
 	}
 
 	@Override
