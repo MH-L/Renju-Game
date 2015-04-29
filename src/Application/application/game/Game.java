@@ -2,6 +2,9 @@ package application.game;
 
 import application.IPlayer;
 import application.command.Command;
+import application.command.Move;
+import application.command.Quit;
+import application.command.Withdraw;
 import exceptions.GameException;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
@@ -48,9 +51,7 @@ public abstract class Game {
 	}
 
 	private void withdraw(IPlayer sender) throws WithdrawException, InvalidIndexException{
-		if (gameInProgress && (sender.equals(activePlayer) || sender.equals(getInactivePlayer()))) {
-			// TODO
-			IPlayer otherPlayer = sender.equals(activePlayer) ? getInactivePlayer() : activePlayer;
+		if (gameInProgress && sender.equals(activePlayer)) {
 			board.withdrawMove(getActivePlayer().getLastMove());
 			board.withdrawMove(getInactivePlayer().getLastMove());
 			getActivePlayer().withdraw();
@@ -96,18 +97,28 @@ public abstract class Game {
 		}
 	}
 
-	public void doCommand(Command c) throws InvalidIndexException {
-		switch (c.getType()) {
-			case MOVE:
-				makeMove(c.getSender(), c.getValue());
-				break;
-			case QUIT:
+	public void doCommand(Command c) {
+		if (c == null) {
+			return;
+		}
+		if (gameInProgress && (c.getSender().equals(activePlayer) || c.getSender().equals(getInactivePlayer()))) {
+			if (c instanceof Move) {
+				try {
+					makeMove(c.getSender(), ((Move) c).getLocation());
+				} catch (InvalidIndexException e) {
+					// TODO tell sender his move is invalid
+				}
+			} else if (c instanceof Quit) {
 				quit(c.getSender());
-				break;
-			case WITHDRAW:
-				break;
-			default:
-				break;
+			} else if (c instanceof Withdraw) {
+				try {
+					withdraw(c.getSender());
+				} catch (WithdrawException e) {
+					e.printStackTrace();
+				} catch (InvalidIndexException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

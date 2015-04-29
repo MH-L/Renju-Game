@@ -4,7 +4,6 @@ import application.game.Game;
 import application.game.MultiPlayer;
 import application.game.Network;
 import application.game.SinglePlayer;
-import exceptions.InvalidIndexException;
 import model.Board;
 
 import java.util.Scanner;
@@ -111,12 +110,12 @@ public class Main {
 				game.doCommand(game.getActivePlayer().getCommand());
                 game.getBoard().renderBoard(dispMode);
 				Thread.sleep(delay);
-            } catch (InvalidIndexException e) {
-                switch (e.getMessage()) {
-                    case "x":
-                        actionGameOver();
-                        return;
-                    case "w":
+//            } catch (InvalidIndexException e) {
+//                switch (e.getMessage()) {
+//                    case "x":
+//                        actionGameOver();
+//                        return;
+//                    case "w":
 //                        try {
 ////                            actionWithdraw();
 //							System.out.format(
@@ -133,16 +132,16 @@ public class Main {
 //							System.out.println(e1.getMessage());
 //							continue;
 //						}
-						break;
-					case "i":
-                        printInstruction();
-                        break;
-                    default:
-                        // TODO fix this since Board also throws the exception which doesn't
-                        // return the command issued as the message
-                        // Could just give a generic response rather than returning the issued command
-                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
-                }
+//						break;
+//					case "i":
+//                        printInstruction();
+//                        break;
+//                    default:
+//                        // TODO fix this since Board also throws the exception which doesn't
+//                        // return the command issued as the message
+//                        // Could just give a generic response rather than returning the issued command
+//                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
+//                }
             } catch (InterruptedException e) {
 				e.printStackTrace();
 			}

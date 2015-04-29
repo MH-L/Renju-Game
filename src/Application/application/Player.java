@@ -1,6 +1,9 @@
 package application;
 
 import application.command.Command;
+import application.command.Move;
+import application.command.Quit;
+import application.command.Withdraw;
 import exceptions.*;
 import model.BoardLocation;
 
@@ -122,17 +125,20 @@ public class Player implements IPlayer {
 
 	@Override
 	public Command getCommand() {
-		Scanner input = new Scanner(System.in);
-		String move = input.nextLine();
+		Scanner in = new Scanner(System.in);
+		String move = in.nextLine().trim();
 		if (move.contains(",")) {
 			try {
-				return new Command (Command.Type.MOVE, translateBoardLocation(move), this);
+				return new Move(this, translateBoardLocation(move));
 			} catch (InvalidIndexException e) {
 				System.out.println("Invalid index. Try again");
 				getCommand();
 			}
+		} else if(move.equals("x")) {
+			return new Quit(this);
+		} else if (move.equals("w")){
+			return new Withdraw(this);
 		}
-		// TODO
 		return null;
 	}
 
