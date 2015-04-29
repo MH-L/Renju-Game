@@ -5,7 +5,6 @@ import application.game.MultiPlayer;
 import application.game.Network;
 import application.game.SinglePlayer;
 import exceptions.InvalidIndexException;
-import exceptions.WithdrawException;
 import model.Board;
 
 import java.util.Scanner;
@@ -90,6 +89,16 @@ public class Main {
 	}
 
 	private static void playNetwork() {
+		if (host){
+			while (game.isGameInProgress()) {
+				// if game current turn is host, then make move
+				// if not, then recieve message from client until it's host's turn
+				// when game state changes, send to client.
+			}
+		} else {
+			// render the board received from host
+			// pick a boardlocation and write to host
+		}
 	}
 
 	private static void playLocal(int delay) {
@@ -99,7 +108,7 @@ public class Main {
 		while (game.isGameInProgress()) {
             System.out.println(getPlayerID(game.getActivePlayer()) + ", it is your turn.");
             try {
-				game.makeMove(game.getActivePlayer(), game.getActivePlayer().makeMove());
+				game.doCommand(game.getActivePlayer().getCommand());
                 game.getBoard().renderBoard(dispMode);
 				Thread.sleep(delay);
             } catch (InvalidIndexException e) {
@@ -108,22 +117,22 @@ public class Main {
                         actionGameOver();
                         return;
                     case "w":
-                        try {
-                            actionWithdraw();
-							System.out.format(
-									"You have %d withdrawals left.\n",
-									((Player) game.getActivePlayer())
-											.getRegrets());
-							System.out.println("Now the board is shown below.");
-							game.getBoard().renderBoard(dispMode);
-                        } catch (WithdrawException e1) {
-                            // Redo this turn since the player is out of withdrawals
-                            continue;
-                        } catch (InvalidIndexException e1) {
-							e1.printStackTrace();
-							System.out.println(e1.getMessage());
-							continue;
-						}
+//                        try {
+////                            actionWithdraw();
+//							System.out.format(
+//									"You have %d withdrawals left.\n",
+//									((Player) game.getActivePlayer())
+//											.getRegrets());
+//							System.out.println("Now the board is shown below.");
+//							game.getBoard().renderBoard(dispMode);
+////                        } catch (WithdrawException e1) {
+////                            // Redo this turn since the player is out of withdrawals
+////                            continue;
+//                        } catch (InvalidIndexException e1) {
+//							e1.printStackTrace();
+//							System.out.println(e1.getMessage());
+//							continue;
+//						}
 						break;
 					case "i":
                         printInstruction();
@@ -149,10 +158,10 @@ public class Main {
 		System.out.println("Created By: Minghao Liu. Refactor: Kelvin Yip.");
 	}
 
-	private static void actionWithdraw() throws WithdrawException,
-			InvalidIndexException {
-		game.withdraw();
-	}
+//	private static void actionWithdraw() throws WithdrawException,
+//			InvalidIndexException {
+//		game.withdraw();
+//	}
 
 	private static boolean getHost() {
 		System.out.println(" Are you host or client?\n"

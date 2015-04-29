@@ -1,5 +1,6 @@
 package application;
 
+import application.command.Command;
 import model.BoardLocation;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
@@ -26,6 +27,11 @@ public class MockAI implements IPlayer {
 	@Override
 	public BoardLocation getLastMove() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Command getCommand() {
 		return null;
 	}
 

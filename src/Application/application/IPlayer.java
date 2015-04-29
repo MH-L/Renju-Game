@@ -1,5 +1,6 @@
 package application;
 
+import application.command.Command;
 import model.BoardLocation;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
@@ -9,5 +10,5 @@ public interface IPlayer {
 	boolean withdraw() throws WithdrawException;
 	void forceWithdraw();
 	BoardLocation getLastMove();
-
+	Command getCommand();
 }

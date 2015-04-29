@@ -1,6 +1,8 @@
 package application.game;
 
 import application.IPlayer;
+import application.command.Command;
+import exceptions.GameException;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 import model.Board;
@@ -30,6 +32,14 @@ public abstract class Game {
 		startGame();
 	}
 
+	public void startNewGame() throws GameException {
+		if (player1 != null && player2 !=null){
+			startGame();
+		} else {
+			throw new GameException("You need two players!");
+		}
+	}
+
 	private void startGame() {
 		board = new Board();
 		gameInProgress = true;
@@ -37,11 +47,15 @@ public abstract class Game {
 		winner = null;
 	}
 
-	public void withdraw() throws WithdrawException, InvalidIndexException{
-		board.withdrawMove(getActivePlayer().getLastMove());
-		board.withdrawMove(getInactivePlayer().getLastMove());
-		getActivePlayer().withdraw();
-		getInactivePlayer().forceWithdraw();
+	private void withdraw(IPlayer sender) throws WithdrawException, InvalidIndexException{
+		if (gameInProgress && (sender.equals(activePlayer) || sender.equals(getInactivePlayer()))) {
+			// TODO
+			IPlayer otherPlayer = sender.equals(activePlayer) ? getInactivePlayer() : activePlayer;
+			board.withdrawMove(getActivePlayer().getLastMove());
+			board.withdrawMove(getInactivePlayer().getLastMove());
+			getActivePlayer().withdraw();
+			getInactivePlayer().forceWithdraw();
+		}
 	}
 
 	/**
@@ -57,7 +71,7 @@ public abstract class Game {
 	* 		thrown if the move chosen is invalid
 	 *
 	 */
-	public void makeMove(IPlayer sender, BoardLocation loc) throws InvalidIndexException {
+	private void makeMove(IPlayer sender, BoardLocation loc) throws InvalidIndexException {
 		if (gameInProgress && sender.equals(activePlayer)) {
 			if (!board.updateBoard(loc, isPlayer1Active()))
 				throw new InvalidIndexException("The index you entered is not valid!");
@@ -72,7 +86,29 @@ public abstract class Game {
 			}
 			else toggleActivePlayer();
 		}
+	}
 
+	private void quit(IPlayer sender) {
+		if (gameInProgress && (sender.equals(activePlayer) || sender.equals(getInactivePlayer()))) {
+			winner = sender.equals(activePlayer) ? getInactivePlayer() : activePlayer;
+			isGameTie = false;
+			gameInProgress = false;
+		}
+	}
+
+	public void doCommand(Command c) throws InvalidIndexException {
+		switch (c.getType()) {
+			case MOVE:
+				makeMove(c.getSender(), c.getValue());
+				break;
+			case QUIT:
+				quit(c.getSender());
+				break;
+			case WITHDRAW:
+				break;
+			default:
+				break;
+		}
 	}
 
 	public Board getBoard(){

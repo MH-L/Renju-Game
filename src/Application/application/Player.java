@@ -1,5 +1,6 @@
 package application;
 
+import application.command.Command;
 import exceptions.*;
 import model.BoardLocation;
 
@@ -73,6 +74,11 @@ public class Player implements IPlayer {
 	public BoardLocation makeMove() throws InvalidIndexException {
 		Scanner input = new Scanner(System.in);
 		String move = input.nextLine();
+		lastMove = translateBoardLocation(move);
+		return lastMove;
+	}
+
+	public static BoardLocation translateBoardLocation(String move) throws InvalidIndexException {
 		if (!move.contains(",")) {
 			throw new InvalidIndexException(move);
 		}
@@ -90,7 +96,6 @@ public class Player implements IPlayer {
 			y_coord = Integer.parseInt(inputs[0]);
 		} else
 			throw new InvalidIndexException(move);
-		lastMove = new BoardLocation(y_coord - 1, x_coord - 1);
 		return new BoardLocation(y_coord - 1, x_coord - 1);
 	}
 
@@ -113,6 +118,22 @@ public class Player implements IPlayer {
 
 	public BoardLocation getLastMove() {
 		return lastMove;
+	}
+
+	@Override
+	public Command getCommand() {
+		Scanner input = new Scanner(System.in);
+		String move = input.nextLine();
+		if (move.contains(",")) {
+			try {
+				return new Command (Command.Type.MOVE, translateBoardLocation(move), this);
+			} catch (InvalidIndexException e) {
+				System.out.println("Invalid index. Try again");
+				getCommand();
+			}
+		}
+		// TODO
+		return null;
 	}
 
 	private static boolean isNumber(String string) {

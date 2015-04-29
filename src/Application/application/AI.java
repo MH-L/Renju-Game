@@ -1,16 +1,12 @@
 package application;
 
-import application.IPlayer;
+import algorithm.*;
+import application.command.Command;
 import application.game.Game;
-import model.Board;
-import model.BoardLocation;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
-import algorithm.AdvancedAlgorithm;
-import algorithm.Algorithm;
-import algorithm.BasicAlgorithm;
-import algorithm.IntermediateAlgorithm;
-import algorithm.UltimateAlgorithm;
+import model.Board;
+import model.BoardLocation;
 
 /**
  * This is a class for the AI of the Renju game. It has different difficulty
@@ -87,5 +83,11 @@ public class AI implements IPlayer {
 	@Override
 	public BoardLocation getLastMove() {
 		return lastMove;
+	}
+
+	@Override
+	public Command getCommand() {
+		// TODO
+		return null;
 	}
 }
