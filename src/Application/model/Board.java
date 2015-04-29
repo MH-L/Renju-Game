@@ -1,21 +1,11 @@
 package model;
 
+import algorithm.*;
+import exceptions.InvalidIndexException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import exceptions.InvalidIndexException;
-import algorithm.BoardChecker;
-import algorithm.ContClosedPattern;
-import algorithm.ContOpenPattern;
-import algorithm.DiscClosedPattern;
-import algorithm.DiscOpenPattern;
-import algorithm.Pattern;
-import application.Game;
-import exceptions.InvalidIndexException;
-import org.omg.CORBA.DynAnyPackage.Invalid;
-
-import java.util.ArrayList;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -429,7 +419,7 @@ public class Board implements Serializable {
 	 * @param loc
 	 *            Indicates the board location to place the stone
 	 * @param first
-	 *            true means it is player1's stone, otherwise it is player2's
+	 *      String userIDans it is player1's stone, otherwise it is player2's
 	 * @return false if it did not succeed. true if succeeded
 	 */
 	public boolean updateBoard(BoardLocation loc, boolean first) throws InvalidIndexException {

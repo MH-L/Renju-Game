@@ -1,6 +1,5 @@
 package application;
 
-import application.*;
 import application.game.Game;
 import application.game.MultiPlayer;
 import application.game.Network;
@@ -74,60 +73,35 @@ public class Main {
 		// Play the game
 		if (mode == Game.NETWORK_GAME_MODE) {
 			playNetwork();
-		} else if (mode == Game.AI_VERSUS_AI_GAME_MODE) {
-			playAiVAi();
 		}
 		else {
-			playLocal();
+			playLocal(50);
 		}
-	}
 
-	private static void playAiVAi() {
-		if (game.getActivePlayer() == null) {
-			throw new RuntimeException("There is no player!");
-		}
-		while (game.isGameInProgress()) {
-			System.out.println("Computer " + (game.isPlayer1Active() ? "one" : "two")+ ", it is your turn.");
-			try {
-				game.makeMove(game.getActivePlayer(), game.getActivePlayer().makeMove());
-				game.getBoard().renderBoard(dispMode);
-				Thread.sleep(1000);
-			} catch (InvalidIndexException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		// Check end of game status
 		if (game.isWinning()) {
-			// get inactive player because the current player was toggled at the
-			// end of the round
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
-			// TODO print winner
+			System.out.println(getPlayerID(game.getWinner()) + ", You won!");
 		} else if (game.isGameTie()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
-
-		reader.close();
-	}
-
-	private static boolean isValidDifficulty(int diff) {
-		return Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY;
 	}
 
 	private static void playNetwork() {
 	}
 
-	private static void playLocal() {
+	private static void playLocal(int delay) {
 		if (game.getActivePlayer() == null) {
 			throw new RuntimeException("There is no player!");
 		}
 		while (game.isGameInProgress()) {
-            System.out.println(getActivePlayerID() + ", it is your turn.");
+            System.out.println(getPlayerID(game.getActivePlayer()) + ", it is your turn.");
             try {
 				game.makeMove(game.getActivePlayer(), game.getActivePlayer().makeMove());
                 game.getBoard().renderBoard(dispMode);
+				Thread.sleep(delay);
             } catch (InvalidIndexException e) {
                 switch (e.getMessage()) {
                     case "x":
@@ -160,17 +134,14 @@ public class Main {
                         // Could just give a generic response rather than returning the issued command
                         System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
                 }
-            }
-        }
-		if (game.isWinning()) {
-			System.out.println(((Player)game.getWinner()).getId()
-					+ ", You won!");
-		} else if (game.isGameTie()) {
-			System.out
-					.println("There are no more moves left. You both came to a draw!");
+            } catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+	}
 
-		reader.close();
+	private static boolean isValidDifficulty(int diff) {
+		return Game.NOVICE_DIFFICULTY <= diff && diff <= Game.ULTIMATE_DIFFICULTY;
 	}
 
 	private static void printHeader() {
@@ -196,14 +167,12 @@ public class Main {
 		return host.equals("1");
 	}
 
-
 	private static void actionGameOver() {
 		System.out.println("Game Over!");
 		reader.close();
 	}
 
 	private static void printInstruction() {
-		// TODO fix the magic number
 		System.out
 				.println("Game instruction:\nEach player takes turn to place a stone on the board."
 						+ "\nYour goal is to place "
@@ -273,25 +242,6 @@ public class Main {
 		}
 		return Integer.parseInt(difficulty);
 	}
-
-	/**
-	 * If the active player is a Player, then return their user ID.
-	 * Else, return the string "Computer".
-	 * @return
-	 * 		The active player's user ID
-	 */
-	private static String getActivePlayerID(){
-		if (game.getActivePlayer() instanceof Player)
-			return ((Player) game.getActivePlayer()).getId();
-		else return "Computer";
-	}
-
-	private static String getInactivePlayerAsString(){
-		if(game.isPlayer1Active()){
-			return "two";
-		} else return "one";
-	}
-
 	/**
 	 * Return the game mode as a string
 	 *
@@ -318,4 +268,17 @@ public class Main {
 		}
 		return Integer.parseInt(input) == 1;
 	}
+
+	/**
+	 * If the <code>player</code>player is a Player, then return their user ID.
+	 * Else, return the string "Computer".
+	 * @return
+	 * 		The active player's user ID
+	 */
+	private static String getPlayerID(IPlayer player){
+		if (player instanceof Player)
+			return ((Player) player).getId();
+		else return "Computer " + (player.equals(game.getPlayer1()) ? "one" : "two");
+	}
+
 }

@@ -1,6 +1,6 @@
 package Net;
 
-import application.Network;
+import application.game.Network;
 import application.Player;
 
 import java.io.IOException;

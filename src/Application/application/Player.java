@@ -1,6 +1,5 @@
 package application;
 
-import application.IPlayer;
 import exceptions.*;
 import model.BoardLocation;
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import application.Game;
 import utils.DeepCopy;
 import exceptions.InvalidIndexException;
 import exceptions.InvalidPatternException;
