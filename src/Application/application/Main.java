@@ -1,5 +1,10 @@
 package application;
 
+import application.*;
+import application.game.Game;
+import application.game.MultiPlayer;
+import application.game.Network;
+import application.game.SinglePlayer;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 import model.Board;
@@ -81,10 +86,10 @@ public class Main {
 		if (game.getActivePlayer() == null) {
 			throw new RuntimeException("There is no player!");
 		}
-		while (!Game.isWinning() && !Game.boardFull()) {
+		while (game.isGameInProgress()) {
 			System.out.println("Computer " + (game.isPlayer1Active() ? "one" : "two")+ ", it is your turn.");
 			try {
-				game.makeMove();
+				game.makeMove(game.getActivePlayer(), game.getActivePlayer().makeMove());
 				game.getBoard().renderBoard(dispMode);
 				Thread.sleep(1000);
 			} catch (InvalidIndexException e) {
@@ -93,14 +98,13 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
-		if (Game.isWinning()) {
+		if (game.isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
-			System.out.println("Player " + getInactivePlayerAsString()
-					+ ", You won!");
-		} else if (Game.boardFull()) {
+			// TODO print winner
+		} else if (game.isGameTie()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
@@ -119,10 +123,10 @@ public class Main {
 		if (game.getActivePlayer() == null) {
 			throw new RuntimeException("There is no player!");
 		}
-		while (!Game.isWinning() && !Game.boardFull()) {
+		while (game.isGameInProgress()) {
             System.out.println(getActivePlayerID() + ", it is your turn.");
             try {
-                game.makeMove();
+				game.makeMove(game.getActivePlayer(), game.getActivePlayer().makeMove());
                 game.getBoard().renderBoard(dispMode);
             } catch (InvalidIndexException e) {
                 switch (e.getMessage()) {
@@ -158,14 +162,10 @@ public class Main {
                 }
             }
         }
-		if (Game.isWinning()) {
-			// get inactive player because the current player was toggled at the
-			// end of the round
-			// if (game.getBoard().getTotalStones() <= 8)
-			// System.err.println("Fuck! This is not even possible!");
-			System.out.println("Player " + getInactivePlayerAsString()
+		if (game.isWinning()) {
+			System.out.println(((Player)game.getWinner()).getId()
 					+ ", You won!");
-		} else if (Game.boardFull()) {
+		} else if (game.isGameTie()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}

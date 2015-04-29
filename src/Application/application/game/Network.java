@@ -1,7 +1,8 @@
-package application;
+package application.game;
 
 import Net.Client;
 import Net.Host;
+import application.game.Game;
 
 import java.io.IOException;
 import java.util.Scanner;

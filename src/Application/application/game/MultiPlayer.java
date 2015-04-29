@@ -1,4 +1,4 @@
-package application;
+package application.game;
 
 /**
  * Created by kelvin on 4/28/15.

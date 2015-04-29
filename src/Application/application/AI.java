@@ -1,5 +1,7 @@
 package application;
 
+import application.IPlayer;
+import application.game.Game;
 import model.Board;
 import model.BoardLocation;
 import exceptions.InvalidIndexException;

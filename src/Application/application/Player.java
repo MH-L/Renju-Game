@@ -1,5 +1,6 @@
 package application;
 
+import application.IPlayer;
 import exceptions.*;
 import model.BoardLocation;
 
@@ -11,7 +12,7 @@ import java.util.Scanner;
  * @author Kelvin Yip
  *
  */
-public class Player implements IPlayer{
+public class Player implements IPlayer {
 
 	public static final int NUM_HINTS_LIMIT = 3;
 	public static final int NUM_REGRETS_LIMIT = 3;
