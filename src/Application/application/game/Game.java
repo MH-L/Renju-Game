@@ -13,15 +13,18 @@ import model.BoardLocation;
 import java.util.ArrayList;
 
 public abstract class Game {
-	public static final int MULTIPLAYER_GAME_MODE = 1;
-	public static final int SINGLEPLAYER_GAME_MODE = 2;
-	public static final int NETWORK_GAME_MODE = 3;
-	public static final int AI_VERSUS_AI_GAME_MODE = 9;
-
-	public static final int NOVICE_DIFFICULTY = 1;
-	public static final int INTERMEDIATE_DIFFICULTY = 2;
-	public static final int ADVANCED_DIFFICULTY = 3;
-	public static final int ULTIMATE_DIFFICULTY = 4;
+	public enum Mode {
+		SINGLEPLAYER,
+		MULTIPLAYER,
+		NETWORK,
+		AIVERSUSAI
+	}
+	public enum Difficulty {
+		NOVICE,
+		INTERMEDIATE,
+		ADVANCED,
+		ULTIMATE
+	}
 
 	protected IPlayer player2;
 	protected IPlayer player1;

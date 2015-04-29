@@ -8,7 +8,7 @@ import application.Player;
  */
 public class SinglePlayer extends Game {
 
-    private int difficulty;
+    private Difficulty difficulty;
     private boolean isPlayerFirst;
 
     /**
@@ -19,7 +19,7 @@ public class SinglePlayer extends Game {
      *      true if the player is player 1
      *      false if the player is player 2
      */
-    public SinglePlayer(int difficulty, boolean isPlayerFirst){
+    public SinglePlayer(Difficulty difficulty, boolean isPlayerFirst){
         super();
         this.difficulty = difficulty;
         this.isPlayerFirst = isPlayerFirst;
