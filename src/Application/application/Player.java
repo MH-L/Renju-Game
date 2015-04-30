@@ -4,9 +4,10 @@ import application.command.Command;
 import application.command.Move;
 import application.command.Quit;
 import application.command.Withdraw;
-import exceptions.*;
+import exceptions.InvalidIndexException;
 import model.BoardLocation;
 
+import java.util.Random;
 import java.util.Scanner;
 
 /**
@@ -19,11 +20,21 @@ public class Player implements IPlayer {
 	private String id;
 
 	public Player() {
-		System.out.println("What is your User ID?");
-		Scanner reader = new Scanner(System.in);
-		setId(reader.nextLine());
+//		System.out.println("What is your User ID?");
+//		Scanner reader = new Scanner(System.in);
+//		setId(reader.nextLine());
+		// generate random ID since System.in input for testing doesn't work for me
+		String alphaNumerals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder id = new StringBuilder();
+		Random rnd = new Random();
+		while (id.length() < 16) {
+			int index = (int) (rnd.nextInt(alphaNumerals.length()));
+			id.append(alphaNumerals.charAt(index));
+		}
+		this.id = id.toString();
 		System.out.println("Hello, " + getId());
 	}
+
 
 	public void setId(String id) {
 		this.id = id;

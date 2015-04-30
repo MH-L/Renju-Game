@@ -29,6 +29,7 @@ public abstract class Game {
 		ULTIMATE
 	}
 
+
 	protected IPlayer player1;
 	protected IPlayer player2;
 
@@ -123,6 +124,10 @@ public abstract class Game {
 
 	public IPlayer getPlayer1() {
 		return player1;
+	}
+
+	public IPlayer getPlayer2(){
+		return player2;
 	}
 
 	private boolean checkWinning(){
