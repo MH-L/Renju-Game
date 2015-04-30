@@ -14,6 +14,6 @@ public class MultiPlayer extends Game {
         super();
         player1 = new Player();
         player2 = new Player();
-        getState().startNewGame(player1, player2);
+        getState().startGame(player1);
     }
 }

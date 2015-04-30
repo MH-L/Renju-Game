@@ -35,11 +35,11 @@ public class GameTest {
 		// Not player 2's turn so nothing should happen.
 		game.doCommand(new Withdraw(game.getPlayer2()));
 		assertEquals(game.getBoard().getTotalStones(), 2);
-		assertEquals(game.getState().getPlayerRegrets(game.getPlayer2()), Game.NUM_REGRETS_LIMIT);
+		assertEquals(game.getPlayerRegrets(game.getPlayer2()), Game.NUM_REGRETS_LIMIT);
 		game.doCommand(new Withdraw(game.getPlayer1()));
 		assertEquals(game.getBoard().getTotalStones(), 0);
-		assertEquals(game.getState().getPlayerRegrets(game.getPlayer2()), Game.NUM_REGRETS_LIMIT);
-		assertEquals(game.getState().getPlayerRegrets(game.getPlayer1()), Game.NUM_REGRETS_LIMIT-1);
+		assertEquals(game.getPlayerRegrets(game.getPlayer2()), Game.NUM_REGRETS_LIMIT);
+		assertEquals(game.getPlayerRegrets(game.getPlayer1()), Game.NUM_REGRETS_LIMIT-1);
 		game.getBoard().renderBoard(Board.CLASSIC_MODE);
 	}
 }

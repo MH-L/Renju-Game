@@ -29,17 +29,20 @@ public abstract class Game {
 		ULTIMATE
 	}
 
-
 	protected IPlayer player1;
 	protected IPlayer player2;
 
 	protected GameState state;
+	private PlayerState p1State;
+	private PlayerState p2State;
 
 	private Board board;
 
 	public Game() {
 		board = new Board();
 		state = new GameState();
+		p1State = new PlayerState(player1);
+		p2State = new PlayerState(player2);
 	}
 
 	public GameState getState(){
@@ -48,14 +51,14 @@ public abstract class Game {
 
 	private void withdraw(IPlayer sender) {
 		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
-			if (state.getPlayerRegrets(state.getActivePlayer()) > 0) {
+			if (getPlayerRegrets(state.getActivePlayer()) > 0) {
 				try {
-					board.withdrawMove(state.removeLastMove(state.getActivePlayer()));
-					state.decreasePlayerRegrets(state.getActivePlayer());
-					System.out.println("You only have " + state.getPlayerRegrets(state.getActivePlayer()) + " withdrawals remaining.");
+					board.withdrawMove(removeLastMove(state.getActivePlayer()));
+					decreasePlayerRegrets(state.getActivePlayer());
+					System.out.println("You only have " + getPlayerRegrets(state.getActivePlayer()) + " withdrawals remaining.");
 					// Force withdraw the inactive player
-					if (state.getLastMove(state.getInactivePlayer()) != null) {
-						board.withdrawMove(state.removeLastMove(state.getInactivePlayer()));
+					if (getLastMove(getInactivePlayer()) != null) {
+						board.withdrawMove(removeLastMove(getInactivePlayer()));
 					}
 				} catch (InvalidIndexException e) {
 					System.out.println(e.getMessage());
@@ -81,21 +84,21 @@ public abstract class Game {
 	 */
 	private void makeMove(IPlayer sender, BoardLocation loc) throws InvalidIndexException {
 		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
-			board.updateBoard(loc, state.isPlayerOne(sender));
-			state.setLastMove(sender, loc);
+			board.updateBoard(loc, isPlayerOne(sender));
+			setLastMove(sender, loc);
 			if (checkWinning()) {
 				state.setWinner(sender);
 			}
 			else if (boardFull()) {
 				state.setTieGame();
 			}
-			else state.toggleActivePlayer();
+			else toggleActivePlayer();
 		}
 	}
 
 	private void quit(IPlayer sender) {
 		if (state.isGameInProgress() && sender.equals(state.getActivePlayer())) {
-			state.setWinner(state.getInactivePlayer());
+			state.setWinner(getInactivePlayer());
 		}
 	}
 
@@ -130,6 +133,10 @@ public abstract class Game {
 		return player2;
 	}
 
+	private boolean isPlayerOne(IPlayer sender) {
+		return sender.equals(player1);
+	}
+
 	private boolean checkWinning(){
 		return board.checkrow() || board.checkcol() || board.checkdiag();
 	}
@@ -137,4 +144,62 @@ public abstract class Game {
 	private boolean boardFull(){
 		return board.boardFull();
 	}
+
+	private void toggleActivePlayer(){
+		state.setActivePlayer((state.getActivePlayer().equals(player1)) ? player2 : player1);
+	}
+
+	private IPlayer getInactivePlayer(){
+		if (state.getActivePlayer().equals(player1)){
+			return player2;
+		} else return player1;
+	}
+
+	private PlayerState getPlayerState(IPlayer player) {
+		if (player.equals(player1)) {
+			return p1State;
+		} else if (player.equals(player2)) {
+			return p2State;
+		} else return null;
+	}
+
+	private void setLastMove(IPlayer sender, BoardLocation loc) {
+		PlayerState ps = getPlayerState(sender);
+		if (ps != null) {
+			ps.setLastMove(loc);
+		}
+	}
+
+	private BoardLocation getLastMove(IPlayer player) {
+		PlayerState ps = getPlayerState(player);
+		if (ps != null) {
+			return ps.peekLastMove();
+		}
+		return null;
+	}
+
+	private BoardLocation removeLastMove(IPlayer player) {
+		PlayerState ps = getPlayerState(player);
+		if (ps != null) {
+			return ps.popLastMove();
+		}
+		return null;
+	}
+
+	public int getPlayerRegrets(IPlayer player) {
+		PlayerState ps = getPlayerState(player);
+		if (ps == null) {
+			return 0;
+		}
+		return ps.getRegrets();
+	}
+
+	private void decreasePlayerRegrets(IPlayer player) {
+		PlayerState ps = getPlayerState(player);
+		if (ps == null) {
+			return;
+		}
+		ps.decrementRegrets();
+	}
+
 }

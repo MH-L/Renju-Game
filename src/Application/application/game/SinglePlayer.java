@@ -25,6 +25,6 @@ public class SinglePlayer extends Game {
         this.isPlayerFirst = isPlayerFirst;
         player1 = isPlayerFirst ? new Player() : new AI(difficulty, getBoard(), true);
         player2 = isPlayerFirst ? new AI(difficulty, getBoard(), false) : new Player();
-        getState().startNewGame(player1, player2);
+        getState().startGame(player1);
     }
 }
