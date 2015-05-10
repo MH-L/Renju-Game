@@ -332,14 +332,107 @@ public class BoardTest {
 		assertEquals(new BoardLocation(4, 12), blockers.get(1));
 		locations.clear();
 		bd.reset();
-		locations.add(new BoardLocation(15,3));
-		locations.add(new BoardLocation(14,4));
-		locations.add(new BoardLocation(13,5));
-		bd.updateBoard(new BoardLocation(15,3), true);
-		bd.updateBoard(new BoardLocation(14,4), true);
-		bd.updateBoard(new BoardLocation(13,5), true);
+		locations.add(new BoardLocation(15, 3));
+		locations.add(new BoardLocation(14, 4));
+		locations.add(new BoardLocation(13, 5));
+		bd.updateBoard(new BoardLocation(15, 3), true);
+		bd.updateBoard(new BoardLocation(14, 4), true);
+		bd.updateBoard(new BoardLocation(13, 5), true);
 		blockers = bd.findBlockingLocs(locations, Pattern.ON_URDIAG);
 		assertEquals(blockers.size(), 1);
-		assertEquals(blockers.get(0), new BoardLocation(12,6));
+		assertEquals(blockers.get(0), new BoardLocation(12, 6));
+	}
+
+	@Test
+	public void testGetJumpLocs() {
+		BoardLocation test = new BoardLocation(0, 0);
+		ArrayList<BoardLocation> results = Board.getJumpLocations(test);
+		assertEquals(results.size(), 3);
+		assertTrue(results.contains(new BoardLocation(2, 2)));
+		assertTrue(results.contains(new BoardLocation(0, 2)));
+		assertTrue(results.contains(new BoardLocation(2, 0)));
+		test = new BoardLocation(15, 15);
+		results = Board.getJumpLocations(test);
+		assertEquals(results.size(), 3);
+		assertTrue(results.contains(new BoardLocation(13, 13)));
+		assertTrue(results.contains(new BoardLocation(13, 15)));
+		assertTrue(results.contains(new BoardLocation(15, 13)));
+		test = new BoardLocation(7, 9);
+		results = Board.getJumpLocations(test);
+		assertEquals(results.size(), 8);
+		assertTrue(results.contains(new BoardLocation(7, 7)));
+		assertTrue(results.contains(new BoardLocation(9, 7)));
+		assertTrue(results.contains(new BoardLocation(9, 9)));
+		assertTrue(results.contains(new BoardLocation(9, 11)));
+		assertTrue(results.contains(new BoardLocation(7, 11)));
+		assertTrue(results.contains(new BoardLocation(5, 7)));
+		assertTrue(results.contains(new BoardLocation(5, 9)));
+		assertTrue(results.contains(new BoardLocation(5, 11)));
+	}
+
+	@Test
+	public void testSideAndCorner() {
+		assertTrue(Board.isOnSide(new BoardLocation(2, 0)));
+		assertTrue(Board.isOnSide(new BoardLocation(15, 2)));
+		assertFalse(Board.isOnSide(new BoardLocation(13, 12)));
+		assertFalse(Board.isOnSide(new BoardLocation(1, 2)));
+		assertFalse(Board.isOnSide(new BoardLocation(0, 15)));
+		assertFalse(Board.isOnSide(new BoardLocation(15, 0)));
+		assertTrue(Board.isInCorner(new BoardLocation(0, 0)));
+		assertTrue(Board.isInCorner(new BoardLocation(15, 15)));
+		assertFalse(Board.isInCorner(new BoardLocation(1, 0)));
+		assertFalse(Board.isInCorner(new BoardLocation(2, 3)));
+	}
+
+	@Test
+	public void testGetBlockedStones() throws InvalidIndexException {
+		ArrayList<BoardLocation> patLocs = new ArrayList<BoardLocation>();
+		patLocs.add(new BoardLocation(2, 3));
+		patLocs.add(new BoardLocation(3, 4));
+		patLocs.add(new BoardLocation(4, 5));
+		patLocs.add(new BoardLocation(5, 6));
+		bd.updateBoard(new BoardLocation(2, 3), true);
+		bd.updateBoard(new BoardLocation(3, 4), true);
+		bd.updateBoard(new BoardLocation(4, 5), true);
+		bd.updateBoard(new BoardLocation(5, 6), true);
+		bd.updateBoard(new BoardLocation(6, 7), false);
+		ArrayList<BoardLocation> blocked = bd.getBlockedStones(patLocs,
+				Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 1);
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+		bd.updateBoard(new BoardLocation(1, 2), false);
+		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 2);
+		assertTrue(blocked.contains(new BoardLocation(1, 2)));
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+		bd.withdrawMove(new BoardLocation(1, 2));
+		bd.updateBoard(new BoardLocation(7, 7), false);
+		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		assertEquals(blocked.size(), 1);
+		assertTrue(blocked.contains(new BoardLocation(6, 7)));
+	}
+
+	@Test
+	public void testPatternWinning() throws InvalidIndexException {
+		ArrayList<BoardLocation> testLocations = new ArrayList<BoardLocation>();
+		testLocations.add(new BoardLocation(9, 9));
+		testLocations.add(new BoardLocation(10, 10));
+		testLocations.add(new BoardLocation(11, 11));
+		bd.updateBoard(new BoardLocation(9, 9), true);
+		bd.updateBoard(new BoardLocation(10, 10), true);
+		bd.updateBoard(new BoardLocation(11, 11), true);
+		Pattern pat = new ContOpenPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertFalse(bd.isPatternWinning(pat));
+		testLocations.add(new BoardLocation(12, 12));
+		bd.updateBoard(new BoardLocation(12, 12), true);
+		pat = new ContOpenPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertTrue(bd.isPatternWinning(pat));
+		bd.updateBoard(new BoardLocation(13, 13), false);
+		pat = new ContClosedPattern(testLocations, Pattern.ON_ULDIAG,
+				bd.getBlockedStones(testLocations, Pattern.ON_ULDIAG),
+				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
+		assertFalse(bd.isPatternWinning(pat));
 	}
 }

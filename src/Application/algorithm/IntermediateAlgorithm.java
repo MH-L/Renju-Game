@@ -3,17 +3,16 @@ package algorithm;
 import java.util.ArrayList;
 
 import exceptions.InvalidIndexException;
+import utils.DeepCopy;
 import model.Board;
 import model.BoardLocation;
 import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
-	private VirtualBoard vBoard;
 	public static final int calculationSteps = 2;
 
-	public IntermediateAlgorithm(Board board) {
-		super(board);
-		// TODO Auto-generated constructor stub
+	public IntermediateAlgorithm(Board board, boolean isFirst) {
+		super(board, isFirst);
 	}
 
 	@Override

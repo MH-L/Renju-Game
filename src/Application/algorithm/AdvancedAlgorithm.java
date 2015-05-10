@@ -7,11 +7,10 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class AdvancedAlgorithm extends Algorithm {
-	private VirtualBoard vBoard;
 	public static final int calculationSteps = 5;
 
-	public AdvancedAlgorithm(Board board) {
-		super(board);
+	public AdvancedAlgorithm(Board board, boolean isFirst) {
+		super(board, isFirst);
 		// TODO Auto-generated constructor stub
 	}
 

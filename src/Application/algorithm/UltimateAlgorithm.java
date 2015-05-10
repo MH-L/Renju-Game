@@ -7,10 +7,9 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class UltimateAlgorithm extends Algorithm {
-	private VirtualBoard vBoard;
 
-	public UltimateAlgorithm(Board board) {
-		super(board);
+	public UltimateAlgorithm(Board board, boolean isFirst) {
+		super(board, isFirst);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -36,24 +36,24 @@ public class AI implements IPlayer {
 		return instance;
 	}
 
-	public static void initAI(int difficulty, Board board) {
+	public static void initAI(int difficulty, Board board, boolean isFirst) {
 		// TODO Board param may not be needed if game board is static
 		AI.difficulty = difficulty;
 		AI.board = board;
 		switch (difficulty) {
 		case Game.NOVICE_DIFFICULTY:
-			AI.solver = new BasicAlgorithm(board);
+			AI.solver = new BasicAlgorithm(board, isFirst);
 			break;
 		case Game.INTERMEDIATE_DIFFICULTY:
-			AI.solver = new IntermediateAlgorithm(board);
+			AI.solver = new IntermediateAlgorithm(board, isFirst);
 			break;
 		case Game.ADVANCED_DIFFICULTY:
-			AI.solver = new AdvancedAlgorithm(board);
+			AI.solver = new AdvancedAlgorithm(board, isFirst);
 			break;
 		case Game.ULTIMATE_DIFFICULTY:
-			AI.solver = new UltimateAlgorithm(board);
+			AI.solver = new UltimateAlgorithm(board, isFirst);
 		default:
-			AI.solver = new UltimateAlgorithm(board);
+			AI.solver = new UltimateAlgorithm(board, isFirst);
 			break;
 		}
 	}
@@ -62,6 +62,7 @@ public class AI implements IPlayer {
 	public boolean withdraw() throws WithdrawException {
 		// TODO Auto-generated method stub
 		// Since AI will never withdraw, just do not do anything.
+		this.lastMove = Board.getInvalidBoardLocation();
 		return false;
 	}
 
@@ -73,6 +74,7 @@ public class AI implements IPlayer {
 		} catch (InvalidIndexException e) {
 			e.printStackTrace();
 		}
+		lastMove = Board.getInvalidBoardLocation();
 	}
 
 	@Override
@@ -82,9 +84,16 @@ public class AI implements IPlayer {
 		BoardLocation nextMove = null;
 		if (board.getTotalStones() < 10)
 			nextMove = solver.makeMoveBeginning();
-		// TODO
+		// TODO modify this function since it is not complete.
 		else
 			nextMove = solver.makeMoveEnd();
+		lastMove = nextMove;
+		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getXPos(), nextMove.getYPos());
 		return nextMove;
+	}
+
+	@Override
+	public BoardLocation getLastMove() {
+		return lastMove;
 	}
 }

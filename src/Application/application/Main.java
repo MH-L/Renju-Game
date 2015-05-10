@@ -19,6 +19,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		// Get initializations
+		printHeader();
 		reader = new Scanner(System.in);
 		int mode = getGameMode();
 		int dispMode = getDisplayMode();
@@ -33,7 +34,8 @@ public class Main {
 				// This would be better if initSinglePlayer handled this input
 				// but creating a new exception might be overkill for something
 				// that likely isn't going to change
-				game.initSinglePlayer(diff);
+				boolean playerFirst = getIfFirst(reader);
+				game.initSinglePlayer(diff, playerFirst);
 			} else {
 				System.err.println("Internal Error!");
 				return;
@@ -64,9 +66,21 @@ public class Main {
 					return;
 				case "w":
 					try {
-						actionWithdraw();
+						try {
+							actionWithdraw();
+							System.out.format(
+									"You have %d withdrawals left.\n",
+									((Player) game.getActivePlayer())
+											.getRegrets());
+							System.out.println("Now the board is shown below.");
+							game.getBoard().renderBoard(dispMode);
+							continue;
+						} catch (InvalidIndexException e1) {
+							System.out.println(e1.getMessage());
+						}
 					} catch (WithdrawException e1) {
 						// Redo this turn since the player is out of withdrawals
+						System.out.println("You are out of withdrawals!");
 						continue;
 					}
 				case "i":
@@ -83,22 +97,29 @@ public class Main {
 				}
 				continue;
 			}
-
-			game.toggleActivePlayer();
 		}
 		if (Game.isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
+			// if (game.getBoard().getTotalStones() <= 8)
+			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
 		} else if (Game.boardFull()) {
-			System.out.println("There are no more moves left. You both lose!");
+			System.out
+					.println("There are no more moves left. You both came to a draw!");
 		}
 
 		reader.close();
 	}
 
-	private static void actionWithdraw() throws WithdrawException {
+	private static void printHeader() {
+		System.out.println("Renju Game. First Release. 2015/4/18.");
+		System.out.println("Created By: Minghao Liu. Refactor: Kelvin Yip.");
+	}
+
+	private static void actionWithdraw() throws WithdrawException,
+			InvalidIndexException {
 		game.withdraw();
 	}
 
@@ -117,7 +138,9 @@ public class Main {
 						+ "The first one to do so wins!"
 						+ "\nTo place a stone, enter the letter and number corresponding to the column and row respectively."
 						+ "\nSeparate the two by a comma."
-						+ "\n  For example: A,1 or 3,B."
+						+ "\n  For example: A,1 or 3,B are all valid inputs."
+						+ "\nHowever, inputs such as \"13,12\", \"A,G\", \"B\""
+						+ "\nare not valid ones."
 						+ "\n\nYou are allowed to undo your last move up to "
 						+ Player.NUM_REGRETS_LIMIT
 						+ " times."
@@ -149,7 +172,7 @@ public class Main {
 						+ " ("
 						+ Board.FANCY_MODE
 						+ ") Fancy mode\n"
-						+ " (Note that the fancy mode may require unicode plugin for your cmd.)");
+						+ " (Note that the fancy mode may require unicode setup for your cmd.)");
 		String displayMode = reader.next();
 		while (!displayMode.equals(String.valueOf(Board.CLASSIC_MODE))
 				&& !displayMode.equals(String.valueOf(Board.FANCY_MODE))) {
@@ -160,11 +183,15 @@ public class Main {
 	}
 
 	private static int getDifficulty() {
+		// TODO change here in future releases. since now we cannot set up more
+		// difficult versions.
 		System.out.println(" Please enter the AI difficulty:\n" + " ("
 				+ Game.NOVICE_DIFFICULTY + ") Novice\n" + " ("
-				+ Game.INTERMEDIATE_DIFFICULTY + ") Intermediate\n" + " ("
-				+ Game.ADVANCED_DIFFICULTY + ") Advanced\n" + " ("
-				+ Game.ULTIMATE_DIFFICULTY + ") Ultimate\n");
+				+ Game.INTERMEDIATE_DIFFICULTY
+				+ ") Intermediate (coming soon) \n" + " ("
+				+ Game.ADVANCED_DIFFICULTY + ") Advanced (coming soon) \n"
+				+ " (" + Game.ULTIMATE_DIFFICULTY
+				+ ") Ultimate (coming soon) \n");
 		String difficulty = reader.next();
 
 		while (!difficulty.equals(String.valueOf(Game.NOVICE_DIFFICULTY))
@@ -200,7 +227,7 @@ public class Main {
 	}
 
 	/**
-	 * Retusn the game mode as a string
+	 * Return the game mode as a string
 	 *
 	 * @return "single player" if the mode is SINGLEPLAYER_GAME_MODE
 	 *         "multi-player" if the mode is MULTIPLAYER_GAME_MODE
@@ -211,5 +238,20 @@ public class Main {
 		} else {
 			return "multiplayer";
 		}
+	}
+
+	private static boolean getIfFirst(Scanner reader) {
+		System.out.println("Do you want to make move first?\n"
+				+ "(1) Yes\n(2) No");
+		String input = reader.nextLine();
+		while (!input.equals("1") && !input.equals("2")) {
+			System.out
+					.println("The choice you entered is invalid. Please re-enter.");
+			input = reader.nextLine();
+		}
+		if (Integer.parseInt(input) == 1)
+			return true;
+		else
+			return false;
 	}
 }

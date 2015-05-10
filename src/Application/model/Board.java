@@ -1,6 +1,8 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import exceptions.InvalidIndexException;
 import algorithm.BoardChecker;
@@ -18,7 +20,11 @@ import application.Game;
  * @Date 2015/4/9
  *
  */
-public class Board {
+public class Board implements Serializable {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 5164712316412329207L;
 	/**
 	 * A height-by-width grid representing the board. Grid value is zero if the
 	 * spot is empty, 1 if occupied by a stone belongs to the first player, 2 if
@@ -197,6 +203,34 @@ public class Board {
 		}
 
 		return this.getURDiags().get(index);
+	}
+
+	protected void setBasicGrid(int[][] basicGrid) {
+		this.basicGrid = basicGrid;
+	}
+
+	protected void setRows(ArrayList<int[]> rows) {
+		this.rows = rows;
+	}
+
+	protected void setColumns(ArrayList<int[]> columns) {
+		this.columns = columns;
+	}
+
+	protected void setDiagonals_Uleft(ArrayList<int[]> diagonals_Uleft) {
+		this.diagonals_Uleft = diagonals_Uleft;
+	}
+
+	protected void setDiagonals_Uright(ArrayList<int[]> diagonals_Uright) {
+		this.diagonals_Uright = diagonals_Uright;
+	}
+
+	protected void setPlayer1Stone(ArrayList<BoardLocation> player1Stone) {
+		this.player1Stone = player1Stone;
+	}
+
+	protected void setPlayer2Stone(ArrayList<BoardLocation> player2Stone) {
+		this.player2Stone = player2Stone;
 	}
 
 	/**
@@ -460,8 +494,8 @@ public class Board {
 			secondPlayerChar = 'O';
 			emptyLocChar = '-';
 		} else {
-			firstPlayerChar = '\u25CB';
-			secondPlayerChar = '\u25CF';
+			firstPlayerChar = '\u25CF';
+			secondPlayerChar = '\u25CB';
 			emptyLocChar = '\u25A1';
 		}
 
@@ -550,7 +584,7 @@ public class Board {
 		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
 		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
 		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
-		if (this.player1Stone.size() > this.player2Stone.size())
+		if (player1Stone.contains(lastMove))
 			this.player1Stone.remove(lastMove);
 		else
 			this.player2Stone.remove(lastMove);
@@ -663,6 +697,69 @@ public class Board {
 					retLocs.add(anotherCandidate);
 		}
 		return retLocs;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(basicGrid);
+		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+		result = prime * result
+				+ ((diagonals_Uleft == null) ? 0 : diagonals_Uleft.hashCode());
+		result = prime
+				* result
+				+ ((diagonals_Uright == null) ? 0 : diagonals_Uright.hashCode());
+		result = prime * result
+				+ ((player1Stone == null) ? 0 : player1Stone.hashCode());
+		result = prime * result
+				+ ((player2Stone == null) ? 0 : player2Stone.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Board other = (Board) obj;
+		if (!Arrays.deepEquals(basicGrid, other.basicGrid))
+			return false;
+		if (columns == null) {
+			if (other.columns != null)
+				return false;
+		} else if (!columns.equals(other.columns))
+			return false;
+		if (diagonals_Uleft == null) {
+			if (other.diagonals_Uleft != null)
+				return false;
+		} else if (!diagonals_Uleft.equals(other.diagonals_Uleft))
+			return false;
+		if (diagonals_Uright == null) {
+			if (other.diagonals_Uright != null)
+				return false;
+		} else if (!diagonals_Uright.equals(other.diagonals_Uright))
+			return false;
+		if (player1Stone == null) {
+			if (other.player1Stone != null)
+				return false;
+		} else if (!player1Stone.equals(other.player1Stone))
+			return false;
+		if (player2Stone == null) {
+			if (other.player2Stone != null)
+				return false;
+		} else if (!player2Stone.equals(other.player2Stone))
+			return false;
+		if (rows == null) {
+			if (other.rows != null)
+				return false;
+		} else if (!rows.equals(other.rows))
+			return false;
+		return true;
 	}
 
 	/**
@@ -1027,6 +1124,13 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Check if a location is in the middle part of the board.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return True if the location is in the middle, false otherwise.
+	 */
 	public static boolean isMiddleLocation(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
@@ -1035,6 +1139,13 @@ public class Board {
 		return !(x_coord < 3 || x_coord > width - 4 || y_coord < 3 || y_coord > width - 4);
 	}
 
+	/**
+	 * Check if a location is in the corner.
+	 *
+	 * @param loc
+	 *            Location to be checked.
+	 * @return True if the location is in the corner, false otherwise.
+	 */
 	public static boolean isInCorner(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
@@ -1042,6 +1153,13 @@ public class Board {
 				&& (loc.getYPos() == 0 || loc.getYPos() == height - 1);
 	}
 
+	/**
+	 * Check if a location is on a side of the board.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return True if the location is on a side. False otherwise.
+	 */
 	public static boolean isOnSide(BoardLocation loc) {
 		if (loc == null || !Board.isReachable(loc))
 			return false;
@@ -1149,7 +1267,7 @@ public class Board {
 	 * @return The first empty spot found on board.
 	 */
 	public BoardLocation findEmptyLocSpiral() {
-		if (Game.boardFull())
+		if (boardFull())
 			return Board.getInvalidBoardLocation();
 		BoardLocation firstLoc;
 		if (width % 2 == 0)
@@ -1226,6 +1344,13 @@ public class Board {
 		return locations.get(maxIndex);
 	}
 
+	/**
+	 * Filter out those board locations which are already occupied.
+	 *
+	 * @param locations
+	 *            The locations to be filtered.
+	 * @return A list of locations which are empty.
+	 */
 	public ArrayList<BoardLocation> filterOccupied(
 			ArrayList<BoardLocation> locations) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -1235,6 +1360,14 @@ public class Board {
 		return retVal;
 	}
 
+	/**
+	 * Check if a pattern is a must-win pattern. A pattern is a must-win if the
+	 * pattern consists of four board locations and cannot be blocked
+	 * efficiently (open four).
+	 *
+	 * @param pat
+	 * @return
+	 */
 	public boolean isPatternWinning(Pattern pat) {
 		BoardLocation firstStone = pat.getLocations().get(0);
 		int checker = basicGrid[firstStone.getYPos()][firstStone.getXPos()];
@@ -1347,6 +1480,12 @@ public class Board {
 		return false;
 	}
 
+	/**
+	 * Check if the one moved first has two fours on board. This is not allowed
+	 * in formal games.
+	 *
+	 * @return True if there is, false otherwise.
+	 */
 	public boolean checkTwoFour() {
 		ArrayList<Pattern> results = BoardChecker.checkBoardClosedPatCont(this,
 				true, 4);
@@ -1357,4 +1496,76 @@ public class Board {
 			return true;
 		return false;
 	}
+
+	/**
+	 * Get BoardLocations which are not directly associated with the given
+	 * location but with a jump.
+	 *
+	 * @param loc
+	 *            The location to check.
+	 * @return A list of BoardLocations with one jump to loc.
+	 */
+	public static ArrayList<BoardLocation> getJumpLocations(BoardLocation loc) {
+		ArrayList<BoardLocation> returnVal = new ArrayList<BoardLocation>();
+		int y = loc.getYPos();
+		int x = loc.getXPos();
+		if (x - 2 < 0) {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			}
+		} else if (x + 2 >= width) {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+			}
+		} else {
+			if (y - 2 < 0) {
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+			} else if (y + 2 >= height) {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+			} else {
+				returnVal.add(new BoardLocation(y - 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x + 2));
+				returnVal.add(new BoardLocation(y + 2, x));
+				returnVal.add(new BoardLocation(y, x + 2));
+				returnVal.add(new BoardLocation(y - 2, x));
+				returnVal.add(new BoardLocation(y + 2, x - 2));
+				returnVal.add(new BoardLocation(y, x - 2));
+				returnVal.add(new BoardLocation(y - 2, x - 2));
+			}
+		}
+		return returnVal;
+	}
+
 }

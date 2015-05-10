@@ -7,8 +7,8 @@ import model.BoardLocation;
 
 public class CompletelyRandomizedSelect extends RandomizedSelect {
 
-	public CompletelyRandomizedSelect(Board board) {
-		super(board);
+	public CompletelyRandomizedSelect(Board board, boolean isFirst) {
+		super(board, isFirst);
 		// TODO Auto-generated constructor stub
 	}
 

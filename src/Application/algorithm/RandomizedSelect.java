@@ -7,8 +7,8 @@ import model.BoardLocation;
 
 public abstract class RandomizedSelect extends Algorithm {
 
-	public RandomizedSelect(Board board) {
-		super(board);
+	public RandomizedSelect(Board board, boolean isFirst) {
+		super(board, isFirst);
 		// TODO Auto-generated constructor stub
 	}
 

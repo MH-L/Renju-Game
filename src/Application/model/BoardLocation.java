@@ -1,6 +1,12 @@
 package model;
 
-public class BoardLocation {
+import java.io.Serializable;
+
+public class BoardLocation implements Serializable {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -1911182207997358711L;
 	private int x_pos;
 	private int y_pos;
 

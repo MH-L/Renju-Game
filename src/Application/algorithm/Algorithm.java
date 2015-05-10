@@ -1,17 +1,99 @@
 package algorithm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
+import application.Game;
+import utils.DeepCopy;
+import exceptions.InvalidIndexException;
+import exceptions.InvalidPatternException;
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
 
 public abstract class Algorithm {
 	private static Board board;
 	private static final Random rand = new Random();
+	protected VirtualBoard vBoard;
+	protected boolean isFirst;
 
-	public Algorithm(Board board) {
-		this.board = board;
+	public Algorithm(Board board, boolean isFirst) {
+		Algorithm.board = board;
+		this.isFirst = isFirst;
+	}
+
+	public ArrayList<BoardLocation> calculateAttack() {
+		ArrayList<BoardLocation> previousStones = isFirst ? board
+				.getPlayer1Stone() : board.getPlayer2Stone();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		for (BoardLocation stone : previousStones) {
+			ArrayList<BoardLocation> curCandidates = Board
+					.findAdjacentLocs(stone);
+			curCandidates.addAll(Board.getJumpLocations(stone));
+			for (BoardLocation loc : curCandidates) {
+				if (!candidates.contains(loc) && Board.isReachable(loc)
+						&& !board.isOccupied(loc))
+					candidates.add(loc);
+			}
+			curCandidates.clear();
+		}
+		Board anotherBoard = (Board) DeepCopy.copy(board);
+		this.vBoard = VirtualBoard.getVBoard(anotherBoard);
+		Iterator<BoardLocation> iter = candidates.iterator();
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		while (iter.hasNext()) {
+			BoardLocation adjacentLoc = iter.next();
+			try {
+				vBoard.updateBoard(adjacentLoc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
+					isFirst);
+			for (Pattern pat : patterns)
+				if (board.isPatternWinning(pat)) {
+					retVal.clear();
+					retVal.add(adjacentLoc);
+					return retVal;
+				}
+			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() != 0)
+				retVal.add(adjacentLoc);
+			try {
+				vBoard.withdrawMove(adjacentLoc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return retVal;
+	}
+
+	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
+		if (locations.isEmpty())
+			return board.findEmptyLocSpiral();
+		this.vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (BoardLocation location : locations) {
+			try {
+				vBoard.updateBoard(location, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
+					!isFirst);
+			for (Pattern pat : patterns) {
+				if (board.isPatternWinning(pat))
+					return location;
+			}
+			try {
+				vBoard.withdrawMove(location);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
+		// System.out.format("The return value I gave is (%d, %d).\n",
+		// retVal.getXPos(), retVal.getYPos());
+		return retVal;
 	}
 
 	public static int getRandNum(int modulo) {
@@ -51,7 +133,7 @@ public abstract class Algorithm {
 			return new BoardLocation(Board.getHeight() / 2,
 					Board.getWidth() / 2);
 		}
-		return null;
+		return new BoardLocation(8, 8);
 	}
 
 	public BoardLocation makeFirstMoveSecond() {
@@ -87,30 +169,212 @@ public abstract class Algorithm {
 		else if (board.getTotalStones() == 3)
 			return makeSecondMoveSecond();
 		else {
+			ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(
+					board, isFirst);
+			ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
+			if (excellents.size() != 0)
+				return findWinningLoc(excellents.get(0));
+			for (Pattern pat : selfPatterns) {
+				if (board.isPatternWinning(pat))
+					return findWinningLoc(pat);
+			}
 			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-					true);
+					!isFirst);
+			ArrayList<Pattern> urgents = filterUrgentPats(patterns);
+			if (urgents.size() != 0) {
+				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+				if (result.size() != 0) {
+					return result.get(getRandNum(result.size()) - 1);
+				} else
+					return tofilter.get(0);
+			}
+			// No urgent patterns.
+			if (selfPatterns.size() != 0) {
+				for (Pattern pat : selfPatterns) {
+					BoardLocation retLoc = extendToWinning(pat);
+					if (retLoc != null)
+						return retLoc;
+				}
+			}
 			if (patterns.size() != 0) {
-				return patterns.get(0).getBlockingLocs().get(0);
+				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+				if (result.size() != 0) {
+					BoardLocation blockAttack = result.get(getRandNum(result
+							.size()) - 1);
+					// System.out
+					// .format("The value I gave (for blocking attack) is (%d, %d).\n",
+					// blockAttack.getXPos(),
+					// blockAttack.getYPos());
+					return blockAttack;
+				}
+				// System.out
+				// .format("Special case: The value I gave (for blocking attack) is (%d, %d).\n",
+				// tofilter.get(0).getXPos(), tofilter.get(0)
+				// .getYPos());
+				return tofilter.get(0);
+			}
+			ArrayList<BoardLocation> locations = calculateAttack();
+			return processLocs(locations);
+		}
+	}
+
+	public BoardLocation extendToWinning(Pattern pat) {
+		// TODO if the pattern is blocked on one side, then
+		// this method might not work.
+		ArrayList<BoardLocation> boardLocs = pat.getLocations();
+		int firstInc = 0;
+		int secondInc = 0;
+		switch (pat.getType()) {
+		case Pattern.ON_ROW:
+			firstInc = 0;
+			secondInc = 1;
+			break;
+		case Pattern.ON_COL:
+			firstInc = 1;
+			secondInc = 0;
+			break;
+		case Pattern.ON_ULDIAG:
+			firstInc = 1;
+			secondInc = 1;
+			break;
+		case Pattern.ON_URDIAG:
+			firstInc = 1;
+			secondInc = -1;
+			break;
+		default:
+			break;
+		}
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (int j = 0; j < boardLocs.size(); j++) {
+			BoardLocation loc = boardLocs.get(j);
+			BoardLocation first = new BoardLocation(loc.getYPos() + firstInc,
+					loc.getXPos() + secondInc);
+			BoardLocation second = new BoardLocation(loc.getYPos() - firstInc,
+					loc.getXPos() - secondInc);
+			if (Board.isReachable(first) && !board.isOccupied(first)
+					&& !boardLocs.contains(first)) {
+				try {
+					vBoard.updateBoard(first, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
+						return first;
+				}
+				try {
+					vBoard.withdrawMove(first);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+			if (Board.isReachable(second) && !board.isOccupied(second)
+					&& !boardLocs.contains(second)) {
+				try {
+					vBoard.updateBoard(second, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
+						return second;
+				}
+				try {
+					vBoard.withdrawMove(second);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
 			}
 		}
-		ArrayList<BoardLocation> result = board.filterOccupied(Board
-				.findAdjacentLocs(board.getPlayer2Stone().get(
-						board.getPlayer2Stone().size() - 1)));
-		if (result.size() == 0)
-			return board.findEmptyLocSpiral();
-		else {
-			int randSeed = getRandNum(result.size()) - 1;
-			return result.get(randSeed);
+		return null;
+	}
+
+	private BoardLocation findWinningLoc(Pattern pat) {
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		ArrayList<BoardLocation> locations = pat.getLocations();
+		int firstInc = 0;
+		int secondInc = 0;
+		switch (pat.getType()) {
+		case Pattern.ON_ROW:
+			firstInc = 0;
+			secondInc = 1;
+			break;
+		case Pattern.ON_COL:
+			firstInc = 1;
+			secondInc = 0;
+			break;
+		case Pattern.ON_ULDIAG:
+			firstInc = 1;
+			secondInc = 1;
+			break;
+		case Pattern.ON_URDIAG:
+			firstInc = 1;
+			secondInc = -1;
+			break;
+		default:
+			break;
+		}
+		for (BoardLocation loc : locations) {
+			BoardLocation firstCandidate = new BoardLocation(loc.getYPos()
+					+ firstInc, loc.getXPos() + secondInc);
+			BoardLocation secondCandidate = new BoardLocation(loc.getYPos()
+					- firstInc, loc.getXPos() - secondInc);
+			if (Board.isReachable(firstCandidate)
+					&& !board.isOccupied(firstCandidate)
+					&& !locations.contains(firstCandidate)) {
+				try {
+					vBoard.updateBoard(firstCandidate, isFirst);
+					if (vBoard.checkcol() || vBoard.checkrow()
+							|| vBoard.checkdiag())
+						return firstCandidate;
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				try {
+					vBoard.withdrawMove(firstCandidate);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+
+			if (Board.isReachable(secondCandidate)
+					&& !board.isOccupied(secondCandidate)
+					&& !locations.contains(secondCandidate)) {
+				try {
+					vBoard.updateBoard(secondCandidate, isFirst);
+					if (vBoard.checkcol() || vBoard.checkrow()
+							|| vBoard.checkdiag())
+						return secondCandidate;
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				try {
+					vBoard.withdrawMove(secondCandidate);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+		}
+		try {
+			throw new InvalidPatternException("No way to win!");
+		} catch (InvalidPatternException e) {
+			System.out.println(e.getMessage());
+			return null;
 		}
 	}
 
 	public BoardLocation makeSecondMoveFirst() {
-		// TODO Auto-generated method stub
 		BoardLocation firstMove = board.getPlayer1Stone().get(0);
 		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
 		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
 			int randSeed = getRandNum(8);
-			return Board.findAdjacentLocs(firstMove).get(randSeed);
+			return Board.findAdjacentLocs(firstMove).get(randSeed - 1);
 		}
 		int randSeed = getRandNum(2);
 		int desiredDist = randSeed == 1 ? 2 : 3;
@@ -144,13 +408,54 @@ public abstract class Algorithm {
 	}
 
 	public BoardLocation makeMoveEnd() {
-		// TODO Auto-generated method stub
-		ArrayList<Pattern> patterns = BoardChecker
-				.checkAllPatterns(board, true);
-		if (patterns.size() != 0) {
-			return patterns.get(0).getBlockingLocs().get(0);
+		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board,
+				isFirst);
+		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
+		if (excellents.size() != 0)
+			return findWinningLoc(excellents.get(0));
+		for (Pattern pat : selfPatterns) {
+			if (board.isPatternWinning(pat))
+				return findWinningLoc(pat);
 		}
-		return board.findEmptyLocSpiral();
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
+				!isFirst);
+		ArrayList<Pattern> urgents = filterUrgentPats(patterns);
+		if (urgents.size() != 0) {
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				return result.get(getRandNum(result.size()) - 1);
+			} else
+				return tofilter.get(0);
+		}
+		// No urgent patterns.
+		if (selfPatterns.size() != 0) {
+			for (Pattern pat : selfPatterns) {
+				BoardLocation retLoc = extendToWinning(pat);
+				if (retLoc != null)
+					return retLoc;
+			}
+		}
+		if (patterns.size() != 0) {
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				BoardLocation blockAttack = result
+						.get(getRandNum(result.size()) - 1);
+				// System.out
+				// .format("The value I gave (for blocking attack) is (%d, %d).\n",
+				// blockAttack.getXPos(),
+				// blockAttack.getYPos());
+				return blockAttack;
+			}
+			// System.out
+			// .format("Special case: The value I gave (for blocking attack) is (%d, %d).\n",
+			// tofilter.get(0).getXPos(), tofilter.get(0)
+			// .getYPos());
+			return tofilter.get(0);
+		}
+		ArrayList<BoardLocation> locations = calculateAttack();
+		return processLocs(locations);
 	}
 
 	public static ArrayList<BoardLocation> filterWithDesiredDist(
@@ -162,6 +467,84 @@ public abstract class Algorithm {
 				retVal.add(loc);
 		}
 		return retVal;
-
 	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	/**
+	 * Filter blocking locations in terms of being able to attack.
+	 *
+	 * @param blockingLocs
+	 *            The list of blocking locations to filter.
+	 * @return An arrayList of board locations which can form a pattern with
+	 *         previous stones.
+	 */
+	public ArrayList<BoardLocation> filterBlockingLocsAtk(
+			ArrayList<BoardLocation> blockingLocs) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		int prevSize = BoardChecker.checkAllPatterns(board, isFirst).size();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (BoardLocation blockingloc : blockingLocs) {
+			if (retVal.contains(blockingloc))
+				continue;
+			try {
+				vBoard.updateBoard(blockingloc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> pats = BoardChecker.checkAllPatterns(vBoard,
+					isFirst);
+			if (pats.size() > prevSize) {
+				retVal.add(blockingloc);
+				continue;
+			}
+			for (Pattern patt : pats) {
+				if (board.isPatternWinning(patt)) {
+					retVal.clear();
+					retVal.add(blockingloc);
+				}
+			}
+			try {
+				vBoard.withdrawMove(blockingloc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return retVal;
+	}
+
+	public static ArrayList<BoardLocation> extractBlockingLocs(
+			ArrayList<Pattern> patterns) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (Pattern pat : patterns) {
+			ArrayList<BoardLocation> candidates = pat.getBlockingLocs();
+			for (BoardLocation loc : candidates) {
+				if (!retVal.contains(loc))
+					retVal.add(loc);
+			}
+		}
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> filterUrgentPats(
+			ArrayList<Pattern> patterns) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		for (Pattern pat : patterns) {
+			if (pat.getLocations().size() == 4)
+				retVal.add(pat);
+		}
+		return retVal;
+	}
+
+	public ArrayList<BoardLocation> getSelfStone() {
+		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
+	}
+
+	public ArrayList<BoardLocation> getOtherStone() {
+		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
+	}
+
+
 }

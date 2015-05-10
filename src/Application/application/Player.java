@@ -77,6 +77,7 @@ public class Player implements IPlayer{
 			y_coord = Integer.parseInt(inputs[0]);
 		} else
 			throw new InvalidIndexException(move);
+		lastMove = new BoardLocation(y_coord - 1, x_coord - 1);
 		return new BoardLocation(y_coord - 1, x_coord - 1);
 	}
 
@@ -92,6 +93,10 @@ public class Player implements IPlayer{
 			}
 		}
 		return true;
+	}
+
+	public BoardLocation getLastMove() {
+		return lastMove;
 	}
 
 	private static boolean isNumber(String string) {

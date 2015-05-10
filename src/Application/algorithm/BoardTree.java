@@ -31,7 +31,11 @@ public class BoardTree {
 			return 0;
 		int maxDepth = 0;
 		for (int i = 0; i < arrayTrees.size(); i++) {
+<<<<<<< HEAD
 			if (arrayTrees.get(i).getDepth() > maxDepth)
+=======
+			if (arrayTrees.get(i).getDepth > maxDepth)
+>>>>>>> master
 				maxDepth = arrayTrees.get(i).getDepth();
 		}
 		return maxDepth;
