@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import application.Game;
 import utils.DeepCopy;
 import exceptions.InvalidIndexException;
 import exceptions.InvalidPatternException;
@@ -400,16 +399,14 @@ public abstract class Algorithm {
 			} while (board.isOccupied(retVal));
 			return retVal;
 		} else {
-			ArrayList<BoardLocation> result = board.filterOccupied(Board
-					.findAdjacentLocs(firstMove));
+			ArrayList<BoardLocation> result = board.filterOccupied(Board.findAdjacentLocs(firstMove));
 			int randSeed = getRandNum(result.size());
 			return result.get(randSeed - 1);
 		}
 	}
 
 	public BoardLocation makeMoveEnd() {
-		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board,
-				isFirst);
+		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
@@ -417,8 +414,7 @@ public abstract class Algorithm {
 			if (board.isPatternWinning(pat))
 				return findWinningLoc(pat);
 		}
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-				!isFirst);
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns);
 		if (urgents.size() != 0) {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
@@ -440,18 +436,9 @@ public abstract class Algorithm {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
 			if (result.size() != 0) {
-				BoardLocation blockAttack = result
-						.get(getRandNum(result.size()) - 1);
-				// System.out
-				// .format("The value I gave (for blocking attack) is (%d, %d).\n",
-				// blockAttack.getXPos(),
-				// blockAttack.getYPos());
+				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
 				return blockAttack;
 			}
-			// System.out
-			// .format("Special case: The value I gave (for blocking attack) is (%d, %d).\n",
-			// tofilter.get(0).getXPos(), tofilter.get(0)
-			// .getYPos());
 			return tofilter.get(0);
 		}
 		ArrayList<BoardLocation> locations = calculateAttack();

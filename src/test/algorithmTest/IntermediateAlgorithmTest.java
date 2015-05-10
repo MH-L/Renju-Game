@@ -36,15 +36,16 @@ public class IntermediateAlgorithmTest {
 		firstGameBoard.updateBoard(new BoardLocation(8,5), false);
 		firstGameBoard.updateBoard(new BoardLocation(5,9), true);
 		firstGameBoard.updateBoard(new BoardLocation(6,9), true);
-		firstGameBoard.renderBoard(2);
 		assertEquals(firstAi.getSelfStone().size(), 5);
 		assertEquals(firstAi.getOtherStone().size(), 1);
-		assertEquals(BoardChecker.checkAllPatterns(firstGameBoard, true).size(), 0);
-		firstGameBoard.updateBoard(new BoardLocation(4,9), true);
-		assertEquals(BoardChecker.checkAllPatterns(firstGameBoard, true).size(), 2);
 		ArrayList<BoardLocation> retVal = firstAi.intermediateAttack();
 		assertFalse(retVal.isEmpty());
-		System.out.println(retVal.size());
+		firstGameBoard.reset();
+	}
+
+	@Test
+	public void testBlockCompositePat() {
+
 	}
 
 }

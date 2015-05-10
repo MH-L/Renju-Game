@@ -77,7 +77,6 @@ public class IntermediateAlgorithm extends Algorithm {
 		for (BoardLocation loc : candidates) {
 			try {
 				vBoard.updateBoard(loc, isFirst);
-				System.out.format("The total number of pegs on the virtual board is %d\n", vBoard.getTotalStones());
 			} catch (InvalidIndexException e) {
 				continue;
 			}

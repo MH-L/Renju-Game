@@ -12,9 +12,14 @@ import exceptions.InvalidIndexException;
  *
  */
 public class VirtualBoard extends Board {
+	/**
+	 * Just complying with the board class (which implements serializable).
+	 */
+	private static final long serialVersionUID = 8912340532666938303L;
 	private ArrayList<BoardLocation> additionalP1stones;
 	private ArrayList<BoardLocation> additionalP2stones;
 	private int stepsToFuture;
+	private boolean lastUpdateChanged;
 
 	public static VirtualBoard getVBoard(Board board) {
 		return new VirtualBoard(board.getGrids(), board.getRows(),
@@ -37,6 +42,7 @@ public class VirtualBoard extends Board {
 		stepsToFuture = 0;
 		additionalP1stones = new ArrayList<BoardLocation>();
 		additionalP2stones = new ArrayList<BoardLocation>();
+		lastUpdateChanged = false;
 	}
 
 	public ArrayList<BoardLocation> getAdditionalP1stones() {
@@ -59,7 +65,15 @@ public class VirtualBoard extends Board {
 			additionalP1stones.add(location);
 		else
 			additionalP2stones.add(location);
-		return super.updateBoard(location, isFirst);
+		lastUpdateChanged = super.updateBoard(location, isFirst);
+		return lastUpdateChanged;
+	}
+
+	@Override
+	public void withdrawMove(BoardLocation location) throws InvalidIndexException {
+		if (!lastUpdateChanged)
+			return;
+		super.withdrawMove(location);
 	}
 
 }
