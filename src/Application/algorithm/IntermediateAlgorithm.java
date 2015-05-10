@@ -62,4 +62,36 @@ public class IntermediateAlgorithm extends Algorithm {
 		return retVal;
 	}
 
+
+	public ArrayList<BoardLocation> intermediateAttack() {
+		ArrayList<BoardLocation> aiLoc = getSelfStone();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (BoardLocation loc : aiLoc) {
+			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
+			adjLocs.addAll(Board.getJumpLocations(loc));
+			for (BoardLocation loc2 : adjLocs)
+				if (!candidates.contains(loc2))
+					candidates.add(loc2);
+		}
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
+		for (BoardLocation loc : candidates) {
+			try {
+				vBoard.updateBoard(loc, isFirst);
+				System.out.format("The total number of pegs on the virtual board is %d\n", vBoard.getTotalStones());
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patternsFound = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			if (patternsFound.size() >= 2) {
+				retVal.add(loc);
+			}
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return retVal;
+	}
 }
