@@ -4,60 +4,28 @@ import model.Board;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 
-public class Game {
-	public static final int MULTIPLAYER_GAME_MODE = 1;
-	public static final int SINGLEPLAYER_GAME_MODE = 2;
+public abstract class Game {
+	public enum Mode {
+		SINGLEPLAYER,
+		MULTIPLAYER,
+		NETWORK,
+		AIVERSUSAI
+	}
+	public enum Difficulty {
+		NOVICE,
+		INTERMEDIATE,
+		ADVANCED,
+		ULTIMATE
+	}
 
-	public static final int NOVICE_DIFFICULTY = 1;
-	public static final int INTERMEDIATE_DIFFICULTY = 2;
-	public static final int ADVANCED_DIFFICULTY = 3;
-	public static final int ULTIMATE_DIFFICULTY = 4;
-
-	private int mode;
-	private static Game instance = null;
-	private IPlayer player2;
-	private IPlayer player1;
+	protected IPlayer player2;
+	protected IPlayer player1;
+	protected IPlayer activePlayer;
 
 	private static Board board;
-	private IPlayer activePlayer;
 
-	private Game() {
+	public Game() {
 		board = new Board();
-		// initialize as multiplayer by default
-		initMultiplayer();
-	}
-
-	/**
-	 * Initialize the game to a local multiplayer game with two Players
-	 */
-	public void initMultiplayer(){
-		this.mode = MULTIPLAYER_GAME_MODE;
-		board = new Board();
-		player1 = new Player();
-		player2 = new Player();
-		activePlayer = player1;
-	}
-
-	/**
-	 * Initialize the game to single-player of difficulty <code>difficulty</code>
-	 * @param difficulty
-	 * 		The difficulty of the game
-	 * @param playerFirst
-	 */
-	public void initSinglePlayer(int difficulty, boolean playerFirst){
-		this.mode = SINGLEPLAYER_GAME_MODE;
-		board = new Board();
-		player1 = playerFirst ? new Player() : application.AI.getInstance();
-		player2 = playerFirst ? application.AI.getInstance() : new Player();
-		AI.initAI(difficulty, board, !playerFirst);
-		activePlayer = player1;
-	}
-
-	public static Game getInstance() {
-		if (instance == null) {
-			instance = new Game();
-		}
-		return instance;
 	}
 
 	public void withdraw() throws WithdrawException, InvalidIndexException{
@@ -67,15 +35,14 @@ public class Game {
 		getInactivePlayer().forceWithdraw();
 	}
 
-	public int getMode() {
-		return mode;
-	}
-
 	/**
-	 * Prompts the player to make their next move
+	 * Prompts the player to make their next move.
+	 * Toggles the active player at the end of their successful turn.
 	 *
+	 * @return
+	 * 		state of if there's a valid next move to make
 	 * @throws InvalidIndexException
-	 * 		Thrown if the chosen move is invalid
+	 * 		thrown if the move chosen is invalid
 	 */
 	public void makeMove() throws InvalidIndexException {
 		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))

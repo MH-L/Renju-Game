@@ -1,111 +1,157 @@
 package application;
 
-import java.util.Scanner;
-
-import model.Board;
 import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
+import model.Board;
+
+import java.util.Scanner;
+
+import static application.Game.*;
 
 /**
  * The start point of the application.
- *
  * @author Minghao Liu
- * @ModifiedBy Kelvin Yip
+ * @author Kelvin Yip
  *
  */
 public class Main {
 	private static Game game;
 	private static Scanner reader;
+	private static int dispMode;
+	private static boolean host;
 
 	public static void main(String[] args) {
 		// Get initializations
 		printHeader();
 		reader = new Scanner(System.in);
-		int mode = getGameMode();
-		int dispMode = getDisplayMode();
-		game = Game.getInstance();
+		Mode mode = getGameMode();
+		dispMode = getDisplayMode();
 		printInstruction();
 
 		// Initialize game mode
-		if (mode == Game.SINGLEPLAYER_GAME_MODE) {
-			int diff = getDifficulty();
-			if (Game.NOVICE_DIFFICULTY <= diff
-					&& diff <= Game.ULTIMATE_DIFFICULTY) {
-				// This would be better if initSinglePlayer handled this input
-				// but creating a new exception might be overkill for something
-				// that likely isn't going to change
-				boolean playerFirst = getIfFirst(reader);
-				game.initSinglePlayer(diff, playerFirst);
-			} else {
-				System.err.println("Internal Error!");
+		switch (mode) {
+			case SINGLEPLAYER:
+				Difficulty diff = getDifficulty();
+				boolean playerFirst = getIfFirst();
+				game = new SinglePlayer(diff, playerFirst);
+				break;
+			case MULTIPLAYER:
+				game = new MultiPlayer();
+				break;
+			case NETWORK:
+				host = getHost();
+				game = new Network(host);
+				break;
+			case AIVERSUSAI:
+				Difficulty diff1 = getDifficulty();
+				Difficulty diff2 = getDifficulty();
+				game = new AiVersusAi(diff1, diff2);
+				break;
+			default:
+				System.err.println("Invalid game mode. Exiting");
 				return;
-			}
-		} else {
-			game.initMultiplayer();
 		}
 
-		System.out.println("The match is set as " + getModeAsString()
-				+ " in a " + Board.getWidth() + "x" + Board.getHeight()
-				+ " board as shown:");
+		System.out.println("The match is set as " + mode.toString() + " in a " +
+				Board.getWidth() + "x" + Board.getHeight() + " board as shown:");
 		game.getBoard().renderBoard(dispMode);
 
 		// Play the game
-		while (!Game.boardFull() && !Game.isWinning()) {
-			if (game.getActivePlayer() == null) {
-				throw new RuntimeException("There is no player!");
-			}
-			System.out.println("\nPlayer " + getActivePlayerAsString()
-					+ ", it is your turn.");
+		if (mode == Mode.NETWORK) {
+			playNetwork();
+		} else if (mode == Mode.AIVERSUSAI) {
+			playAiVAi();
+		}
+		else {
+			playLocal();
+		}
+	}
+
+	private static void playAiVAi() {
+		if (game.getActivePlayer() == null) {
+			throw new RuntimeException("There is no player!");
+		}
+		while (!isWinning() && !boardFull()) {
+			System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
 			try {
 				game.makeMove();
 				game.getBoard().renderBoard(dispMode);
+				Thread.sleep(1000);
 			} catch (InvalidIndexException e) {
-				switch (e.getMessage()) {
-				case "x":
-					actionGameOver();
-					return;
-				case "w":
-					try {
-						try {
-							actionWithdraw();
-							System.out.format(
-									"You have %d withdrawals left.\n",
-									((Player) game.getActivePlayer())
-											.getRegrets());
-							System.out.println("Now the board is shown below.");
-							game.getBoard().renderBoard(dispMode);
-							continue;
-						} catch (InvalidIndexException e1) {
-							System.out.println(e1.getMessage());
-						}
-					} catch (WithdrawException e1) {
-						// Redo this turn since the player is out of withdrawals
-						System.out.println("You are out of withdrawals!");
-						continue;
-					}
-				case "i":
-					printInstruction();
-					break;
-				default:
-					// TODO fix this since Board also throws the exception which
-					// doesn't
-					// return the command issued as the message
-					// Could just give a generic response rather than returning
-					// the issued command
-					System.out.println("Your input, [" + e.getMessage()
-							+ "] is not a valid command or move.");
-				}
-				continue;
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-		if (Game.isWinning()) {
+		if (isWinning()) {
 			// get inactive player because the current player was toggled at the
 			// end of the round
 			// if (game.getBoard().getTotalStones() <= 8)
 			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
-		} else if (Game.boardFull()) {
+		} else if (boardFull()) {
+			System.out
+					.println("There are no more moves left. You both came to a draw!");
+		}
+
+		reader.close();
+	}
+
+	private static void playNetwork() {
+	}
+
+	private static void playLocal() {
+		if (game.getActivePlayer() == null) {
+			throw new RuntimeException("There is no player!");
+		}
+		while (!isWinning() && !boardFull()) {
+            System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+            try {
+                game.makeMove();
+                game.getBoard().renderBoard(dispMode);
+            } catch (InvalidIndexException e) {
+                switch (e.getMessage()) {
+                    case "x":
+                        actionGameOver();
+                        return;
+                    case "w":
+                        try {
+                            actionWithdraw();
+							System.out.format(
+									"You have %d withdrawals left.\n",
+									((Player) game.getActivePlayer())
+											.getRegrets());
+							System.out.println("Now the board is shown below.");
+							game.getBoard().renderBoard(dispMode);
+                        } catch (WithdrawException e1) {
+                            // Redo this turn since the player is out of withdrawals
+                            continue;
+                        } catch (InvalidIndexException e1) {
+							e1.printStackTrace();
+							System.out.println(e1.getMessage());
+							continue;
+						}
+						break;
+					case "i":
+                        printInstruction();
+                        break;
+                    default:
+                        // TODO fix this since Board also throws the exception which doesn't
+                        // return the command issued as the message
+                        // Could just give a generic response rather than returning the issued command
+                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
+                }
+            }
+        }
+		if (isWinning()) {
+			// get inactive player because the current player was toggled at the
+			// end of the round
+			// if (game.getBoard().getTotalStones() <= 8)
+			// System.err.println("Fuck! This is not even possible!");
+			System.out.println("Player " + getInactivePlayerAsString()
+					+ ", You won!");
+		} else if (boardFull()) {
 			System.out
 					.println("There are no more moves left. You both came to a draw!");
 		}
@@ -123,13 +169,26 @@ public class Main {
 		game.withdraw();
 	}
 
+	private static boolean getHost() {
+		System.out.println(" Are you host or client?\n"
+				+ " (" + Network.HOST + ") Host\n"
+				+ " (" + Network.CLIENT + ") Client\n");
+		String host = reader.next();
+		while (!host.equals(String.valueOf(Network.HOST)) &&
+				!host.equals(String.valueOf(Network.CLIENT))) {
+			System.out.println("Invalid input. Please re-enter your choice.");
+			host = reader.next();
+		}
+		return host.equals("1");
+	}
+
+
 	private static void actionGameOver() {
 		System.out.println("Game Over!");
 		reader.close();
 	}
 
 	private static void printInstruction() {
-		// TODO fix the magic number
 		System.out
 				.println("Game instruction:\nEach player takes turn to place a stone on the board."
 						+ "\nYour goal is to place "
@@ -149,98 +208,80 @@ public class Main {
 						+ "\nTo see the instructions again, enter \"i\"\n");
 	}
 
-	private static int getGameMode() {
-		System.out.println(" Welcome to the Renju Game!\n Select a game mode:"
-				+ "\n (" + Game.MULTIPLAYER_GAME_MODE + ") Multi-player"
-				+ "\n (" + Game.SINGLEPLAYER_GAME_MODE + ") Single-player");
-		String gameMode = reader.next();
-		while (!gameMode.equals(String.valueOf(Game.MULTIPLAYER_GAME_MODE))
-				&& !gameMode
-						.equals(String.valueOf(Game.SINGLEPLAYER_GAME_MODE))) {
-			System.out.println("Invalid input. Please re-enter your choice.");
-			gameMode = reader.nextLine();
+	private static Mode getGameMode() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Select a game mode:\n");
+		for (Mode m : Mode.values()) {
+			sb.append(" (").append(m.ordinal()+1).append(") ").append(m.toString()).append("\n");
 		}
-		return Integer.parseInt(gameMode);
+		System.out.println(sb.toString());
+		int selection = 0;
+		while (selection < 1 || selection > Mode.values().length) {
+			try{
+				selection = Integer.parseInt(reader.next());
+				if (selection < 1 || selection > Difficulty.values().length)
+					System.err.println("Invalid option. Please try again");
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid option. Please try again");
+			}
+		}
+		return Mode.values()[selection-1];
 	}
 
 	private static int getDisplayMode() {
-		System.out
-				.println(" Please enter your display mode:\n"
-						+ " ("
-						+ Board.CLASSIC_MODE
-						+ ") Classic mode\n"
-						+ " ("
-						+ Board.FANCY_MODE
-						+ ") Fancy mode\n"
-						+ " (Note that the fancy mode may require unicode setup for your cmd.)");
+		System.out.println(" Please enter your display mode:\n"
+				+ " (" + Board.CLASSIC_MODE + ") Classic mode\n"
+				+ " (" + Board.FANCY_MODE + ") Fancy mode\n"
+				+ " (Note that the fancy mode may require unicode plugin for your cmd.)");
 		String displayMode = reader.next();
-		while (!displayMode.equals(String.valueOf(Board.CLASSIC_MODE))
-				&& !displayMode.equals(String.valueOf(Board.FANCY_MODE))) {
+		while (!displayMode.equals(String.valueOf(Board.CLASSIC_MODE)) &&
+				!displayMode.equals(String.valueOf(Board.FANCY_MODE))) {
 			System.out.println("Invalid input. Please re-enter your choice.");
 			displayMode = reader.next();
 		}
 		return Integer.parseInt(displayMode);
 	}
 
-	private static int getDifficulty() {
-		// TODO change here in future releases. since now we cannot set up more
-		// difficult versions.
-		System.out.println(" Please enter the AI difficulty:\n" + " ("
-				+ Game.NOVICE_DIFFICULTY + ") Novice\n" + " ("
-				+ Game.INTERMEDIATE_DIFFICULTY
-				+ ") Intermediate (coming soon) \n" + " ("
-				+ Game.ADVANCED_DIFFICULTY + ") Advanced (coming soon) \n"
-				+ " (" + Game.ULTIMATE_DIFFICULTY
-				+ ") Ultimate (coming soon) \n");
-		String difficulty = reader.next();
-
-		while (!difficulty.equals(String.valueOf(Game.NOVICE_DIFFICULTY))
-				&& !difficulty.equals(String
-						.valueOf(Game.INTERMEDIATE_DIFFICULTY))
-				&& !difficulty.equals(String.valueOf(Game.ADVANCED_DIFFICULTY))
-				&& !difficulty.equals(String.valueOf(Game.ULTIMATE_DIFFICULTY))) {
-			System.out
-					.println("Invalid difficulty level. Please re-enter your choice.");
-			difficulty = reader.next();
+	private static Difficulty getDifficulty() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Please select the game difficulty:\n");
+		for (Difficulty d : Difficulty.values()) {
+			sb.append(" (").append(d.ordinal()+1).append(") ").append(d.toString()).append("\n");
 		}
-		return Integer.parseInt(difficulty);
+		System.out.println(sb.toString());
+		int selection = 0;
+		while (selection < 1 || selection > Difficulty.values().length) {
+			try{
+				selection = Integer.parseInt(reader.next());
+				if (selection < 1 || selection > Difficulty.values().length)
+					System.err.println("Invalid option. Please try again");
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid option. Please try again");
+			}
+		}
+		return Difficulty.values()[selection-1];
 	}
 
 	/**
-	 * Returns the active player as a string of either "one" if player 1 is
-	 * active and "two" if player two is active
-	 *
-	 * @return "one" if player 1 is active. "two if player 2 is active.
+	 * Returns the active player as a string of either "one" if player 1 is active
+	 * and "two" if player two is active
+	 * @return
+	 * 		"one" if player 1 is active.
+	 * 		"two if player 2 is active.
 	 */
-	private static String getActivePlayerAsString() {
-		if (game.isPlayer1Active()) {
+	private static String getActivePlayerAsString(){
+		if (game.isPlayer1Active()){
 			return "one";
-		} else
+		} else return "two";
+	}
+
+	private static String getInactivePlayerAsString(){
+		if(game.isPlayer1Active()){
 			return "two";
+		} else return "one";
 	}
 
-	private static String getInactivePlayerAsString() {
-		if (game.isPlayer1Active()) {
-			return "two";
-		} else
-			return "one";
-	}
-
-	/**
-	 * Return the game mode as a string
-	 *
-	 * @return "single player" if the mode is SINGLEPLAYER_GAME_MODE
-	 *         "multi-player" if the mode is MULTIPLAYER_GAME_MODE
-	 */
-	private static String getModeAsString() {
-		if (game.getMode() == Game.SINGLEPLAYER_GAME_MODE) {
-			return "single player";
-		} else {
-			return "multiplayer";
-		}
-	}
-
-	private static boolean getIfFirst(Scanner reader) {
+	private static boolean getIfFirst() {
 		System.out.println("Do you want to make move first?\n"
 				+ "(1) Yes\n(2) No");
 		String input = reader.nextLine();
@@ -249,9 +290,6 @@ public class Main {
 					.println("The choice you entered is invalid. Please re-enter.");
 			input = reader.nextLine();
 		}
-		if (Integer.parseInt(input) == 1)
-			return true;
-		else
-			return false;
+		return Integer.parseInt(input) == 1;
 	}
 }

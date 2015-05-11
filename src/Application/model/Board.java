@@ -12,6 +12,10 @@ import algorithm.DiscClosedPattern;
 import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
 import application.Game;
+import exceptions.InvalidIndexException;
+import org.omg.CORBA.DynAnyPackage.Invalid;
+
+import java.util.ArrayList;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -496,6 +500,7 @@ public class Board implements Serializable {
 			consectCount = 0;
 		}
 
+
 		prev = EMPTY_SPOT;
 		consectCount = 0;
 
@@ -775,7 +780,7 @@ public class Board implements Serializable {
 		if (this.isOccupied(loc))
 			return false;
 		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
-	
+
 		this.basicGrid[row_num][col_num] = marker;
 		this.getColumns().get(col_num)[row_num] = marker;
 		this.getRows().get(row_num)[col_num] = marker;
@@ -794,7 +799,7 @@ public class Board implements Serializable {
 		else
 			this.player2Stone.add(loc);
 		return true;
-	
+
 	}
 
 	/**
@@ -1101,7 +1106,7 @@ public class Board implements Serializable {
 							patternsFound.get(0).getLocations().get(0)))
 				return true;
 		}
-	
+
 		return false;
 	}
 
@@ -1141,7 +1146,7 @@ public class Board implements Serializable {
 			firstIncrement = 0;
 			secondIncrement = 0;
 			break;
-	
+
 		}
 		if (Pattern.findBubbleIndex(locations, type) != -1
 				&& locations.size() == 4) {
@@ -1152,7 +1157,7 @@ public class Board implements Serializable {
 					+ secondIncrement * bubbleIndex));
 			return retVal;
 		}
-	
+
 		for (int i = 0; i < locations.size(); i++) {
 			BoardLocation candidate = new BoardLocation(locations.get(i)
 					.getYPos() + firstIncrement, locations.get(i).getXPos()
