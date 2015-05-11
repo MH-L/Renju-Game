@@ -29,6 +29,11 @@ public class IntermediateAlgorithmTest {
 	}
 
 	@Test
+	public void testConstructor() {
+		assertEquals(firstGameBoard, firstAi.getBoard());
+		assertEquals(secondGameBoard, ai.getBoard());
+	}
+	@Test
 	public void testIntermediateAttack() throws InvalidIndexException {
 		firstGameBoard.updateBoard(new BoardLocation(5,8), true);
 		firstGameBoard.updateBoard(new BoardLocation(6,7), true);
@@ -44,8 +49,19 @@ public class IntermediateAlgorithmTest {
 	}
 
 	@Test
-	public void testBlockCompositePat() {
-
+	public void testBlockCompositePat() throws InvalidIndexException {
+		secondGameBoard.updateBoard(new BoardLocation(11,11), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,9), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(12,11), true);
+		secondGameBoard.updateBoard(new BoardLocation(12,10), true);
+		assertEquals(ai.getBoard().getTotalStones(), 6);
+		assertEquals(ai.getSelfStone().size(), 1);
+		assertEquals(ai.getOtherStone().size(), 5);
+		ArrayList<BoardLocation> retVal = ai.blockPotentialCompositePat();
+		assertFalse(retVal.isEmpty());
+		secondGameBoard.reset();
 	}
 
 }

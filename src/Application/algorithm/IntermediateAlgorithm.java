@@ -49,7 +49,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() >= 2) {
+			if (BoardChecker.checkAllPatterns(vBoard, !isFirst).size() >= 2) {
 				retVal.add(loc);
 			}
 			try {
@@ -91,5 +91,13 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 		}
 		return retVal;
+	}
+
+	@Override
+	public ArrayList<BoardLocation> calculateAttack() {
+		ArrayList<BoardLocation> composites = intermediateAttack();
+		if (composites.isEmpty())
+			return super.calculateAttack();
+		return composites;
 	}
 }

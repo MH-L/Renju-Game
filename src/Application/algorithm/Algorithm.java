@@ -12,13 +12,13 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public abstract class Algorithm {
-	private static Board board;
+	private Board board;
 	private static final Random rand = new Random();
 	protected VirtualBoard vBoard;
 	protected boolean isFirst;
 
 	public Algorithm(Board board, boolean isFirst) {
-		Algorithm.board = board;
+		this.board = board;
 		this.isFirst = isFirst;
 	}
 
