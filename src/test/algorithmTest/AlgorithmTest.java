@@ -78,4 +78,18 @@ public class AlgorithmTest {
 		assertTrue(testVal != null);
 		assertTrue(testVal.equals(new BoardLocation(4,4)));
 	}
+
+	@Test
+	public void testExtractingAdjacentLocs() throws InvalidIndexException {
+		Board bd = alg.getBoard();
+		bd.reset();
+		bd.updateBoard(new BoardLocation(0,0), true);
+		assertEquals(alg.extractAllAdjacentLocs().size(), 6);
+		bd.updateBoard(new BoardLocation(1,1), true);
+		assertEquals(alg.extractAllAdjacentLocs().size(), 10);
+		bd.updateBoard(new BoardLocation(2,2), false);
+		assertEquals(alg.extractAllAdjacentLocs().size(), 9);
+		bd.updateBoard(new BoardLocation(7,7), true);
+		assertEquals(alg.extractAllAdjacentLocs().size(), 25);
+	}
 }

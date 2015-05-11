@@ -61,6 +61,9 @@ public class IntermediateAlgorithmTest {
 		assertEquals(ai.getOtherStone().size(), 5);
 		ArrayList<BoardLocation> retVal = ai.blockPotentialCompositePat();
 		assertFalse(retVal.isEmpty());
+		BoardLocation toTest = retVal.get(0);
+		assertEquals(toTest.getXPos(), 12);
+		assertEquals(toTest.getYPos(), 12);
 		secondGameBoard.reset();
 	}
 

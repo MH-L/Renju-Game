@@ -9,7 +9,6 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
-	public static final int calculationSteps = 2;
 
 	public IntermediateAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
@@ -62,8 +61,13 @@ public class IntermediateAlgorithm extends Algorithm {
 		return retVal;
 	}
 
-
-	public ArrayList<BoardLocation> intermediateAttack() {
+	/**
+	 * Method for developing composite patterns.
+	 * @return
+	 * 		ArrayList of BoardLocations where composite patterns come
+	 * 		along after placing a stone.
+	 */
+	public ArrayList<BoardLocation> compositePatAtk() {
 		ArrayList<BoardLocation> aiLoc = getSelfStone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -92,6 +96,18 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 		}
 		return retVal;
+	}
+
+	public ArrayList<BoardLocation> intermediateAttack() {
+		ArrayList<BoardLocation> composites = compositePatAtk();
+		if (!composites.isEmpty())
+			return composites;
+		ArrayList<BoardLocation> relevantLocs = extractAllAdjacentLocs();
+		for (BoardLocation loc : relevantLocs) {
+			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		}
+		return null;
+		//
 	}
 
 	@Override

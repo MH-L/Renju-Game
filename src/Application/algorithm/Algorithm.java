@@ -264,81 +264,6 @@ public abstract class Algorithm {
 		return processLocs(locations);
 	}
 
-	public BoardLocation extendToWinning(Pattern pat) {
-		// TODO if the pattern is blocked on one side, then
-		// this method might not work.
-		ArrayList<BoardLocation> boardLocs = pat.getLocations();
-		int firstInc = 0;
-		int secondInc = 0;
-		switch (pat.getType()) {
-		case Pattern.ON_ROW:
-			firstInc = 0;
-			secondInc = 1;
-			break;
-		case Pattern.ON_COL:
-			firstInc = 1;
-			secondInc = 0;
-			break;
-		case Pattern.ON_ULDIAG:
-			firstInc = 1;
-			secondInc = 1;
-			break;
-		case Pattern.ON_URDIAG:
-			firstInc = 1;
-			secondInc = -1;
-			break;
-		default:
-			break;
-		}
-		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
-		for (int j = 0; j < boardLocs.size(); j++) {
-			BoardLocation loc = boardLocs.get(j);
-			BoardLocation first = new BoardLocation(loc.getYPos() + firstInc,
-					loc.getXPos() + secondInc);
-			BoardLocation second = new BoardLocation(loc.getYPos() - firstInc,
-					loc.getXPos() - secondInc);
-			if (Board.isReachable(first) && !board.isOccupied(first)
-					&& !boardLocs.contains(first)) {
-				try {
-					vBoard.updateBoard(first, isFirst);
-				} catch (InvalidIndexException e) {
-					continue;
-				}
-				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
-						vBoard, isFirst);
-				for (Pattern pat1 : patterns) {
-					if (vBoard.isPatternWinning(pat1))
-						return first;
-				}
-				try {
-					vBoard.withdrawMove(first);
-				} catch (InvalidIndexException e) {
-					continue;
-				}
-			}
-			if (Board.isReachable(second) && !board.isOccupied(second)
-					&& !boardLocs.contains(second)) {
-				try {
-					vBoard.updateBoard(second, isFirst);
-				} catch (InvalidIndexException e) {
-					continue;
-				}
-				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
-						vBoard, isFirst);
-				for (Pattern pat1 : patterns) {
-					if (vBoard.isPatternWinning(pat1))
-						return second;
-				}
-				try {
-					vBoard.withdrawMove(second);
-				} catch (InvalidIndexException e) {
-					continue;
-				}
-			}
-		}
-		return null;
-	}
-
 	private BoardLocation findWinningLoc(Pattern pat) {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		ArrayList<BoardLocation> locations = pat.getLocations();
@@ -374,8 +299,7 @@ public abstract class Algorithm {
 					&& !locations.contains(firstCandidate)) {
 				try {
 					vBoard.updateBoard(firstCandidate, isFirst);
-					if (vBoard.checkcol() || vBoard.checkrow()
-							|| vBoard.checkdiag())
+					if (vBoard.checkcol() || vBoard.checkrow() || vBoard.checkdiag())
 						return firstCandidate;
 				} catch (InvalidIndexException e) {
 					continue;
@@ -466,6 +390,91 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	public static ArrayList<Pattern> filterUrgentPats(
+			ArrayList<Pattern> patterns) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		for (Pattern pat : patterns) {
+			if (pat.getLocations().size() == 4)
+				retVal.add(pat);
+		}
+		return retVal;
+	}
+
+	public BoardLocation extendToWinning(Pattern pat) {
+		// TODO if the pattern is blocked on one side, then
+		// this method might not work.
+		ArrayList<BoardLocation> boardLocs = pat.getLocations();
+		int firstInc = 0;
+		int secondInc = 0;
+		switch (pat.getType()) {
+		case Pattern.ON_ROW:
+			firstInc = 0;
+			secondInc = 1;
+			break;
+		case Pattern.ON_COL:
+			firstInc = 1;
+			secondInc = 0;
+			break;
+		case Pattern.ON_ULDIAG:
+			firstInc = 1;
+			secondInc = 1;
+			break;
+		case Pattern.ON_URDIAG:
+			firstInc = 1;
+			secondInc = -1;
+			break;
+		default:
+			break;
+		}
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		for (int j = 0; j < boardLocs.size(); j++) {
+			BoardLocation loc = boardLocs.get(j);
+			BoardLocation first = new BoardLocation(loc.getYPos() + firstInc,
+					loc.getXPos() + secondInc);
+			BoardLocation second = new BoardLocation(loc.getYPos() - firstInc,
+					loc.getXPos() - secondInc);
+			if (Board.isReachable(first) && !board.isOccupied(first)
+					&& !boardLocs.contains(first)) {
+				try {
+					vBoard.updateBoard(first, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
+						return first;
+				}
+				try {
+					vBoard.withdrawMove(first);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+			if (Board.isReachable(second) && !board.isOccupied(second)
+					&& !boardLocs.contains(second)) {
+				try {
+					vBoard.updateBoard(second, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
+						vBoard, isFirst);
+				for (Pattern pat1 : patterns) {
+					if (vBoard.isPatternWinning(pat1))
+						return second;
+				}
+				try {
+					vBoard.withdrawMove(second);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static ArrayList<BoardLocation> extractBlockingLocs(
 			ArrayList<Pattern> patterns) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -479,19 +488,25 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
-	public static ArrayList<Pattern> filterUrgentPats(
-			ArrayList<Pattern> patterns) {
-		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
-		for (Pattern pat : patterns) {
-			if (pat.getLocations().size() == 4)
-				retVal.add(pat);
-		}
-		return retVal;
-	}
-
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
 		return new ArrayList<BoardLocation>();
 	}
 
+	public ArrayList<BoardLocation> extractAllAdjacentLocs() {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> selfStones = getSelfStone();
+		ArrayList<BoardLocation> otherStones = getOtherStone();
+		for (BoardLocation self : selfStones) {
+			ArrayList<BoardLocation> candidates = Board.findAdjacentLocs(self);
+			candidates.addAll(Board.findJumpLocations(self));
+			for (int i = 0; i < candidates.size(); i++) {
+				BoardLocation cur = candidates.get(i);
+				if (!retVal.contains(cur) && !selfStones.contains(cur) &&
+						!otherStones.contains(cur) && Board.isReachable(cur))
+					retVal.add(candidates.get(i));
+			}
+		}
+		return retVal;
+	}
 
 }
