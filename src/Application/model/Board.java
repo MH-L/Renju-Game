@@ -369,10 +369,8 @@ public class Board implements Serializable {
 	 * @return True if there is such combination, false if there is not.
 	 */
 	public boolean checkrow() {
-		int consectCount = 0; // This counts the number of consecutive stones
-								// for one player.
-		int prev = EMPTY_SPOT; // This is the last stone. 0 denotes that there
-								// is no last stone.
+		int consectCount = 0;
+		int prev = EMPTY_SPOT;
 		for (int[] array : this.rows) {
 			for (int i = 0; i < array.length; i++) {
 				if (prev == array[i] && array[i] != EMPTY_SPOT)

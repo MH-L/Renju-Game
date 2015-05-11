@@ -31,6 +31,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		return this.vBoard;
 	}
 
+	@Override
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
 		ArrayList<BoardLocation> otherPlayer = getOtherStone();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();

@@ -67,6 +67,11 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 *
+	 * @param locations Candidate locations passed to the function.
+	 * @return
+	 */
 	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
 		if (locations.isEmpty())
 			return board.findEmptyLocSpiral();
@@ -90,8 +95,6 @@ public abstract class Algorithm {
 			}
 		}
 		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
-		// System.out.format("The return value I gave is (%d, %d).\n",
-		// retVal.getXPos(), retVal.getYPos());
 		return retVal;
 	}
 
@@ -99,6 +102,18 @@ public abstract class Algorithm {
 		if (modulo <= 0)
 			return -1;
 		return rand.nextInt(modulo) + 1;
+	}
+
+	public Board getBoard() {
+		return board;
+	}
+
+	public ArrayList<BoardLocation> getSelfStone() {
+		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
+	}
+
+	public ArrayList<BoardLocation> getOtherStone() {
+		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
 	}
 
 	public abstract ArrayList<BoardLocation> findLocation();
@@ -156,6 +171,97 @@ public abstract class Algorithm {
 
 		return Board.findLocationWithLargestDist(candidates);
 
+	}
+
+	public BoardLocation makeSecondMoveFirst() {
+		BoardLocation firstMove = board.getPlayer1Stone().get(0);
+		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
+		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
+			int randSeed = getRandNum(8);
+			return Board.findAdjacentLocs(firstMove).get(randSeed - 1);
+		}
+		int randSeed = getRandNum(2);
+		int desiredDist = randSeed == 1 ? 2 : 3;
+		ArrayList<BoardLocation> result = filterWithDesiredDist(
+				otherPlayerFirstMove, desiredDist,
+				Board.findAdjacentLocs(firstMove));
+		randSeed = getRandNum(result.size());
+		return result.get(randSeed - 1);
+	}
+
+	public BoardLocation makeSecondMoveSecond() {
+		BoardLocation firstMove = board.getPlayer2Stone().get(0);
+		BoardLocation firstMoveOther = board.getPlayer1Stone().get(0);
+		BoardLocation secondMoveOther = board.getPlayer1Stone().get(1);
+		if (Board.findDistance(firstMoveOther, secondMoveOther) >= 4) {
+			int randSeed = getRandNum(2);
+			ArrayList<BoardLocation> result = filterWithDesiredDist(firstMove,
+					randSeed, Board.findAdjacentLocs(firstMove));
+			BoardLocation retVal;
+			do {
+				randSeed = getRandNum(result.size());
+				retVal = result.get(randSeed - 1);
+			} while (board.isOccupied(retVal));
+			return retVal;
+		} else {
+			ArrayList<BoardLocation> result = board.filterOccupied(Board.findAdjacentLocs(firstMove));
+			int randSeed = getRandNum(result.size());
+			return result.get(randSeed - 1);
+		}
+	}
+
+	public BoardLocation makeMoveBeginning() {
+		if (board.getTotalStones() == 1)
+			return makeFirstMoveSecond();
+		else if (board.getTotalStones() == 0)
+			return makeFirstMoveFirst();
+		else if (board.getTotalStones() == 2)
+			return makeSecondMoveFirst();
+		else if (board.getTotalStones() == 3)
+			return makeSecondMoveSecond();
+		else
+			return makeMoveEnd();
+	}
+
+	public BoardLocation makeMoveEnd() {
+		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
+		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
+		if (excellents.size() != 0)
+			return findWinningLoc(excellents.get(0));
+		for (Pattern pat : selfPatterns) {
+			if (board.isPatternWinning(pat))
+				return findWinningLoc(pat);
+		}
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
+		ArrayList<Pattern> urgents = filterUrgentPats(patterns);
+		if (urgents.size() != 0) {
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				return result.get(getRandNum(result.size()) - 1);
+			} else
+				return tofilter.get(0);
+		}
+		// No urgent patterns.
+		if (selfPatterns.size() != 0) {
+			for (Pattern pat : selfPatterns) {
+				BoardLocation retLoc = extendToWinning(pat);
+				if (retLoc != null)
+					return retLoc;
+			}
+		}
+		if (patterns.size() != 0) {
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
+				return blockAttack;
+			}
+			return tofilter.get(0);
+		}
+		ArrayList<BoardLocation> locations = calculateAttack();
+		locations.addAll(blockPotentialCompositePat());
+		return processLocs(locations);
 	}
 
 	public BoardLocation extendToWinning(Pattern pat) {
@@ -307,96 +413,6 @@ public abstract class Algorithm {
 		}
 	}
 
-	public BoardLocation makeSecondMoveFirst() {
-		BoardLocation firstMove = board.getPlayer1Stone().get(0);
-		BoardLocation otherPlayerFirstMove = board.getPlayer2Stone().get(0);
-		if (Board.findDistance(firstMove, otherPlayerFirstMove) >= 4) {
-			int randSeed = getRandNum(8);
-			return Board.findAdjacentLocs(firstMove).get(randSeed - 1);
-		}
-		int randSeed = getRandNum(2);
-		int desiredDist = randSeed == 1 ? 2 : 3;
-		ArrayList<BoardLocation> result = filterWithDesiredDist(
-				otherPlayerFirstMove, desiredDist,
-				Board.findAdjacentLocs(firstMove));
-		randSeed = getRandNum(result.size());
-		return result.get(randSeed - 1);
-	}
-
-	public BoardLocation makeSecondMoveSecond() {
-		BoardLocation firstMove = board.getPlayer2Stone().get(0);
-		BoardLocation firstMoveOther = board.getPlayer1Stone().get(0);
-		BoardLocation secondMoveOther = board.getPlayer1Stone().get(1);
-		if (Board.findDistance(firstMoveOther, secondMoveOther) >= 4) {
-			int randSeed = getRandNum(2);
-			ArrayList<BoardLocation> result = filterWithDesiredDist(firstMove,
-					randSeed, Board.findAdjacentLocs(firstMove));
-			BoardLocation retVal;
-			do {
-				randSeed = getRandNum(result.size());
-				retVal = result.get(randSeed - 1);
-			} while (board.isOccupied(retVal));
-			return retVal;
-		} else {
-			ArrayList<BoardLocation> result = board.filterOccupied(Board.findAdjacentLocs(firstMove));
-			int randSeed = getRandNum(result.size());
-			return result.get(randSeed - 1);
-		}
-	}
-
-	public BoardLocation makeMoveEnd() {
-		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
-		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
-		if (excellents.size() != 0)
-			return findWinningLoc(excellents.get(0));
-		for (Pattern pat : selfPatterns) {
-			if (board.isPatternWinning(pat))
-				return findWinningLoc(pat);
-		}
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
-		ArrayList<Pattern> urgents = filterUrgentPats(patterns);
-		if (urgents.size() != 0) {
-			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (result.size() != 0) {
-				return result.get(getRandNum(result.size()) - 1);
-			} else
-				return tofilter.get(0);
-		}
-		// No urgent patterns.
-		if (selfPatterns.size() != 0) {
-			for (Pattern pat : selfPatterns) {
-				BoardLocation retLoc = extendToWinning(pat);
-				if (retLoc != null)
-					return retLoc;
-			}
-		}
-		if (patterns.size() != 0) {
-			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (result.size() != 0) {
-				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
-				return blockAttack;
-			}
-			return tofilter.get(0);
-		}
-		ArrayList<BoardLocation> locations = calculateAttack();
-		return processLocs(locations);
-	}
-
-	public BoardLocation makeMoveBeginning() {
-		if (board.getTotalStones() == 1)
-			return makeFirstMoveSecond();
-		else if (board.getTotalStones() == 0)
-			return makeFirstMoveFirst();
-		else if (board.getTotalStones() == 2)
-			return makeSecondMoveFirst();
-		else if (board.getTotalStones() == 3)
-			return makeSecondMoveSecond();
-		else
-			return makeMoveEnd();
-	}
-
 	public static ArrayList<BoardLocation> filterWithDesiredDist(
 			BoardLocation comparer, int desiredDist,
 			ArrayList<BoardLocation> candidate) {
@@ -406,10 +422,6 @@ public abstract class Algorithm {
 				retVal.add(loc);
 		}
 		return retVal;
-	}
-
-	public Board getBoard() {
-		return board;
 	}
 
 	/**
@@ -477,12 +489,8 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
-	public ArrayList<BoardLocation> getSelfStone() {
-		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
-	}
-
-	public ArrayList<BoardLocation> getOtherStone() {
-		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
+	public ArrayList<BoardLocation> blockPotentialCompositePat() {
+		return new ArrayList<BoardLocation>();
 	}
 
 
