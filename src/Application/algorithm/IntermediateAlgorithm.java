@@ -37,7 +37,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		for (BoardLocation loc : otherPlayer) {
 			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
-			adjLocs.addAll(Board.getJumpLocations(loc));
+			adjLocs.addAll(Board.findJumpLocations(loc));
 			for (BoardLocation loc2 : adjLocs)
 				if (!candidates.contains(loc2))
 					candidates.add(loc2);
@@ -68,7 +68,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		for (BoardLocation loc : aiLoc) {
 			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
-			adjLocs.addAll(Board.getJumpLocations(loc));
+			adjLocs.addAll(Board.findJumpLocations(loc));
 			for (BoardLocation loc2 : adjLocs)
 				if (!candidates.contains(loc2))
 					candidates.add(loc2);

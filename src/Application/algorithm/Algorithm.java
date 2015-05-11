@@ -29,7 +29,7 @@ public abstract class Algorithm {
 		for (BoardLocation stone : previousStones) {
 			ArrayList<BoardLocation> curCandidates = Board
 					.findAdjacentLocs(stone);
-			curCandidates.addAll(Board.getJumpLocations(stone));
+			curCandidates.addAll(Board.findJumpLocations(stone));
 			for (BoardLocation loc : curCandidates) {
 				if (!candidates.contains(loc) && Board.isReachable(loc)
 						&& !board.isOccupied(loc))
@@ -154,69 +154,8 @@ public abstract class Algorithm {
 				candidates.add(loc);
 		}
 
-		return Board.getLocationWithLargestDist(candidates);
+		return Board.findLocationWithLargestDist(candidates);
 
-	}
-
-	public BoardLocation makeMoveBeginning() {
-		if (board.getTotalStones() == 1)
-			return makeFirstMoveSecond();
-		else if (board.getTotalStones() == 0)
-			return makeFirstMoveFirst();
-		else if (board.getTotalStones() == 2)
-			return makeSecondMoveFirst();
-		else if (board.getTotalStones() == 3)
-			return makeSecondMoveSecond();
-		else {
-			ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(
-					board, isFirst);
-			ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
-			if (excellents.size() != 0)
-				return findWinningLoc(excellents.get(0));
-			for (Pattern pat : selfPatterns) {
-				if (board.isPatternWinning(pat))
-					return findWinningLoc(pat);
-			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board,
-					!isFirst);
-			ArrayList<Pattern> urgents = filterUrgentPats(patterns);
-			if (urgents.size() != 0) {
-				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-				if (result.size() != 0) {
-					return result.get(getRandNum(result.size()) - 1);
-				} else
-					return tofilter.get(0);
-			}
-			// No urgent patterns.
-			if (selfPatterns.size() != 0) {
-				for (Pattern pat : selfPatterns) {
-					BoardLocation retLoc = extendToWinning(pat);
-					if (retLoc != null)
-						return retLoc;
-				}
-			}
-			if (patterns.size() != 0) {
-				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-				if (result.size() != 0) {
-					BoardLocation blockAttack = result.get(getRandNum(result
-							.size()) - 1);
-					// System.out
-					// .format("The value I gave (for blocking attack) is (%d, %d).\n",
-					// blockAttack.getXPos(),
-					// blockAttack.getYPos());
-					return blockAttack;
-				}
-				// System.out
-				// .format("Special case: The value I gave (for blocking attack) is (%d, %d).\n",
-				// tofilter.get(0).getXPos(), tofilter.get(0)
-				// .getYPos());
-				return tofilter.get(0);
-			}
-			ArrayList<BoardLocation> locations = calculateAttack();
-			return processLocs(locations);
-		}
 	}
 
 	public BoardLocation extendToWinning(Pattern pat) {
@@ -443,6 +382,19 @@ public abstract class Algorithm {
 		}
 		ArrayList<BoardLocation> locations = calculateAttack();
 		return processLocs(locations);
+	}
+
+	public BoardLocation makeMoveBeginning() {
+		if (board.getTotalStones() == 1)
+			return makeFirstMoveSecond();
+		else if (board.getTotalStones() == 0)
+			return makeFirstMoveFirst();
+		else if (board.getTotalStones() == 2)
+			return makeSecondMoveFirst();
+		else if (board.getTotalStones() == 3)
+			return makeSecondMoveSecond();
+		else
+			return makeMoveEnd();
 	}
 
 	public static ArrayList<BoardLocation> filterWithDesiredDist(

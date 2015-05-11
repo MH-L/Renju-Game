@@ -123,6 +123,6 @@ public class Game {
 	}
 
 	public static boolean boardFull(){
-		return board.boardFull();
+		return board.isBoardFull();
 	}
 }

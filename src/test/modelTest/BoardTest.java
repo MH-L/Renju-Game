@@ -346,19 +346,19 @@ public class BoardTest {
 	@Test
 	public void testGetJumpLocs() {
 		BoardLocation test = new BoardLocation(0, 0);
-		ArrayList<BoardLocation> results = Board.getJumpLocations(test);
+		ArrayList<BoardLocation> results = Board.findJumpLocations(test);
 		assertEquals(results.size(), 3);
 		assertTrue(results.contains(new BoardLocation(2, 2)));
 		assertTrue(results.contains(new BoardLocation(0, 2)));
 		assertTrue(results.contains(new BoardLocation(2, 0)));
 		test = new BoardLocation(15, 15);
-		results = Board.getJumpLocations(test);
+		results = Board.findJumpLocations(test);
 		assertEquals(results.size(), 3);
 		assertTrue(results.contains(new BoardLocation(13, 13)));
 		assertTrue(results.contains(new BoardLocation(13, 15)));
 		assertTrue(results.contains(new BoardLocation(15, 13)));
 		test = new BoardLocation(7, 9);
-		results = Board.getJumpLocations(test);
+		results = Board.findJumpLocations(test);
 		assertEquals(results.size(), 8);
 		assertTrue(results.contains(new BoardLocation(7, 7)));
 		assertTrue(results.contains(new BoardLocation(9, 7)));
@@ -396,18 +396,18 @@ public class BoardTest {
 		bd.updateBoard(new BoardLocation(4, 5), true);
 		bd.updateBoard(new BoardLocation(5, 6), true);
 		bd.updateBoard(new BoardLocation(6, 7), false);
-		ArrayList<BoardLocation> blocked = bd.getBlockedStones(patLocs,
+		ArrayList<BoardLocation> blocked = bd.findBlockedStones(patLocs,
 				Pattern.ON_ULDIAG);
 		assertEquals(blocked.size(), 1);
 		assertTrue(blocked.contains(new BoardLocation(6, 7)));
 		bd.updateBoard(new BoardLocation(1, 2), false);
-		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		blocked = bd.findBlockedStones(patLocs, Pattern.ON_ULDIAG);
 		assertEquals(blocked.size(), 2);
 		assertTrue(blocked.contains(new BoardLocation(1, 2)));
 		assertTrue(blocked.contains(new BoardLocation(6, 7)));
 		bd.withdrawMove(new BoardLocation(1, 2));
 		bd.updateBoard(new BoardLocation(7, 7), false);
-		blocked = bd.getBlockedStones(patLocs, Pattern.ON_ULDIAG);
+		blocked = bd.findBlockedStones(patLocs, Pattern.ON_ULDIAG);
 		assertEquals(blocked.size(), 1);
 		assertTrue(blocked.contains(new BoardLocation(6, 7)));
 	}
@@ -431,7 +431,7 @@ public class BoardTest {
 		assertTrue(bd.isPatternWinning(pat));
 		bd.updateBoard(new BoardLocation(13, 13), false);
 		pat = new ContClosedPattern(testLocations, Pattern.ON_ULDIAG,
-				bd.getBlockedStones(testLocations, Pattern.ON_ULDIAG),
+				bd.findBlockedStones(testLocations, Pattern.ON_ULDIAG),
 				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
 		assertFalse(bd.isPatternWinning(pat));
 	}
