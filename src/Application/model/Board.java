@@ -704,8 +704,8 @@ public class Board implements Serializable {
 			emptyLocChar = '-';
 		} else {
 			firstPlayerChar = '\u25CF';
-			secondPlayerChar = '\u25CE';
-			emptyLocChar = '\u2610';
+			secondPlayerChar = '\u25CB';
+			emptyLocChar = '\u25A1';
 		}
 
 		for (int i = 0; i < this.basicGrid.length; i++) {
@@ -716,11 +716,11 @@ public class Board implements Serializable {
 				System.out.print("\u0020");
 			for (int j = 0; j < this.basicGrid[0].length; j++) {
 				if (this.basicGrid[i][j] == EMPTY_SPOT)
-					System.out.print(emptyLocChar + "\u0020\u0020");
+					System.out.print(emptyLocChar + "\u0020");
 				else if (this.basicGrid[i][j] == FIRST_PLAYER)
-					System.out.print(firstPlayerChar + "\u0020\u0020");
+					System.out.print(firstPlayerChar + "\u0020");
 				else
-					System.out.print(secondPlayerChar + "\u0020\u0020");
+					System.out.print(secondPlayerChar + "\u0020");
 			}
 			System.out.print('\n');
 		}
@@ -1132,7 +1132,7 @@ public class Board implements Serializable {
 
 		}
 		if (Pattern.findBubbleIndex(locations, type) != -1
-				&& locations.size() == 4) {
+				&& locations.size() >= 4) {
 			int bubbleIndex = Pattern.findBubbleIndex(locations, type);
 			ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 			retVal.add(new BoardLocation(locations.get(0).getYPos()
@@ -1156,7 +1156,7 @@ public class Board implements Serializable {
 					&& isReachable(anotherCandidate))
 				if (this.basicGrid[anotherCandidate.getYPos()][anotherCandidate
 						.getXPos()] == Board.EMPTY_SPOT
-						&& !retLocs.contains(candidate))
+						&& !retLocs.contains(anotherCandidate))
 					retLocs.add(anotherCandidate);
 		}
 		return retLocs;

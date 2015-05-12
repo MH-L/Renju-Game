@@ -235,12 +235,9 @@ public abstract class Algorithm {
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
-			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (result.size() != 0) {
-				return result.get(getRandNum(result.size()) - 1);
-			} else
-				return tofilter.get(0);
+			ArrayList<BoardLocation> result = extractBlockingLocs(urgents);
+			if (result.size() != 0)
+				return result.get(0);
 		}
 		// No urgent patterns.
 		if (selfPatterns.size() != 0) {
@@ -395,7 +392,7 @@ public abstract class Algorithm {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
 		boolean checker = isSelf ? isFirst : !isFirst;
 		for (Pattern pat : patterns) {
-			if (pat.getLocations().size() == 4 && !board.isPatternDead(pat, checker))
+			if (pat.getLocations().size() >= 4 && !board.isPatternDead(pat, checker))
 				retVal.add(pat);
 		}
 		return retVal;

@@ -28,14 +28,26 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(2, 2), true);
 		board.updateBoard(new BoardLocation(2, 3), true);
 		board.updateBoard(new BoardLocation(2, 5), true);
-		assertEquals(
-				algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 3)
+		assertEquals(algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 3)
 						.size(), 1);
-		assertEquals(
-				algorithm.BoardChecker.checkOpenPatDisc(board.getRowByIndex(2),
+		assertEquals(algorithm.BoardChecker.checkOpenPatDisc(board.getRowByIndex(2),
 						2, Pattern.ON_ROW, true, 3, board).size(), 1);
 		board.reset();
-
+		board.updateBoard(new BoardLocation(3,3), true);
+		board.updateBoard(new BoardLocation(4,4), true);
+		board.updateBoard(new BoardLocation(6,6), true);
+		board.updateBoard(new BoardLocation(7,7), true);
+		assertEquals(algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+				.size(), 1);
+		assertEquals(algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 3)
+				.size(), 0);
+		board.updateBoard(new BoardLocation(8,8), false);
+		assertEquals(algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+				.size(), 0);
+		board.withdrawMove(new BoardLocation(8,8));
+		board.updateBoard(new BoardLocation(9,9), false);
+		assertEquals(algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+				.size(), 1);
 	}
 
 	@Test
@@ -202,8 +214,7 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(12, 11), true);
 		board.updateBoard(new BoardLocation(13, 10), true);
 		board.updateBoard(new BoardLocation(14, 9), true);
-		ArrayList<Pattern> patterns = BoardChecker
-				.checkAllPatterns(board, true);
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 1);
 		board.reset();
 		board.updateBoard(new BoardLocation(2, 5), true);
@@ -213,6 +224,19 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(1, 4), false);
 		patterns = BoardChecker.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 1);
+		board.reset();
+		board.updateBoard(new BoardLocation(4,4), true);
+		board.updateBoard(new BoardLocation(5,5), true);
+		board.updateBoard(new BoardLocation(7,7), true);
+		board.updateBoard(new BoardLocation(8,8), false);
+		patterns = BoardChecker.checkAllPatterns(board, true);
+		assertEquals(patterns.size(), 0);
+		board.updateBoard(new BoardLocation(6,6), true);
+		patterns = BoardChecker.checkAllPatterns(board, true);
+		assertEquals(patterns.size(), 1);
+		board.updateBoard(new BoardLocation(3,3), false);
+		patterns = BoardChecker.checkAllPatterns(board, true);
+		assertEquals(patterns.size(), 0);
 	}
 
 	@Test
