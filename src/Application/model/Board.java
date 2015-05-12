@@ -879,7 +879,7 @@ public class Board implements Serializable {
 					if (pat.getType() == Pattern.ON_ULDIAG) {
 						int ULIndex = getULDiagIndex(pat.getLocations().get(0));
 						int[] curULDiag = getULDiagByIndex(ULIndex);
-						if (ULIndex < 4 || ULIndex > diag - 4)
+						if (ULIndex < 4 || ULIndex > diag - 5)
 							return true;
 						else if (getULDiagSubIndex(pat.getLocations().get(0)) == 0) {
 							if (curULDiag[4] == blocker)
@@ -891,7 +891,7 @@ public class Board implements Serializable {
 					} else if (pat.getType() == Pattern.ON_URDIAG) {
 						int URIndex = getURDiagIndex(pat.getLocations().get(0));
 						int[] curURDiag = getURDiagByIndex(URIndex);
-						if (URIndex < 4 || URIndex > diag - 4)
+						if (URIndex < 4 || URIndex > diag - 5)
 							return true;
 						else if (getURDiagSubIndex(pat.getLocations().get(0)) == 0) {
 							if (curURDiag[4] == blocker)
@@ -924,14 +924,14 @@ public class Board implements Serializable {
 				} else if (pat.getLocations().size() == 4) {
 					if (pat.getType() == Pattern.ON_ULDIAG) {
 						int diagIndex = getULDiagIndex(pat.getLocations().get(0));
-						if (diagIndex < 4 || diagIndex > diag - 4)
+						if (diagIndex < 4 || diagIndex > diag - 5)
 							return true;
 						else
 							return false;
 					} else if (pat.getType() == Pattern.ON_URDIAG) {
 						int diagIndex = getURDiagIndex(pat.getLocations()
 								.get(0));
-						if (diagIndex < 4 || diagIndex > diag - 4)
+						if (diagIndex < 4 || diagIndex > diag - 5)
 							return true;
 						else
 							return false;

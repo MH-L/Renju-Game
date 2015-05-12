@@ -87,8 +87,7 @@ public class Main {
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
 		} else if (boardFull()) {
-			System.out
-					.println("There are no more moves left. You both came to a draw!");
+			System.out.println("There are no more moves left. You both came to a draw!");
 		}
 
 		reader.close();
