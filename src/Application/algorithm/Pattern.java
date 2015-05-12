@@ -194,4 +194,32 @@ public abstract class Pattern {
 			}
 		}
 	}
+
+	public BoardLocation findFirstStone() {
+		ArrayList<BoardLocation> locs = getLocations();
+		int minIndex = 0;
+		switch (getType()) {
+		case ON_COL:
+		case ON_ULDIAG:
+		case ON_URDIAG:
+			int minY = locs.get(0).getYPos();
+			for (int i = 0; i < locs.size(); i++)
+				if (locs.get(i).getYPos() < minY) {
+					minY = locs.get(i).getYPos();
+					minIndex = i;
+				}
+			break;
+		case ON_ROW:
+			int minX = locs.get(0).getXPos();
+			for (int i = 0; i < locs.size(); i++)
+				if (locs.get(i).getXPos() < minX) {
+					minX = locs.get(i).getXPos();
+					minIndex = i;
+				}
+			break;
+		default:
+			break;
+		}
+		return locs.get(minIndex);
+	}
 }

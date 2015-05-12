@@ -274,6 +274,22 @@ public class BoardTest {
 		test = new ContOpenPattern(locations, Pattern.ON_URDIAG,
 				bd.findBlockingLocs(locations, Pattern.ON_URDIAG));
 		assertTrue(bd.isPatternDead(test, true));
+		locations.clear();
+		bd.reset();
+		locations.add(new BoardLocation(15,12));
+		locations.add(new BoardLocation(14,12));
+		locations.add(new BoardLocation(13,12));
+		locations.add(new BoardLocation(12,12));
+		bd.updateBoard(new BoardLocation(15,12), true);
+		bd.updateBoard(new BoardLocation(14,12), true);
+		bd.updateBoard(new BoardLocation(13,12), true);
+		bd.updateBoard(new BoardLocation(12,12), true);
+		bd.updateBoard(new BoardLocation(11,12), false);
+		ArrayList<BoardLocation> blocked = new ArrayList<BoardLocation>();
+		blocked.add(new BoardLocation(11,12));
+		test = new ContClosedPattern(locations, Pattern.ON_COL,
+				blocked, new ArrayList<BoardLocation>());
+		assertTrue(bd.isPatternDead(test, true));
 	}
 
 	@Test

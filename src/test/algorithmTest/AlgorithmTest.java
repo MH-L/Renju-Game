@@ -12,7 +12,9 @@ import org.junit.Test;
 
 import exceptions.InvalidIndexException;
 import algorithm.Algorithm;
+import algorithm.BoardChecker;
 import algorithm.ContOpenPattern;
+import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
 import algorithm.UltimateAlgorithm;
 
@@ -43,7 +45,6 @@ public class AlgorithmTest {
 		assertEquals(locs.size(), 0);
 		bd.updateBoard(new BoardLocation(2, 2), true);
 		bd.updateBoard(new BoardLocation(2, 1), true);
-		bd.renderBoard(2);
 		locs = alg.calculateAttack();
 		assertEquals(locs.size(), 1);
 	}
@@ -72,8 +73,8 @@ public class AlgorithmTest {
 		locations.add(new BoardLocation(2, 2));
 		locations.add(new BoardLocation(3, 3));
 		locations.add(new BoardLocation(5, 5));
-		test = new ContOpenPattern(locations, Pattern.ON_ULDIAG,
-				board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
+		test = new DiscOpenPattern(locations, Pattern.ON_ULDIAG,
+				2, board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
 		testVal = alg.extendToWinning(test);
 		assertTrue(testVal != null);
 		assertTrue(testVal.equals(new BoardLocation(4,4)));
@@ -91,5 +92,19 @@ public class AlgorithmTest {
 		assertEquals(alg.extractAllAdjacentLocs().size(), 9);
 		bd.updateBoard(new BoardLocation(7,7), true);
 		assertEquals(alg.extractAllAdjacentLocs().size(), 25);
+	}
+
+	@Test
+	public void testFilterDeadPats() throws InvalidIndexException {
+		Board bd = alg.getBoard();
+		bd.reset();
+		bd.updateBoard(new BoardLocation(15,12), true);
+		bd.updateBoard(new BoardLocation(14,12), true);
+		bd.updateBoard(new BoardLocation(13,12), true);
+		bd.updateBoard(new BoardLocation(12,12), true);
+		bd.updateBoard(new BoardLocation(11,12), false);
+		bd.renderBoard(2);
+		ArrayList<Pattern> toFilter = BoardChecker.checkAllPatterns(bd, true);
+		assertEquals(toFilter.size(), 1);
 	}
 }

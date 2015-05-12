@@ -401,6 +401,14 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	public static void filterOutDeadPats(ArrayList<Pattern> toFilter, boolean isFirst, Board board) {
+		Iterator<Pattern> iter = toFilter.iterator();
+		while (iter.hasNext()) {
+			if (board.isPatternDead(iter.next(), isFirst))
+				iter.remove();
+		}
+	}
+
 	public BoardLocation extendToWinning(Pattern pat) {
 		// TODO if the pattern is blocked on one side, then
 		// this method might not work.
@@ -508,15 +516,6 @@ public abstract class Algorithm {
 			}
 		}
 		return retVal;
-	}
-
-	public void filterOutDeadPats(ArrayList<Pattern> toFilter, boolean isSelf) {
-		boolean checker = isSelf ? isFirst : !isFirst;
-		Iterator<Pattern> iter = toFilter.iterator();
-		while (iter.hasNext()) {
-			if (board.isPatternDead(iter.next(), checker))
-				iter.remove();
-		}
 	}
 
 }

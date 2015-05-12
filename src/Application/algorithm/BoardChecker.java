@@ -41,6 +41,7 @@ public class BoardChecker {
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 6));
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 7));
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 8));
+		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
 
@@ -711,7 +712,6 @@ public class BoardChecker {
 			return false;
 		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
 		BoardLocation firstStone = pat.getLocations().get(0);
-		int[][] grid = board.getGrids();
 		switch (pat.getType()) {
 		case Pattern.ON_ROW:
 			int[] row = board.getRowByIndex(firstStone.getYPos());

@@ -39,4 +39,8 @@ public class CompositePattern {
 		}
 		return Cpatterns;
 	}
+
+	public boolean isUrgent() {
+		return isUrgent;
+	}
 }

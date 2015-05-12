@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import exceptions.InvalidIndexException;
-import algorithm.BoardChecker;
 import algorithm.IntermediateAlgorithm;
 
 public class IntermediateAlgorithmTest {

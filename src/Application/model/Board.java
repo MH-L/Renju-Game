@@ -11,11 +11,6 @@ import algorithm.ContOpenPattern;
 import algorithm.DiscClosedPattern;
 import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
-import application.Game;
-import exceptions.InvalidIndexException;
-import org.omg.CORBA.DynAnyPackage.Invalid;
-
-import java.util.ArrayList;
 
 /**
  * A class for the board. A board is always 16*16. It contains grid locations.
@@ -708,9 +703,9 @@ public class Board implements Serializable {
 			secondPlayerChar = 'O';
 			emptyLocChar = '-';
 		} else {
-			firstPlayerChar = '\u263B';
-			secondPlayerChar = '\u263A';
-			emptyLocChar = '\u25A1';
+			firstPlayerChar = '\u25CF';
+			secondPlayerChar = '\u25CE';
+			emptyLocChar = '\u2610';
 		}
 
 		for (int i = 0; i < this.basicGrid.length; i++) {
@@ -721,11 +716,11 @@ public class Board implements Serializable {
 				System.out.print("\u0020");
 			for (int j = 0; j < this.basicGrid[0].length; j++) {
 				if (this.basicGrid[i][j] == EMPTY_SPOT)
-					System.out.print(emptyLocChar + "\u0020");
+					System.out.print(emptyLocChar + "\u0020\u0020");
 				else if (this.basicGrid[i][j] == FIRST_PLAYER)
-					System.out.print(firstPlayerChar + "\u0020");
+					System.out.print(firstPlayerChar + "\u0020\u0020");
 				else
-					System.out.print(secondPlayerChar + "\u0020");
+					System.out.print(secondPlayerChar + "\u0020\u0020");
 			}
 			System.out.print('\n');
 		}
@@ -947,7 +942,7 @@ public class Board implements Serializable {
 				}
 			} else {
 				// TODO pattern is not open. need to do this part.
-				BoardLocation firstStone = pat.getLocations().get(0);
+				BoardLocation firstStone = pat.findFirstStone();
 				switch (pat.getType()) {
 				case Pattern.ON_ROW:
 					int rowSubIndex = firstStone.getXPos();
@@ -991,16 +986,30 @@ public class Board implements Serializable {
 			}
 		} else {
 			if (pat.getClass().equals(algorithm.DiscOpenPattern.class)) {
-				BoardLocation firstStone = pat.getLocations().get(0);
+				BoardLocation firstStone = pat.findFirstStone();
 				if (pat.getType() == Pattern.ON_ULDIAG) {
 					int ULDiagIndex = getULDiagIndex(firstStone);
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
 					if (ULDiag.length < 5)
 						return true;
+					if (pat.getLocations().size() == 4 && (getULDiagSubIndex(firstStone) == 0
+							|| getULDiagSubIndex(firstStone) == ULDiag.length - 4))
+						return true;
 				} else if (pat.getType() == Pattern.ON_URDIAG) {
 					int URDiagIndex = getURDiagIndex(firstStone);
 					int[] URDiag = getURDiagByIndex(URDiagIndex);
 					if (URDiag.length < 5)
+						return true;
+					if (pat.getLocations().size() == 4 && (getURDiagSubIndex(firstStone) == 0
+							|| getURDiagSubIndex(firstStone) == URDiag.length - 4))
+						return true;
+				} else if (pat.getType() == Pattern.ON_COL) {
+					if (pat.getLocations().size() == 4 && (firstStone.getYPos() == 0 ||
+							firstStone.getYPos() == height - 4))
+						return true;
+				} else {
+					if (pat.getLocations().size() == 4 && (firstStone.getXPos() == 0 ||
+							firstStone.getXPos() == width - 4))
 						return true;
 				}
 				return false;
@@ -1020,7 +1029,7 @@ public class Board implements Serializable {
 	 * @return
 	 */
 	public boolean isPatternWinning(Pattern pat) {
-		BoardLocation firstStone = pat.getLocations().get(0);
+		BoardLocation firstStone = pat.findFirstStone();
 		int checker = basicGrid[firstStone.getYPos()][firstStone.getXPos()];
 		int blocker = checker == Board.FIRST_PLAYER ? Board.SECOND_PLAYER
 				: Board.FIRST_PLAYER;

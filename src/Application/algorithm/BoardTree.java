@@ -9,7 +9,7 @@ public class BoardTree {
 	private static Board node;
 
 	public BoardTree(Board board) {
-		node = board;
+		setNode(board);
 		this.children = null;
 	}
 
@@ -35,5 +35,13 @@ public class BoardTree {
 				maxDepth = arrayTrees.get(i).getDepth();
 		}
 		return maxDepth;
+	}
+
+	public static Board getNode() {
+		return node;
+	}
+
+	public static void setNode(Board node) {
+		BoardTree.node = node;
 	}
 }
