@@ -409,6 +409,16 @@ public abstract class Algorithm {
 		}
 	}
 
+	public static void filterOutInControl(ArrayList<Pattern> patterns, boolean isFirst, Board board) {
+		Iterator<Pattern> iter = patterns.iterator();
+		while (iter.hasNext()) {
+			Pattern candidate = iter.next();
+			if (candidate.getClass() == ContOpenPattern.class)
+				if (BoardChecker.isOpenPatInControl(board, (ContOpenPattern) candidate, isFirst))
+					iter.remove();
+		}
+	}
+
 	public BoardLocation extendToWinning(Pattern pat) {
 		// TODO if the pattern is blocked on one side, then
 		// this method might not work.

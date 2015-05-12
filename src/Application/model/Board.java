@@ -923,16 +923,15 @@ public class Board implements Serializable {
 					}
 				} else if (pat.getLocations().size() == 4) {
 					if (pat.getType() == Pattern.ON_ULDIAG) {
-						int diagIndex = getULDiagIndex(pat.getLocations()
-								.get(0));
-						if (diagIndex < 4 || diagIndex > width - 4)
+						int diagIndex = getULDiagIndex(pat.getLocations().get(0));
+						if (diagIndex < 4 || diagIndex > diag - 4)
 							return true;
 						else
 							return false;
 					} else if (pat.getType() == Pattern.ON_URDIAG) {
 						int diagIndex = getURDiagIndex(pat.getLocations()
 								.get(0));
-						if (diagIndex < 4 || diagIndex > width - 4)
+						if (diagIndex < 4 || diagIndex > diag - 4)
 							return true;
 						else
 							return false;
@@ -946,25 +945,21 @@ public class Board implements Serializable {
 				switch (pat.getType()) {
 				case Pattern.ON_ROW:
 					int rowSubIndex = firstStone.getXPos();
-					if (pat.getLocations().size() == 4 && rowSubIndex == 0)
-						return true;
-					else if (pat.getLocations().size() == 4
-							&& rowSubIndex == width - 4)
+					if (pat.getLocations().size() == 4 && (rowSubIndex == 0 || rowSubIndex == width - 4))
 						return true;
 					break;
 				case Pattern.ON_COL:
+					int colSubIndex = firstStone.getYPos();
+					if (pat.getLocations().size() == 4 && (colSubIndex == 0 || colSubIndex == width - 4))
+						return true;
 					break;
 				case Pattern.ON_ULDIAG:
 					int ULDiagIndex = getULDiagIndex(firstStone);
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
 					if (ULDiag.length <= 5)
 						return true;
-					else if (getULDiagSubIndex(firstStone) == 0) {
-						// the pattern is cornered.
-						if (pat.getLocations().size() == 4)
-							return true;
-					} else if (getULDiagSubIndex(firstStone) == ULDiag.length - 4
-							&& pat.getLocations().size() == 4)
+					if (pat.getLocations().size() == 4 && (getULDiagSubIndex(firstStone) == 0
+							|| getULDiagSubIndex(firstStone) == ULDiag.length - 4))
 						return true;
 					break;
 				case Pattern.ON_URDIAG:
@@ -972,12 +967,8 @@ public class Board implements Serializable {
 					int[] URDiag = getURDiagByIndex(URDiagIndex);
 					if (URDiag.length <= 5)
 						return true;
-					else if (getURDiagSubIndex(firstStone) == 0) {
-						// the pattern is cornered.
-						if (pat.getLocations().size() == 4)
-							return true;
-					} else if (getURDiagSubIndex(firstStone) == URDiag.length - 4
-							&& pat.getLocations().size() == 4)
+					if (pat.getLocations().size() == 4 && (getURDiagSubIndex(firstStone) == 0
+							|| getURDiagSubIndex(firstStone) == URDiag.length - 4))
 						return true;
 					break;
 				default:
@@ -992,27 +983,12 @@ public class Board implements Serializable {
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
 					if (ULDiag.length < 5)
 						return true;
-					if (pat.getLocations().size() == 4 && (getULDiagSubIndex(firstStone) == 0
-							|| getULDiagSubIndex(firstStone) == ULDiag.length - 4))
-						return true;
 				} else if (pat.getType() == Pattern.ON_URDIAG) {
 					int URDiagIndex = getURDiagIndex(firstStone);
 					int[] URDiag = getURDiagByIndex(URDiagIndex);
 					if (URDiag.length < 5)
 						return true;
-					if (pat.getLocations().size() == 4 && (getURDiagSubIndex(firstStone) == 0
-							|| getURDiagSubIndex(firstStone) == URDiag.length - 4))
-						return true;
-				} else if (pat.getType() == Pattern.ON_COL) {
-					if (pat.getLocations().size() == 4 && (firstStone.getYPos() == 0 ||
-							firstStone.getYPos() == height - 4))
-						return true;
-				} else {
-					if (pat.getLocations().size() == 4 && (firstStone.getXPos() == 0 ||
-							firstStone.getXPos() == width - 4))
-						return true;
 				}
-				return false;
 			} else if (pat.getClass().equals(algorithm.DiscClosedPattern.class)) {
 				return false;
 			}

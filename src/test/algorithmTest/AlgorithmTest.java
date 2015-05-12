@@ -77,7 +77,7 @@ public class AlgorithmTest {
 				2, board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
 		testVal = alg.extendToWinning(test);
 		assertTrue(testVal != null);
-		assertTrue(testVal.equals(new BoardLocation(4,4)));
+		assertTrue(testVal.equals(new BoardLocation(4, 4)));
 	}
 
 	@Test
@@ -103,8 +103,7 @@ public class AlgorithmTest {
 		bd.updateBoard(new BoardLocation(13,12), true);
 		bd.updateBoard(new BoardLocation(12,12), true);
 		bd.updateBoard(new BoardLocation(11,12), false);
-		bd.renderBoard(2);
 		ArrayList<Pattern> toFilter = BoardChecker.checkAllPatterns(bd, true);
-		assertEquals(toFilter.size(), 1);
+		assertEquals(toFilter.size(), 0);
 	}
 }

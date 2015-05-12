@@ -290,6 +290,54 @@ public class BoardTest {
 		test = new ContClosedPattern(locations, Pattern.ON_COL,
 				blocked, new ArrayList<BoardLocation>());
 		assertTrue(bd.isPatternDead(test, true));
+		locations.clear();
+		bd.reset();
+		locations.add(new BoardLocation(12,15));
+		locations.add(new BoardLocation(12,14));
+		locations.add(new BoardLocation(12,13));
+		locations.add(new BoardLocation(12,12));
+		bd.updateBoard(new BoardLocation(12,15), true);
+		bd.updateBoard(new BoardLocation(12,14), true);
+		bd.updateBoard(new BoardLocation(12,13), true);
+		bd.updateBoard(new BoardLocation(12,12), true);
+		bd.updateBoard(new BoardLocation(12,11), false);
+		blocked.clear();
+		blocked.add(new BoardLocation(12,11));
+		test = new ContClosedPattern(locations, Pattern.ON_ROW,
+				blocked, new ArrayList<BoardLocation>());
+		assertTrue(bd.isPatternDead(test, true));
+		locations.clear();
+		bd.reset();
+		locations.add(new BoardLocation(7,15));
+		locations.add(new BoardLocation(6,14));
+		locations.add(new BoardLocation(5,13));
+		locations.add(new BoardLocation(4,12));
+		bd.updateBoard(new BoardLocation(7,15), true);
+		bd.updateBoard(new BoardLocation(6,14), true);
+		bd.updateBoard(new BoardLocation(5,13), true);
+		bd.updateBoard(new BoardLocation(4,12), true);
+		bd.updateBoard(new BoardLocation(3,11), false);
+		blocked.clear();
+		blocked.add(new BoardLocation(3,11));
+		test = new ContClosedPattern(locations, Pattern.ON_ULDIAG,
+				blocked, new ArrayList<BoardLocation>());
+		assertTrue(bd.isPatternDead(test, true));
+		locations.clear();
+		bd.reset();
+		locations.add(new BoardLocation(9,15));
+		locations.add(new BoardLocation(10,14));
+		locations.add(new BoardLocation(11,13));
+		locations.add(new BoardLocation(12,12));
+		bd.updateBoard(new BoardLocation(9,15), true);
+		bd.updateBoard(new BoardLocation(10,14), true);
+		bd.updateBoard(new BoardLocation(11,13), true);
+		bd.updateBoard(new BoardLocation(12,12), true);
+		bd.updateBoard(new BoardLocation(13,11), false);
+		blocked.clear();
+		blocked.add(new BoardLocation(13,11));
+		test = new ContClosedPattern(locations, Pattern.ON_URDIAG,
+				blocked, new ArrayList<BoardLocation>());
+		assertTrue(bd.isPatternDead(test, true));
 	}
 
 	@Test
