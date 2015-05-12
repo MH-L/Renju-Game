@@ -708,8 +708,8 @@ public class Board implements Serializable {
 			secondPlayerChar = 'O';
 			emptyLocChar = '-';
 		} else {
-			firstPlayerChar = '\u25CF';
-			secondPlayerChar = '\u25CB';
+			firstPlayerChar = '\u263B';
+			secondPlayerChar = '\u263A';
 			emptyLocChar = '\u25A1';
 		}
 

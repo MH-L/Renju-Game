@@ -105,6 +105,32 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> relevantLocs = extractAllAdjacentLocs();
 		for (BoardLocation loc : relevantLocs) {
 			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+			try {
+				vBoard.updateBoard(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+
+			for (BoardLocation test : relevantLocs) {
+				if (test.equals(loc))
+					continue;
+				try {
+					vBoard.updateBoard(test, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				try {
+					vBoard.withdrawMove(test);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
 		}
 		return null;
 		//

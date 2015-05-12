@@ -225,7 +225,7 @@ public abstract class Algorithm {
 
 	public BoardLocation makeMoveEnd() {
 		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
-		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns);
+		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
 		for (Pattern pat : selfPatterns) {
@@ -233,7 +233,7 @@ public abstract class Algorithm {
 				return findWinningLoc(pat);
 		}
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
-		ArrayList<Pattern> urgents = filterUrgentPats(patterns);
+		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
@@ -390,11 +390,12 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
-	public static ArrayList<Pattern> filterUrgentPats(
-			ArrayList<Pattern> patterns) {
+	public ArrayList<Pattern> filterUrgentPats(
+			ArrayList<Pattern> patterns, boolean isSelf) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		boolean checker = isSelf ? isFirst : !isFirst;
 		for (Pattern pat : patterns) {
-			if (pat.getLocations().size() == 4)
+			if (pat.getLocations().size() == 4 && !board.isPatternDead(pat, checker))
 				retVal.add(pat);
 		}
 		return retVal;
@@ -507,6 +508,15 @@ public abstract class Algorithm {
 			}
 		}
 		return retVal;
+	}
+
+	public void filterOutDeadPats(ArrayList<Pattern> toFilter, boolean isSelf) {
+		boolean checker = isSelf ? isFirst : !isFirst;
+		Iterator<Pattern> iter = toFilter.iterator();
+		while (iter.hasNext()) {
+			if (board.isPatternDead(iter.next(), checker))
+				iter.remove();
+		}
 	}
 
 }

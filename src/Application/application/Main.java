@@ -84,10 +84,6 @@ public class Main {
 			}
 		}
 		if (isWinning()) {
-			// get inactive player because the current player was toggled at the
-			// end of the round
-			// if (game.getBoard().getTotalStones() <= 8)
-			// System.err.println("Fuck! This is not even possible!");
 			System.out.println("Player " + getInactivePlayerAsString()
 					+ ", You won!");
 		} else if (boardFull()) {
