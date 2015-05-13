@@ -13,4 +13,8 @@ public class DiscOpenPattern extends Pattern {
 		this.bubbleIndex = bubbleIndex;
 	}
 
+	public int getBubbleIndex() {
+		return this.bubbleIndex;
+	}
+
 }

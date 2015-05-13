@@ -249,9 +249,9 @@ public class Main {
 			try{
 				selection = Integer.parseInt(reader.next());
 				if (selection < 1 || selection > Difficulty.values().length)
-					System.err.println("Invalid option. Please try again");
+					System.err.println("Invalid option. Please try again.");
 			} catch (NumberFormatException e) {
-				System.err.println("Invalid option. Please try again");
+				System.err.println("Invalid option. Please try again.");
 			}
 		}
 		return Difficulty.values()[selection-1];

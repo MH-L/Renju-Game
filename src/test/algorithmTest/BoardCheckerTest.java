@@ -11,8 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import exceptions.InvalidIndexException;
+import algorithm.Algorithm;
 import algorithm.BoardChecker;
 import algorithm.ContOpenPattern;
+import algorithm.DiscOpenPattern;
 import algorithm.Pattern;
 
 public class BoardCheckerTest {
@@ -335,5 +337,30 @@ public class BoardCheckerTest {
 		assertTrue(BoardChecker.isOpenPatInControl(board, checker, true));
 		board.withdrawMove(new BoardLocation(4, 9));
 		assertFalse(BoardChecker.isOpenPatInControl(board, checker, true));
+	}
+
+	@Test
+	public void testKeepOnlyBubble() {
+		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
+		locations.add(new BoardLocation(2,3));
+		locations.add(new BoardLocation(3,4));
+		locations.add(new BoardLocation(5,6));
+		DiscOpenPattern testPattern = new DiscOpenPattern(locations, Pattern.ON_ULDIAG,
+				2, board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
+		ArrayList<Pattern> inputs = new ArrayList<Pattern>();
+		inputs.add(testPattern);
+		ArrayList<BoardLocation> retVal = Algorithm.keepOnlyBubble(inputs);
+		assertEquals(retVal.size(), 1);
+		assertEquals(retVal.get(0), new BoardLocation(4,5));
+		ArrayList<BoardLocation> locations2 = new ArrayList<BoardLocation>();
+		locations2.add(new BoardLocation(7,8));
+		locations2.add(new BoardLocation(8,9));
+		locations2.add(new BoardLocation(9,10));
+		ContOpenPattern test2 = new ContOpenPattern(locations, Pattern.ON_ULDIAG,
+				board.findBlockingLocs(locations, Pattern.ON_ULDIAG));
+		inputs.add(test2);
+		retVal = Algorithm.keepOnlyBubble(inputs);
+		assertEquals(retVal.size(), 3);
+		assertTrue(retVal.contains(new BoardLocation(6,7)));
 	}
 }

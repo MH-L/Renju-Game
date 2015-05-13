@@ -253,14 +253,59 @@ public abstract class Algorithm {
 				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
 				return blockAttack;
 			}
-			return tofilter.get(0);
+			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
+			return filtered.get(0);
 		}
 		ArrayList<BoardLocation> locations = calculateAttack();
 		locations.addAll(blockPotentialCompositePat());
 		return processLocs(locations);
 	}
 
-	private BoardLocation findWinningLoc(Pattern pat) {
+	public static ArrayList<BoardLocation> keepOnlyBubble(ArrayList<Pattern> patterns) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (Pattern pat : patterns) {
+			ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+			ArrayList<BoardLocation> constituents = pat.getBlockingLocs();
+			if (pat.getClass() != DiscOpenPattern.class) {
+				for (BoardLocation loc : constituents) {
+					if (!retVal.contains(loc))
+						retVal.add(loc);
+				}
+			} else {
+				int firstIncrement = 0;
+				int secondIncrement = 0;
+				switch (pat.getType()) {
+				case Pattern.ON_COL:
+					firstIncrement = 1;
+					secondIncrement = 0;
+					break;
+				case Pattern.ON_ROW:
+					firstIncrement = 0;
+					secondIncrement = 1;
+					break;
+				case Pattern.ON_ULDIAG:
+					firstIncrement = 1;
+					secondIncrement = 1;
+					break;
+				case Pattern.ON_URDIAG:
+					firstIncrement = 1;
+					secondIncrement = -1;
+					break;
+				}
+				BoardLocation firstStone = pat.findFirstStone();
+				for (BoardLocation location : constituents) {
+					int xInc = location.getXPos() - firstStone.getXPos();
+					int yInc = location.getYPos() - firstStone.getYPos();
+					if (xInc == ((DiscOpenPattern) pat).getBubbleIndex() * secondIncrement
+							&& yInc == ((DiscOpenPattern) pat).getBubbleIndex() * firstIncrement)
+						retVal.add(location);
+				}
+			}
+		}
+		return retVal;
+	}
+
+	public BoardLocation findWinningLoc(Pattern pat) {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		ArrayList<BoardLocation> locations = pat.getLocations();
 		int firstInc = 0;
@@ -503,10 +548,6 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
-	public ArrayList<BoardLocation> blockPotentialCompositePat() {
-		return new ArrayList<BoardLocation>();
-	}
-
 	public ArrayList<BoardLocation> extractAllAdjacentLocs() {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> selfStones = getSelfStone();
@@ -522,6 +563,10 @@ public abstract class Algorithm {
 			}
 		}
 		return retVal;
+	}
+
+	public ArrayList<BoardLocation> blockPotentialCompositePat() {
+		return new ArrayList<BoardLocation>();
 	}
 
 }

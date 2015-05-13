@@ -14,4 +14,8 @@ public class DiscClosedPattern extends ClosedPattern {
 		this.bubbleIndex = bubbleIndex;
 	}
 
+	public int getBubbleIndex() {
+		return bubbleIndex;
+	}
+
 }
