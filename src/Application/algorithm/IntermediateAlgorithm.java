@@ -99,9 +99,13 @@ public class IntermediateAlgorithm extends Algorithm {
 	}
 
 	public ArrayList<BoardLocation> intermediateAttack() {
+		// Check this function since its logic is complicated
 		ArrayList<BoardLocation> composites = compositePatAtk();
+		// If it can form composite patterns, then return such locations.
 		if (!composites.isEmpty())
 			return composites;
+		// Otherwise, try other methods.
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> relevantLocs = extractAllAdjacentLocs();
 		for (BoardLocation loc : relevantLocs) {
 			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
@@ -110,15 +114,33 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
+			// newRelLocs stores all relevant locations after updating loc
+			// Duplicate removal is necessary since that will greatly
+			// reduce runtime
+			ArrayList<BoardLocation> newRelLocs = new ArrayList<BoardLocation>();
+			newRelLocs.addAll(relevantLocs);
+			ArrayList<BoardLocation> newCandidates = Board.findAdjacentLocs(loc);
+			newCandidates.addAll(Board.findJumpLocations(loc));
+			for (BoardLocation loc2 : newCandidates) {
+				if (!newRelLocs.contains(loc2))
+					newRelLocs.add(loc2);
+			}
+			newRelLocs.remove(loc); // needs to remove loc since it is still in there
+			// this line of code may not be robust (but saves time)
+			ArrayList<BoardLocation> possibleLocs = new ArrayList<BoardLocation>();
 
-			for (BoardLocation test : relevantLocs) {
-				if (test.equals(loc))
-					continue;
+			for (BoardLocation test : newRelLocs) {
 				try {
 					vBoard.updateBoard(test, isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
+
+				ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+				ArrayList<CompositePattern> allComposites = CompositePattern.makeCompositePats(allPatterns);
+				if (!allComposites.isEmpty())
+					possibleLocs.add(test);
+
 				try {
 					vBoard.withdrawMove(test);
 				} catch (InvalidIndexException e) {
@@ -126,14 +148,17 @@ public class IntermediateAlgorithm extends Algorithm {
 				}
 			}
 
+			if (possibleLocs.size() >= 2)
+				retVal.add(loc);
+
 			try {
 				vBoard.withdrawMove(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
 		}
-		return null;
-		//
+		return retVal;
+		// Something needs to be done here!
 	}
 
 	@Override
