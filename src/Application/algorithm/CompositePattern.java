@@ -1,6 +1,7 @@
 package algorithm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class CompositePattern {
 	private ArrayList<Pattern> patterns;
@@ -38,6 +39,14 @@ public class CompositePattern {
 			curList.clear();
 		}
 		return Cpatterns;
+	}
+
+	public static void filterUrgentComposites(ArrayList<CompositePattern> composites) {
+		Iterator<CompositePattern> iter = composites.iterator();
+		while (iter.hasNext()) {
+			if (!iter.next().isUrgent)
+				iter.remove();
+		}
 	}
 
 	public boolean isUrgent() {

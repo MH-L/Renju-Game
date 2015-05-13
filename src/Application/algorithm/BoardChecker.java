@@ -585,8 +585,7 @@ public class BoardChecker {
 				boolean predicate = false;
 				if (count == num) {
 					if (i == array.length - 1) {
-						if (prev2 != checker)
-							predicate = true;
+						predicate = true;
 					} else if (i == array.length - 2) {
 						if (array[i + 1] == Board.EMPTY_SPOT)
 							predicate = true;
@@ -747,6 +746,15 @@ public class BoardChecker {
 			break;
 		}
 		return false;
+	}
+
+	public static ArrayList<Pattern> checkAllContPatterns(Board board, boolean isFirst) {
+		ArrayList<Pattern> retVal = checkBoardClosedPatCont(board, isFirst, 4);
+		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 5));
+		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 6));
+		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 3));
+		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 4));
+		return retVal;
 	}
 
 }

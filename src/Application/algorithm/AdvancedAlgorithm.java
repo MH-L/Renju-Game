@@ -8,9 +8,11 @@ import model.VirtualBoard;
 
 public class AdvancedAlgorithm extends Algorithm {
 	public static final int calculationSteps = 5;
+	BoardTree tree;
 
 	public AdvancedAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
+		tree = new BoardTree(getBoard());
 		// TODO Auto-generated constructor stub
 	}
 

@@ -91,6 +91,31 @@ public class BoardCheckerTest {
 						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
 						true, 4, board).size(), 0);
 		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
+		board.reset();
+		board.updateBoard(new BoardLocation(3,10), true);
+		board.updateBoard(new BoardLocation(2,10), true);
+		board.updateBoard(new BoardLocation(1,10), true);
+		board.updateBoard(new BoardLocation(0,10), true);
+		board.updateBoard(new BoardLocation(5,10), false);
+		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 1);
+		board.reset();
+		board.updateBoard(new BoardLocation(14,0), true);
+		board.updateBoard(new BoardLocation(13,1), true);
+		board.updateBoard(new BoardLocation(12,2), true);
+		board.updateBoard(new BoardLocation(11,3), true);
+		board.updateBoard(new BoardLocation(9,5), false);
+		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 1);
+		board.withdrawMove(new BoardLocation(11,3));
+		board.withdrawMove(new BoardLocation(9,5));
+		board.updateBoard(new BoardLocation(10,4), true);
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 3).size(), 0);
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 0);
+		board.updateBoard(new BoardLocation(11,3), true);
+		board.withdrawMove(new BoardLocation(13,1));
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 3).size(), 0);
+		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 0);
 	}
 
 	@Test

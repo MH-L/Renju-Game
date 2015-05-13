@@ -1,6 +1,7 @@
 package algorithm;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import exceptions.InvalidIndexException;
 import utils.DeepCopy;
@@ -105,7 +106,10 @@ public class IntermediateAlgorithm extends Algorithm {
 		if (!composites.isEmpty())
 			return composites;
 		// Otherwise, try other methods.
+		ArrayList<BoardLocation> bestRetVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> betterAlt = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> alternative = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> relevantLocs = extractAllAdjacentLocs();
 		for (BoardLocation loc : relevantLocs) {
 			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
@@ -128,6 +132,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			newRelLocs.remove(loc); // needs to remove loc since it is still in there
 			// this line of code may not be robust (but saves time)
 			ArrayList<BoardLocation> possibleLocs = new ArrayList<BoardLocation>();
+			ArrayList<BoardLocation> bestLocs = new ArrayList<BoardLocation>();
 
 			for (BoardLocation test : newRelLocs) {
 				try {
@@ -138,8 +143,12 @@ public class IntermediateAlgorithm extends Algorithm {
 
 				ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
 				ArrayList<CompositePattern> allComposites = CompositePattern.makeCompositePats(allPatterns);
+
 				if (!allComposites.isEmpty())
 					possibleLocs.add(test);
+				CompositePattern.filterUrgentComposites(allComposites);
+				if (!allComposites.isEmpty())
+					bestLocs.add(test);
 
 				try {
 					vBoard.withdrawMove(test);
@@ -148,6 +157,12 @@ public class IntermediateAlgorithm extends Algorithm {
 				}
 			}
 
+			if (bestLocs.size() >= 2)
+				bestRetVal.add(loc);
+			if (bestLocs.size() >= 1)
+				betterAlt.add(loc);
+			if (possibleLocs.size() >= 1)
+				alternative.add(loc);
 			if (possibleLocs.size() >= 2)
 				retVal.add(loc);
 
@@ -157,15 +172,68 @@ public class IntermediateAlgorithm extends Algorithm {
 				continue;
 			}
 		}
-		return retVal;
-		// Something needs to be done here!
+		if (!bestRetVal.isEmpty())
+			return bestRetVal;
+		else if (!retVal.isEmpty())
+			return retVal;
+		else if (!betterAlt.isEmpty())
+			return betterAlt;
+		else
+			return alternative;
 	}
 
 	@Override
 	public ArrayList<BoardLocation> calculateAttack() {
 		ArrayList<BoardLocation> composites = intermediateAttack();
-		if (composites.isEmpty())
-			return super.calculateAttack();
-		return composites;
+		if (!composites.isEmpty())
+			return composites;
+		ArrayList<BoardLocation> previousStones = isFirst ? getBoard()
+				.getPlayer1Stone() : getBoard().getPlayer2Stone();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		for (BoardLocation stone : previousStones) {
+			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
+			for (BoardLocation loc : curCandidates) {
+				if (!candidates.contains(loc) && Board.isReachable(loc)
+						&& !getBoard().isOccupied(loc))
+					candidates.add(loc);
+			}
+			curCandidates.clear();
+		}
+		Board anotherBoard = (Board) DeepCopy.copy(getBoard());
+		this.vBoard = VirtualBoard.getVBoard(anotherBoard);
+		Iterator<BoardLocation> iter = candidates.iterator();
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> candidateRetVal = new ArrayList<BoardLocation>();
+		while (iter.hasNext()) {
+			BoardLocation adjacentLoc = iter.next();
+			try {
+				vBoard.updateBoard(adjacentLoc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patterns = BoardChecker.checkAllContPatterns(vBoard, isFirst);
+			ArrayList<Pattern> candidatePats = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			for (Pattern pat : patterns)
+				if (getBoard().isPatternWinning(pat)) {
+					retVal.clear();
+					retVal.add(adjacentLoc);
+					return retVal;
+				}
+			if (candidatePats.size() != 0)
+				candidateRetVal.add(adjacentLoc);
+			if (patterns.size() != 0)
+				retVal.add(adjacentLoc);
+			try {
+				vBoard.withdrawMove(adjacentLoc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+
+		if (retVal.isEmpty()) {
+			return candidateRetVal;
+		}
+		return retVal;
 	}
+
 }

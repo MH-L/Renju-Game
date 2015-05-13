@@ -186,13 +186,19 @@ public abstract class Pattern {
 	}
 
 	public static void removeDuplicates(ArrayList<Pattern> patterns) {
-		Iterator<Pattern> iter = patterns.iterator();
-		while (iter.hasNext()) {
-			Pattern pat = iter.next();
-			if (Collections.frequency(patterns, pat) > 1) {
-				patterns.remove(pat);
-			}
+//		Iterator<Pattern> iter = patterns.iterator();
+//		while (iter.hasNext()) {
+//			Pattern pat = iter.next();
+//			if (Collections.frequency(patterns, pat) > 1) {
+//				patterns.remove(pat);
+//			}
+//		}
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		for (Pattern pat : patterns) {
+			if (!retVal.contains(pat))
+				retVal.add(pat);
 		}
+		patterns = retVal;
 	}
 
 	public BoardLocation findFirstStone() {

@@ -27,9 +27,8 @@ public abstract class Algorithm {
 				.getPlayer1Stone() : board.getPlayer2Stone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		for (BoardLocation stone : previousStones) {
-			ArrayList<BoardLocation> curCandidates = Board
-					.findAdjacentLocs(stone);
-			curCandidates.addAll(Board.findJumpLocations(stone));
+			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
+//			curCandidates.addAll(Board.findJumpLocations(stone));
 			for (BoardLocation loc : curCandidates) {
 				if (!candidates.contains(loc) && Board.isReachable(loc)
 						&& !board.isOccupied(loc))

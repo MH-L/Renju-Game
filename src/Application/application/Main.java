@@ -76,7 +76,7 @@ public class Main {
 			try {
 				game.makeMove();
 				game.getBoard().renderBoard(dispMode);
-				Thread.sleep(10);
+				Thread.sleep(1000);
 			} catch (InvalidIndexException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
