@@ -84,7 +84,7 @@ public abstract class Algorithm {
 			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
 					!isFirst);
 			for (Pattern pat : patterns) {
-				if (board.isPatternWinning(pat))
+				if (vBoard.isPatternWinning(pat))
 					return location;
 			}
 			try {

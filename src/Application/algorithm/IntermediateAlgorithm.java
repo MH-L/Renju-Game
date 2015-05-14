@@ -10,6 +10,7 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
+	private boolean isIntermediateAvailable = false;
 
 	public IntermediateAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
@@ -25,10 +26,24 @@ public class IntermediateAlgorithm extends Algorithm {
 	public BoardLocation findBestLocWhenStuck() {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		ArrayList<BoardLocation> applicableLocs = Algorithm.findFlexibleLocs(getSelfStone(), getBoard());
-		for (BoardLocation loc : applicableLocs) {
-
+		if (applicableLocs.isEmpty())
+			return null;
+		int maxIndex = 0;
+		int maxSubs = -1;
+		for (int i = 0; i < applicableLocs.size(); i++) {
+			BoardLocation loc = applicableLocs.get(i);
+			try {
+				vBoard.updateBoard(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> allSubs = BoardChecker.checkAllSubPatterns(vBoard, isFirst);
+			if (allSubs.size() > maxSubs) {
+				maxIndex = i;
+				maxSubs = allSubs.size();
+			}
 		}
-		return null;
+		return applicableLocs.get(maxIndex);
 	}
 
 	public VirtualBoard getVirtualBoard() {
@@ -178,20 +193,28 @@ public class IntermediateAlgorithm extends Algorithm {
 				continue;
 			}
 		}
-		if (!bestRetVal.isEmpty())
+		if (!bestRetVal.isEmpty()) {
+			isIntermediateAvailable = true;
 			return bestRetVal;
-		else if (!retVal.isEmpty())
+		}
+		else if (!retVal.isEmpty()) {
+			isIntermediateAvailable = true;
 			return retVal;
-		else if (!betterAlt.isEmpty())
+		}
+		else if (!betterAlt.isEmpty()) {
+			isIntermediateAvailable = false;
 			return betterAlt;
-		else
+		}
+		else {
+			isIntermediateAvailable = false;
 			return alternative;
+		}
 	}
 
 	@Override
 	public ArrayList<BoardLocation> calculateAttack() {
 		ArrayList<BoardLocation> composites = intermediateAttack();
-		if (!composites.isEmpty())
+		if (!composites.isEmpty() && isIntermediateAvailable)
 			return composites;
 		ArrayList<BoardLocation> previousStones = isFirst ? getBoard()
 				.getPlayer1Stone() : getBoard().getPlayer2Stone();
@@ -237,8 +260,50 @@ public class IntermediateAlgorithm extends Algorithm {
 		}
 
 		if (retVal.isEmpty()) {
-			return candidateRetVal;
+			if (candidateRetVal.isEmpty())
+				return composites;
+			else
+				return candidateRetVal;
 		}
+		return retVal;
+	}
+
+	@Override
+	public BoardLocation makeMoveEnd() {
+		BoardLocation result = doFundamentalCheck();
+		if (result != null)
+			return result;
+		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
+		if (blockingComps.size() != 0)
+			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
+		ArrayList<BoardLocation> locations = calculateAttack();
+		return processLocs(locations);
+	}
+
+	@Override
+	public BoardLocation processLocs(ArrayList<BoardLocation> locations) {
+		if (locations.isEmpty())
+			return findBestLocWhenStuck();
+		this.vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		for (BoardLocation location : locations) {
+			try {
+				vBoard.updateBoard(location, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
+					!isFirst);
+			for (Pattern pat : patterns) {
+				if (vBoard.isPatternWinning(pat))
+					return location;
+			}
+			try {
+				vBoard.withdrawMove(location);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
 		return retVal;
 	}
 
