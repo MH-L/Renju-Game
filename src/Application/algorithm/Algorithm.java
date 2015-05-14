@@ -81,8 +81,7 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
-					!isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
 			for (Pattern pat : patterns) {
 				if (vBoard.isPatternWinning(pat))
 					return location;
@@ -265,9 +264,9 @@ public abstract class Algorithm {
 		}
 		if (patterns.size() != 0) {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (result.size() != 0) {
-				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
+//			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (tofilter.size() != 0) {
+				BoardLocation blockAttack = tofilter.get(getRandNum(tofilter.size()) - 1);
 				return blockAttack;
 			}
 			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
@@ -438,7 +437,12 @@ public abstract class Algorithm {
 			ArrayList<Pattern> pats = BoardChecker.checkAllPatterns(vBoard,
 					isFirst);
 			if (pats.size() > prevSize) {
-				retVal.add(blockingloc);
+				try {
+					vBoard.withdrawMove(blockingloc);
+					retVal.add(blockingloc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
 				continue;
 			}
 			for (Pattern patt : pats) {

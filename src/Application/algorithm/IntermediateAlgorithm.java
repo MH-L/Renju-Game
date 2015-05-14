@@ -112,7 +112,6 @@ public class IntermediateAlgorithm extends Algorithm {
 	}
 
 	public boolean checkOtherCompositeAtk(VirtualBoard vBoard) {
-		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
 		for (BoardLocation loc : candidates) {
@@ -339,7 +338,10 @@ public class IntermediateAlgorithm extends Algorithm {
 		if (result != null)
 			return result;
 		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
-		if (blockingComps.size() != 0)
+		ArrayList<BoardLocation> filtered = filterBlockingLocsAtk(blockingComps);
+		if (filtered.size() != 0)
+			return filtered.get(getRandNum(filtered.size()) - 1);
+		else if (blockingComps.size() != 0)
 			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
 		ArrayList<BoardLocation> locations = calculateAttack();
 		return processLocs(locations);
@@ -350,14 +352,21 @@ public class IntermediateAlgorithm extends Algorithm {
 		if (locations.isEmpty())
 			return findBestLocWhenStuck();
 		this.vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
-		for (BoardLocation location : locations) {
+		int maxIndex = 0;
+		int maxSize = -1;
+		for (int i = 0; i < locations.size(); i++) {
+			BoardLocation location = locations.get(i);
 			try {
 				vBoard.updateBoard(location, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
-					!isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<Pattern> subPatterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			if (subPatterns.size() > maxSize) {
+				maxIndex = i;
+				maxSize = subPatterns.size();
+			}
 			for (Pattern pat : patterns) {
 				if (vBoard.isPatternWinning(pat))
 					return location;
@@ -368,8 +377,46 @@ public class IntermediateAlgorithm extends Algorithm {
 				continue;
 			}
 		}
-		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
-		return retVal;
+//		BoardLocation retVal = locations.get(getRandNum(locations.size()) - 1);
+		return locations.get(maxIndex);
+	}
+
+	@Override
+	public BoardLocation doFundamentalCheck() {
+		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(getBoard(), isFirst);
+		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
+		if (excellents.size() != 0)
+			return findWinningLoc(excellents.get(0));
+		for (Pattern pat : selfPatterns) {
+			if (getBoard().isPatternWinning(pat))
+				return findWinningLoc(pat);
+		}
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
+		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
+		if (urgents.size() != 0) {
+			ArrayList<BoardLocation> result = extractBlockingLocs(urgents);
+			if (result.size() != 0)
+				return result.get(0);
+		}
+		// No urgent patterns.
+		if (selfPatterns.size() != 0) {
+			for (Pattern pat : selfPatterns) {
+				BoardLocation retLoc = extendToWinning(pat);
+				if (retLoc != null)
+					return retLoc;
+			}
+		}
+		if (patterns.size() != 0) {
+			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
+				return blockAttack;
+			}
+			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
+			return filtered.get(0);
+		}
+		return null;
 	}
 
 }

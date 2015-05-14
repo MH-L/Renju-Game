@@ -47,7 +47,7 @@ public class MainTest {
 			writer.println("The first line");
 			writer.println("The second line");
 
-			for (int i = 0; i < 1000; i++) {
+			for (int i = 0; i < 1200; i++) {
 				logger = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Logs.txt", "UTF-8");
 				logger.println("The current iteration count is " + i);
 				logger.println("The current stats is:");
@@ -57,7 +57,7 @@ public class MainTest {
 				logger.println("Total moves count: " + totalMove);
 				logger.println("Please wait with patience.");
 				logger.close();
-				game = new AiVersusAi(Game.Difficulty.INTERMEDIATE,
+				game = new AiVersusAi(Game.Difficulty.NOVICE,
 						Game.Difficulty.INTERMEDIATE);
 				while (!isWinning() && !boardFull()) {
 					try {

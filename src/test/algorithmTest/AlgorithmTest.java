@@ -124,6 +124,22 @@ public class AlgorithmTest {
 		ArrayList<BoardLocation> result = alg.filterBlockingLocsAtk(blockingLocs);
 		assertEquals(result.size(), 1);
 		assertEquals(result.get(0), new BoardLocation(9,12));
+		bd.reset();
+		bd.updateBoard(new BoardLocation(10,10), false);
+		bd.updateBoard(new BoardLocation(11,10), false);
+		bd.updateBoard(new BoardLocation(13,10), false);
+		bd.updateBoard(new BoardLocation(12,11), true);
+		bd.updateBoard(new BoardLocation(12,9), true);
+		ArrayList<Pattern> whitePatterns =
+				BoardChecker.checkAllPatterns(bd, false);
+		assertEquals(whitePatterns.size(), 1);
+		blockingLocs.clear();
+		blockingLocs.add(new BoardLocation(12,10));
+		blockingLocs.add(new BoardLocation(9,10));
+		blockingLocs.add(new BoardLocation(14,10));
+		result = alg.filterBlockingLocsAtk(blockingLocs);
+		assertEquals(result.size(), 1);
+		assertTrue(result.contains(new BoardLocation(12,10)));
 	}
 
 	@Test
