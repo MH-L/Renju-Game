@@ -220,6 +220,7 @@ public class BoardChecker {
 				temp.add(array[i + j]);
 			if (prev != Board.EMPTY_SPOT) {
 				prev = array[i];
+				temp.clear();
 				continue;
 			}
 			int playerFreq = Collections.frequency(temp, checker);

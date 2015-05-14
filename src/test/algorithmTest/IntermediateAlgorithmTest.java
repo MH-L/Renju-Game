@@ -6,10 +6,12 @@ import java.util.ArrayList;
 
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import utils.DeepCopy;
 import exceptions.InvalidIndexException;
 import algorithm.IntermediateAlgorithm;
 
@@ -76,6 +78,89 @@ public class IntermediateAlgorithmTest {
 		assertEquals(toTest.getXPos(), 12);
 		assertEquals(toTest.getYPos(), 12);
 		secondGameBoard.reset();
+		secondGameBoard.updateBoard(new BoardLocation(1,1), true);
+		secondGameBoard.updateBoard(new BoardLocation(2,2), true);
+		secondGameBoard.updateBoard(new BoardLocation(4,5), true);
+		secondGameBoard.updateBoard(new BoardLocation(0,0), false);
+		secondGameBoard.updateBoard(new BoardLocation(5,6), false);
+		ArrayList<BoardLocation> retVal2 = ai.blockPotentialCompositePat();
+		assertTrue(retVal2.isEmpty());
+		// Use real situation encountered when playing
+		// AI versus AI.
+		firstGameBoard.reset();
+		firstGameBoard.updateBoard(new BoardLocation(3,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(4,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(5,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(6,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(7,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,6), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,3), true);
+		firstGameBoard.updateBoard(new BoardLocation(8,7), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(9,5), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,6), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,2), true);
+		firstGameBoard.updateBoard(new BoardLocation(10,3), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,1), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,4), true);
+		firstGameBoard.renderBoard(2);
+		retVal = firstAi.blockPotentialCompositePat();
+		assertFalse(retVal.isEmpty());
+		assertEquals(retVal.size(), 2);
+	}
+
+	@Test
+	public void testCheckOtherPossibleCompositeAtk() throws InvalidIndexException {
+		firstGameBoard.reset();
+		firstGameBoard.updateBoard(new BoardLocation(3,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(4,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(5,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(6,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(7,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,6), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,3), true);
+		firstGameBoard.updateBoard(new BoardLocation(8,7), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(9,5), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,6), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,2), true);
+		firstGameBoard.updateBoard(new BoardLocation(10,3), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,1), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,4), true);
+		assertTrue(firstAi.checkOtherCompositeAtk(VirtualBoard.getVBoard((Board) DeepCopy.copy(firstGameBoard))));
+	}
+
+	@Test
+	public void testFindBestLocWhenStuck() throws InvalidIndexException {
+		firstGameBoard.reset();
+		firstGameBoard.updateBoard(new BoardLocation(4,4), true);
+		firstGameBoard.updateBoard(new BoardLocation(3,5), true);
+		firstGameBoard.updateBoard(new BoardLocation(2,6), true);
+		firstGameBoard.updateBoard(new BoardLocation(1,7), false);
+		firstGameBoard.updateBoard(new BoardLocation(5,3), false);
+		firstGameBoard.updateBoard(new BoardLocation(3,4), false);
+		firstGameBoard.renderBoard(2);
+		BoardLocation result = firstAi.findBestLocWhenStuck();
+		assertTrue(result != null);
+		assertEquals(result, new BoardLocation(4,6));
 	}
 
 }

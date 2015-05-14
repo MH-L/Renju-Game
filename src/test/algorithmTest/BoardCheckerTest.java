@@ -297,6 +297,36 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(5,4), false);
 		patterns = BoardChecker.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 0);
+		Board firstGameBoard = new Board();
+		firstGameBoard.updateBoard(new BoardLocation(3,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(4,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(5,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(5,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(6,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(7,9), false);
+		firstGameBoard.updateBoard(new BoardLocation(7,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,6), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,3), true);
+		firstGameBoard.updateBoard(new BoardLocation(8,7), false);
+		firstGameBoard.updateBoard(new BoardLocation(8,8), false);
+		firstGameBoard.updateBoard(new BoardLocation(9,5), true);
+		firstGameBoard.updateBoard(new BoardLocation(9,6), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,2), true);
+		firstGameBoard.updateBoard(new BoardLocation(10,3), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,4), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,5), false);
+		firstGameBoard.updateBoard(new BoardLocation(10,8), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,1), true);
+		firstGameBoard.updateBoard(new BoardLocation(11,4), true);
+		firstGameBoard.updateBoard(new BoardLocation(10,6), false);
+		firstGameBoard.updateBoard(new BoardLocation(5,11), true);
+		firstGameBoard.renderBoard(2);
+//		assertEquals(BoardChecker.checkAllPatterns(firstGameBoard, false).size(), 2);
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(firstGameBoard, false, 3).size(), 1);
 	}
 
 	@Test

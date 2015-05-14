@@ -42,6 +42,11 @@ public class IntermediateAlgorithm extends Algorithm {
 				maxIndex = i;
 				maxSubs = allSubs.size();
 			}
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
 		}
 		return applicableLocs.get(maxIndex);
 	}
@@ -52,18 +57,49 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
-		ArrayList<BoardLocation> otherPlayer = getOtherStone();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
+		if (!checkOtherCompositeAtk(vBoard)) {
+			return new ArrayList<BoardLocation>();
+		}
+		ArrayList<BoardLocation> onlyTesting = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
-		candidates = Algorithm.findFlexibleLocs(otherPlayer, getBoard());
-		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
+		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
 		for (BoardLocation loc : candidates) {
+			boolean applicable = true;
 			try {
-				vBoard.updateBoard(loc, !isFirst);
+				vBoard.updateBoard(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			if (BoardChecker.checkAllPatterns(vBoard, !isFirst).size() >= 2) {
+			onlyTesting.addAll(candidates);
+			onlyTesting.remove(loc);
+			for (BoardLocation loc2 : onlyTesting) {
+				try {
+					vBoard.updateBoard(loc2, !isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				ArrayList<Pattern> allOtherPatterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
+				ArrayList<CompositePattern> otherComposites =
+						CompositePattern.makeCompositePats(allOtherPatterns);
+				if (otherComposites.size() > 0) {
+					try {
+						applicable = false;
+						vBoard.withdrawMove(loc2);
+					} catch (InvalidIndexException e) {
+						break;
+					}
+					break;
+				}
+
+				try {
+					vBoard.withdrawMove(loc2);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+			if (applicable) {
 				retVal.add(loc);
 			}
 			try {
@@ -73,6 +109,35 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 		}
 		return retVal;
+	}
+
+	public boolean checkOtherCompositeAtk(VirtualBoard vBoard) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
+		for (BoardLocation loc : candidates) {
+			try {
+				vBoard.updateBoard(loc, !isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
+			ArrayList<CompositePattern> composites = CompositePattern.makeCompositePats(allPatterns);
+			if (composites.size() > 0) {
+				try {
+					vBoard.withdrawMove(loc);
+				} catch (InvalidIndexException e) {
+					return true;
+				}
+				return true;
+			}
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return false;
 	}
 
 	/**
