@@ -24,7 +24,7 @@ public class CompositePattern {
 			Pattern pat = pats.get(i);
 			curList.add(pat);
 			for (int j = i + 1; j < pats.size(); j++) {
-				if (checkedIndexes.contains(i))
+				if (checkedIndexes.contains(j))
 					continue;
 				Pattern pat2 = pats.get(j);
 				if (pat.isIntersecting(pat2)) {

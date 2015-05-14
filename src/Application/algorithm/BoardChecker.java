@@ -45,6 +45,16 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static ArrayList<Pattern> checkAllSubPatterns(Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		retVal.addAll(checkBoardOpenPatDisc(board, first, 2));
+		retVal.addAll(checkBoardOpenPatCont(board, first, 2));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
+		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
+		Algorithm.filterOutDeadPats(retVal, first, board);
+		return retVal;
+	}
+
 	/**
 	 * Checks for all discrete closed patterns on board.
 	 *
@@ -280,79 +290,6 @@ public class BoardChecker {
 	}
 
 	/**
-	 * Makes a discrete pattern with the given first stone and the type.
-	 *
-	 * @param firstStone
-	 *            The first BoardLocation of the pattern
-	 * @param type
-	 *            Indicates whether the pattern is on row/ on column/ on
-	 *            upper-left diagonal/ on upper-right diagonal
-	 * @param bubbleIndex
-	 *            The place where there is an empty spot. E.g. if the empty spot
-	 *            is after the first stone then bubbleIndex is 1.
-	 * @param num
-	 *            Number of stones forming the pattern
-	 * @param isClosed
-	 *            Whether or not the pattern is closed. (i.e. there is a stone
-	 *            of the other party blocking the pattern)
-	 * @param board
-	 *            The board where the patterns are on.
-	 * @return A discrete pattern with the given stone as its first board
-	 *         location and the given type as its type.
-	 */
-	public static Pattern makeDiscPattern(BoardLocation firstStone, int type,
-			int bubbleIndex, int num, boolean isClosed, Board board) {
-		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
-		int startXCoord = firstStone.getXPos();
-		int startYCoord = firstStone.getYPos();
-		switch (type) {
-		case Pattern.ON_ROW:
-			for (int i = 0; i <= num; i++) {
-				if (i != bubbleIndex) {
-					locations.add(new BoardLocation(startYCoord, startXCoord
-							+ i));
-				}
-			}
-			break;
-		case Pattern.ON_COL:
-			for (int i = 0; i <= num; i++) {
-				if (i != bubbleIndex) {
-					locations.add(new BoardLocation(startYCoord + i,
-							startXCoord));
-				}
-			}
-			break;
-		case Pattern.ON_ULDIAG:
-			for (int i = 0; i <= num; i++) {
-				if (i != bubbleIndex) {
-					locations.add(new BoardLocation(startYCoord + i,
-							startXCoord + i));
-				}
-			}
-			break;
-		case Pattern.ON_URDIAG:
-			for (int i = 0; i <= num; i++) {
-				if (i != bubbleIndex) {
-					locations.add(new BoardLocation(startYCoord + i,
-							startXCoord - i));
-				}
-			}
-			break;
-		default:
-			return null;
-		}
-		if (isClosed) {
-			ArrayList<BoardLocation> stones = board.findBlockedStones(locations,
-					type);
-			return new DiscClosedPattern(locations, type, stones, bubbleIndex,
-					board.findBlockingLocs(locations, type));
-		} else
-			return new DiscOpenPattern(locations, type, bubbleIndex,
-					board.findBlockingLocs(locations, type));
-
-	}
-
-	/**
 	 * Checks all closed contiguous patterns in a given array.
 	 *
 	 * @param array
@@ -455,14 +392,6 @@ public class BoardChecker {
 	 */
 	public static ArrayList<Pattern> checkClosedPatDisc(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
-		if (num < 4) {
-			try {
-				throw new InvalidPatternException(
-						"The number of stones in a closed discrete pattern must be at least four!");
-			} catch (InvalidPatternException e) {
-				e.printStackTrace();
-			}
-		}
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		if (array.length < num + 2)
 			return patterns;
@@ -634,6 +563,79 @@ public class BoardChecker {
 			}
 		}
 		return patterns;
+	}
+
+	/**
+	 * Makes a discrete pattern with the given first stone and the type.
+	 *
+	 * @param firstStone
+	 *            The first BoardLocation of the pattern
+	 * @param type
+	 *            Indicates whether the pattern is on row/ on column/ on
+	 *            upper-left diagonal/ on upper-right diagonal
+	 * @param bubbleIndex
+	 *            The place where there is an empty spot. E.g. if the empty spot
+	 *            is after the first stone then bubbleIndex is 1.
+	 * @param num
+	 *            Number of stones forming the pattern
+	 * @param isClosed
+	 *            Whether or not the pattern is closed. (i.e. there is a stone
+	 *            of the other party blocking the pattern)
+	 * @param board
+	 *            The board where the patterns are on.
+	 * @return A discrete pattern with the given stone as its first board
+	 *         location and the given type as its type.
+	 */
+	public static Pattern makeDiscPattern(BoardLocation firstStone, int type,
+			int bubbleIndex, int num, boolean isClosed, Board board) {
+		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
+		int startXCoord = firstStone.getXPos();
+		int startYCoord = firstStone.getYPos();
+		switch (type) {
+		case Pattern.ON_ROW:
+			for (int i = 0; i <= num; i++) {
+				if (i != bubbleIndex) {
+					locations.add(new BoardLocation(startYCoord, startXCoord
+							+ i));
+				}
+			}
+			break;
+		case Pattern.ON_COL:
+			for (int i = 0; i <= num; i++) {
+				if (i != bubbleIndex) {
+					locations.add(new BoardLocation(startYCoord + i,
+							startXCoord));
+				}
+			}
+			break;
+		case Pattern.ON_ULDIAG:
+			for (int i = 0; i <= num; i++) {
+				if (i != bubbleIndex) {
+					locations.add(new BoardLocation(startYCoord + i,
+							startXCoord + i));
+				}
+			}
+			break;
+		case Pattern.ON_URDIAG:
+			for (int i = 0; i <= num; i++) {
+				if (i != bubbleIndex) {
+					locations.add(new BoardLocation(startYCoord + i,
+							startXCoord - i));
+				}
+			}
+			break;
+		default:
+			return null;
+		}
+		if (isClosed) {
+			ArrayList<BoardLocation> stones = board.findBlockedStones(locations,
+					type);
+			return new DiscClosedPattern(locations, type, stones, bubbleIndex,
+					board.findBlockingLocs(locations, type));
+		} else
+			return new DiscOpenPattern(locations, type, bubbleIndex,
+					board.findBlockingLocs(locations, type));
+
 	}
 
 	/**

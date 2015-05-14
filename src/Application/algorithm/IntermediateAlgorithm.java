@@ -22,8 +22,11 @@ public class IntermediateAlgorithm extends Algorithm {
 	}
 
 	@Override
-	public BoardLocation findBestLocation() {
-		// TODO Auto-generated method stub
+	public BoardLocation findBestLocWhenStuck(ArrayList<BoardLocation> applicableLocs) {
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		for (BoardLocation loc : applicableLocs) {
+
+		}
 		return null;
 	}
 
@@ -72,6 +75,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> aiLoc = getSelfStone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
 		for (BoardLocation loc : aiLoc) {
 			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
 			adjLocs.addAll(Board.findJumpLocations(loc));
@@ -79,7 +83,6 @@ public class IntermediateAlgorithm extends Algorithm {
 				if (!candidates.contains(loc2))
 					candidates.add(loc2);
 		}
-		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
 		for (BoardLocation loc : candidates) {
 			try {
 				vBoard.updateBoard(loc, isFirst);
@@ -111,11 +114,19 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> betterAlt = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> alternative = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> relevantLocs = extractAllAdjacentLocs();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		for (BoardLocation loc : relevantLocs) {
-			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 			try {
 				vBoard.updateBoard(loc, isFirst);
 			} catch (InvalidIndexException e) {
+				continue;
+			}
+			if (!BoardChecker.checkAllPatterns(vBoard, isFirst).isEmpty()) {
+				try {
+					vBoard.withdrawMove(loc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
 				continue;
 			}
 			// newRelLocs stores all relevant locations after updating loc
@@ -126,7 +137,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			ArrayList<BoardLocation> newCandidates = Board.findAdjacentLocs(loc);
 			newCandidates.addAll(Board.findJumpLocations(loc));
 			for (BoardLocation loc2 : newCandidates) {
-				if (!newRelLocs.contains(loc2))
+				if (!newRelLocs.contains(loc2) && !vBoard.isOccupied(loc2))
 					newRelLocs.add(loc2);
 			}
 			newRelLocs.remove(loc); // needs to remove loc since it is still in there

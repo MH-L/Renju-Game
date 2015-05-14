@@ -19,7 +19,7 @@ public class CompletelyRandomizedSelect extends RandomizedSelect {
 	}
 
 	@Override
-	public BoardLocation findBestLocation() {
+	public BoardLocation findBestLocWhenStuck() {
 		// TODO Auto-generated method stub
 		return null;
 	}

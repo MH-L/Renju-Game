@@ -17,7 +17,7 @@ public class BasicAlgorithm extends Algorithm {
 	}
 
 	@Override
-	public BoardLocation findBestLocation() {
+	public BoardLocation findBestLocWhenStuck() {
 		// TODO Auto-generated method stub
 		return null;
 	}

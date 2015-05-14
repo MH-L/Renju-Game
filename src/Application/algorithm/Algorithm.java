@@ -117,7 +117,7 @@ public abstract class Algorithm {
 
 	public abstract ArrayList<BoardLocation> findLocation();
 
-	public abstract BoardLocation findBestLocation();
+	public abstract BoardLocation findBestLocWhenStuck(ArrayList<BoardLocation> applicableLocs);
 
 	public BoardLocation makeFirstMoveFirst() {
 		if (Board.getWidth() % 2 == 0) {
@@ -222,7 +222,7 @@ public abstract class Algorithm {
 			return makeMoveEnd();
 	}
 
-	public BoardLocation makeMoveEnd() {
+	public BoardLocation doFundamentalCheck() {
 		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
@@ -256,6 +256,12 @@ public abstract class Algorithm {
 			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
 			return filtered.get(0);
 		}
+		return null;
+	}
+	public BoardLocation makeMoveEnd() {
+		BoardLocation result = doFundamentalCheck();
+		if (result != null)
+			return result;
 		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
 		if (blockingComps.size() != 0)
 			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
