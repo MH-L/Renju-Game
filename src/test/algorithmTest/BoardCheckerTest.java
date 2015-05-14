@@ -148,6 +148,16 @@ public class BoardCheckerTest {
 		Pattern pat = BoardChecker.checkBoardClosedPatDisc(board, false, 4)
 				.get(0);
 		assertEquals(pat.getLocations().get(0), new BoardLocation(3, 4));
+		board.reset();
+		board.updateBoard(new BoardLocation(10,5), true);
+		board.updateBoard(new BoardLocation(10,6), true);
+		board.updateBoard(new BoardLocation(10,7), true);
+		board.updateBoard(new BoardLocation(10,9), true);
+		board.updateBoard(new BoardLocation(10,4), false);
+		board.updateBoard(new BoardLocation(10,10), false);
+		// TODO Remove Duplicates in the original method!
+		ArrayList<Pattern> results = BoardChecker.checkBoardClosedPatDisc(board, true, 4);
+		assertEquals(results.size(), 1);
 	}
 
 	@Test
@@ -205,6 +215,21 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(4, 4), false);
 		assertEquals(BoardChecker.checkBoardClosedPatCont(board, false, 4)
 				.size(), 2);
+		board.reset();
+		board.updateBoard(new BoardLocation(11,2), true);
+		board.updateBoard(new BoardLocation(11,3), true);
+		board.updateBoard(new BoardLocation(11,4), true);
+		board.updateBoard(new BoardLocation(11,5), true);
+		board.updateBoard(new BoardLocation(11,6), false);
+		board.updateBoard(new BoardLocation(11,1), false);
+		assertEquals(BoardChecker.checkBoardClosedPatCont(board, true, 4).size(), 0);
+		board.reset();
+		board.updateBoard(new BoardLocation(10,0), true);
+		board.updateBoard(new BoardLocation(10,1), true);
+		board.updateBoard(new BoardLocation(10,2), true);
+		board.updateBoard(new BoardLocation(10,3), true);
+		board.updateBoard(new BoardLocation(10,4), false);
+		assertEquals(BoardChecker.checkBoardClosedPatCont(board, true, 4).size(), 1);
 	}
 
 	@Test
@@ -262,6 +287,14 @@ public class BoardCheckerTest {
 		patterns = BoardChecker.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 1);
 		board.updateBoard(new BoardLocation(3,3), false);
+		patterns = BoardChecker.checkAllPatterns(board, true);
+		assertEquals(patterns.size(), 0);
+		board.reset();
+		board.updateBoard(new BoardLocation(8,1), true);
+		board.updateBoard(new BoardLocation(9,0), true);
+		board.updateBoard(new BoardLocation(7,2), true);
+		board.updateBoard(new BoardLocation(6,3), true);
+		board.updateBoard(new BoardLocation(5,4), false);
 		patterns = BoardChecker.checkAllPatterns(board, true);
 		assertEquals(patterns.size(), 0);
 	}
@@ -362,5 +395,28 @@ public class BoardCheckerTest {
 		retVal = Algorithm.keepOnlyBubble(inputs);
 		assertEquals(retVal.size(), 3);
 		assertTrue(retVal.contains(new BoardLocation(6,7)));
+	}
+
+	@Test
+	public void testCheckAllSubPatterns() throws InvalidIndexException {
+		board.reset();
+		board.updateBoard(new BoardLocation(2,2), true);
+		board.updateBoard(new BoardLocation(3,3), true);
+		board.updateBoard(new BoardLocation(4,2), true);
+		ArrayList<Pattern> allSubPatterns = BoardChecker.checkAllSubPatterns(board, true);
+		assertTrue(allSubPatterns.size() == 3);
+		board.updateBoard(new BoardLocation(5,1), false);
+		allSubPatterns = BoardChecker.checkAllSubPatterns(board, true);
+		assertTrue(allSubPatterns.size() == 2);
+		board.withdrawMove(new BoardLocation(5,1));
+		board.updateBoard(new BoardLocation(5,1), true);
+		allSubPatterns = BoardChecker.checkAllSubPatterns(board, true);
+		assertTrue(allSubPatterns.size() == 2);
+		board.withdrawMove(new BoardLocation(5,1));
+		board.updateBoard(new BoardLocation(1,5), false);
+		board.updateBoard(new BoardLocation(6,0), false);
+		allSubPatterns = BoardChecker.checkAllSubPatterns(board, true);
+		assertEquals(allSubPatterns.size(), 2);
+		board.renderBoard(2);
 	}
 }

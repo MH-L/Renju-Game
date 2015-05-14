@@ -872,6 +872,7 @@ public class Board implements Serializable {
 	 */
 	public boolean isPatternDead(Pattern pat, boolean first) {
 		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		BoardLocation firstStone = pat.findFirstStone();
 		if (pat.getClass().equals(ContOpenPattern.class)
 				|| pat.getClass().equals(ContClosedPattern.class)) {
 			if (pat.getClass().equals(ContOpenPattern.class)) {
@@ -938,10 +939,43 @@ public class Board implements Serializable {
 					} else {
 						return false;
 					}
+				} else if (pat.getLocations().size() == 2) {
+					BoardLocation minusTwo = null;
+					BoardLocation plusThree = null;
+					int xCoord = firstStone.getXPos();
+					int yCoord = firstStone.getYPos();
+					switch (pat.getType()) {
+					case Pattern.ON_ROW:
+						minusTwo = new BoardLocation(yCoord, xCoord - 2);
+						plusThree = new BoardLocation(yCoord, xCoord + 3);
+						break;
+					case Pattern.ON_COL:
+						minusTwo = new BoardLocation(yCoord - 2, xCoord);
+						plusThree = new BoardLocation(yCoord + 3, xCoord);
+						break;
+					case Pattern.ON_ULDIAG:
+						minusTwo = new BoardLocation(yCoord - 2, xCoord - 2);
+						plusThree = new BoardLocation(yCoord + 3, xCoord + 3);
+						break;
+					case Pattern.ON_URDIAG:
+						minusTwo = new BoardLocation(yCoord - 2, xCoord + 2);
+						plusThree = new BoardLocation(yCoord + 3, xCoord - 3);
+						break;
+					}
+					if (isReachable(minusTwo)) {
+						if (isReachable(plusThree)) {
+							if (getGridVal(plusThree) == blocker && getGridVal(minusTwo) == blocker)
+								return true;
+						} else {
+							if (getGridVal(minusTwo) == blocker)
+								return true;
+						}
+					} else {
+						if (!isReachable(plusThree) || getGridVal(plusThree) == blocker)
+							return true;
+					}
 				}
 			} else {
-				// TODO pattern is not open. need to do this part.
-				BoardLocation firstStone = pat.findFirstStone();
 				switch (pat.getType()) {
 				case Pattern.ON_ROW:
 					int rowSubIndex = firstStone.getXPos();
@@ -977,7 +1011,6 @@ public class Board implements Serializable {
 			}
 		} else {
 			if (pat.getClass().equals(algorithm.DiscOpenPattern.class)) {
-				BoardLocation firstStone = pat.findFirstStone();
 				if (pat.getType() == Pattern.ON_ULDIAG) {
 					int ULDiagIndex = getULDiagIndex(firstStone);
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
@@ -990,6 +1023,40 @@ public class Board implements Serializable {
 						return true;
 				}
 			} else if (pat.getClass().equals(algorithm.DiscClosedPattern.class)) {
+				BoardLocation minusOne = null;
+				BoardLocation plusFour = null;
+				int xCoord = firstStone.getXPos();
+				int yCoord = firstStone.getYPos();
+				switch (pat.getType()) {
+				case Pattern.ON_ROW:
+					minusOne = new BoardLocation(yCoord, xCoord - 1);
+					plusFour = new BoardLocation(yCoord, xCoord + 4);
+					break;
+				case Pattern.ON_COL:
+					minusOne = new BoardLocation(yCoord - 1, xCoord);
+					plusFour = new BoardLocation(yCoord + 4, xCoord);
+					break;
+				case Pattern.ON_ULDIAG:
+					minusOne = new BoardLocation(yCoord - 1, xCoord - 1);
+					plusFour = new BoardLocation(yCoord + 4, xCoord + 4);
+					break;
+				case Pattern.ON_URDIAG:
+					minusOne = new BoardLocation(yCoord - 1, xCoord + 1);
+					plusFour = new BoardLocation(yCoord + 4, xCoord - 4);
+					break;
+				}
+				if (isReachable(minusOne)) {
+					if (isReachable(plusFour)) {
+						if (getGridVal(plusFour) == blocker && getGridVal(minusOne) == blocker)
+							return true;
+					} else {
+						if (getGridVal(minusOne) == blocker)
+							return true;
+					}
+				} else {
+					if (!isReachable(plusFour) || getGridVal(plusFour) == blocker)
+						return true;
+				}
 				return false;
 			}
 		}

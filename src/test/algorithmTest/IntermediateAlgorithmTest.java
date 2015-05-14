@@ -57,7 +57,6 @@ public class IntermediateAlgorithmTest {
 		assertTrue(retVal.contains(new BoardLocation(3,2)));
 		assertTrue(retVal.contains(new BoardLocation(3,1)));
 		assertTrue(retVal.contains(new BoardLocation(3,5)));
-		assertTrue(retVal.contains(new BoardLocation(3,6)));
 	}
 
 	@Test

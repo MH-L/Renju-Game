@@ -130,6 +130,26 @@ public class AlgorithmTest {
 	public void testMakeMoveEnd() {
 		Board board = alg.getBoard();
 		board.reset();
+	}
 
+	@Test
+	public void testFindFlexibleLocs() throws InvalidIndexException {
+		BoardLocation _1 = new BoardLocation(0,0);
+		BoardLocation _2 = new BoardLocation(9,9);
+		BoardLocation _3 = new BoardLocation(2,2);
+		ArrayList<BoardLocation> inputVal = new ArrayList<BoardLocation>();
+		inputVal.add(_1);
+		ArrayList<BoardLocation> retVal = Algorithm.findFlexibleLocs(inputVal, new Board());
+		assertEquals(retVal.size(), 6);
+		inputVal.add(_2);
+		retVal = Algorithm.findFlexibleLocs(inputVal, new Board());
+		assertEquals(retVal.size(), 22);
+		inputVal.add(_3);
+		Board board = new Board();
+		board.updateBoard(new BoardLocation(0, 0), false);
+		board.updateBoard(new BoardLocation(9, 9), false);
+		board.updateBoard(new BoardLocation(2, 2), false);
+		retVal = Algorithm.findFlexibleLocs(inputVal, board);
+		assertEquals(retVal.size(), 33);
 	}
 }

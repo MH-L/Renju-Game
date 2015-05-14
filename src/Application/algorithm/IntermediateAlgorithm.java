@@ -22,8 +22,9 @@ public class IntermediateAlgorithm extends Algorithm {
 	}
 
 	@Override
-	public BoardLocation findBestLocWhenStuck(ArrayList<BoardLocation> applicableLocs) {
+	public BoardLocation findBestLocWhenStuck() {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		ArrayList<BoardLocation> applicableLocs = Algorithm.findFlexibleLocs(getSelfStone(), getBoard());
 		for (BoardLocation loc : applicableLocs) {
 
 		}
@@ -39,13 +40,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> otherPlayer = getOtherStone();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
-		for (BoardLocation loc : otherPlayer) {
-			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
-			adjLocs.addAll(Board.findJumpLocations(loc));
-			for (BoardLocation loc2 : adjLocs)
-				if (!candidates.contains(loc2))
-					candidates.add(loc2);
-		}
+		candidates = Algorithm.findFlexibleLocs(otherPlayer, getBoard());
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
 		for (BoardLocation loc : candidates) {
 			try {
@@ -243,27 +238,6 @@ public class IntermediateAlgorithm extends Algorithm {
 
 		if (retVal.isEmpty()) {
 			return candidateRetVal;
-		}
-		return retVal;
-	}
-
-	public ArrayList<BoardLocation> findFlexibleLocs() {
-		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
-		ArrayList<BoardLocation> selfStones = getSelfStone();
-		ArrayList<BoardLocation> adjacentLocs = new ArrayList<BoardLocation>();
-		for (BoardLocation location : selfStones) {
-			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(location);
-			for (BoardLocation adjLoc : adjLocs)
-				if (!adjacentLocs.contains(adjLoc))
-					adjacentLocs.add(adjLoc);
-			adjLocs = Board.findJumpLocations(location);
-			for (BoardLocation adj : adjLocs)
-				if (!adjacentLocs.contains(adj))
-					adjacentLocs.add(adj);
-		}
-
-		for (BoardLocation candidate : adjacentLocs) {
-
 		}
 		return retVal;
 	}

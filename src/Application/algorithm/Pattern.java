@@ -1,8 +1,6 @@
 package algorithm;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 
 import model.Board;
 import model.BoardLocation;
@@ -85,20 +83,6 @@ public abstract class Pattern {
 	}
 
 	/**
-	 * Check if the two patterns are different
-	 *
-	 * @param pat
-	 * @return True if the tow are different, false otherwise.
-	 */
-	public boolean isDifferent(Pattern pat) {
-		for (BoardLocation loc1 : pat.getLocations())
-			for (BoardLocation loc2 : this.constituent)
-				if (!loc1.equals(loc2))
-					return true;
-		return false;
-	}
-
-	/**
 	 * Finds the index where there is a bubble (i.e. an empty spot) inside a
 	 * discrete pattern.
 	 *
@@ -137,70 +121,6 @@ public abstract class Pattern {
 		return -1;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((blockingLocs == null) ? 0 : blockingLocs.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Pattern other = (Pattern) obj;
-		if (blockingLocs == null) {
-			if (other.blockingLocs != null)
-				return false;
-		} else if (!blockingLocs.equals(other.blockingLocs))
-			return false;
-		return true;
-	}
-
-	public boolean isColinear(BoardLocation loc1, BoardLocation loc2) {
-		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
-			return false;
-		return loc1.getXPos() == loc2.getXPos() || loc1.getYPos() == loc2.getYPos();
-	}
-
-	public boolean isOnSameDiag(BoardLocation loc1, BoardLocation loc2) {
-		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
-			return false;
-		int xDiff = Math.abs(loc1.getXPos() - loc2.getXPos());
-		int yDiff = Math.abs(loc1.getYPos() - loc2.getYPos());
-		return xDiff == yDiff;
-	}
-
-	public static boolean checkIsCompositeUrgent(ArrayList<Pattern> patterns) {
-		for (Pattern pat : patterns) {
-			if (pat.getLocations().size() >= 4)
-				return true;
-		}
-		return false;
-	}
-
-	public static void removeDuplicates(ArrayList<Pattern> patterns) {
-//		Iterator<Pattern> iter = patterns.iterator();
-//		while (iter.hasNext()) {
-//			Pattern pat = iter.next();
-//			if (Collections.frequency(patterns, pat) > 1) {
-//				patterns.remove(pat);
-//			}
-//		}
-		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
-		for (Pattern pat : patterns) {
-			if (!retVal.contains(pat))
-				retVal.add(pat);
-		}
-		patterns = retVal;
-	}
-
 	public BoardLocation findFirstStone() {
 		ArrayList<BoardLocation> locs = getLocations();
 		int minIndex = 0;
@@ -227,5 +147,73 @@ public abstract class Pattern {
 			break;
 		}
 		return locs.get(minIndex);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((constituent == null) ? 0 : constituent.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return !isDifferent((Pattern) obj);
+	}
+
+	/**
+	 * Check if the two patterns are different
+	 *
+	 * @param pat
+	 * @return True if the tow are different, false otherwise.
+	 */
+	public boolean isDifferent(Pattern pat) {
+		ArrayList<BoardLocation> otherStones = pat.getLocations();
+		for (BoardLocation loc1 : otherStones)
+			if (!constituent.contains(loc1))
+				return true;
+		for (BoardLocation loc2 : constituent)
+			if (!otherStones.contains(loc2))
+				return true;
+		return false;
+	}
+
+	public boolean isColinear(BoardLocation loc1, BoardLocation loc2) {
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+			return false;
+		return loc1.getXPos() == loc2.getXPos() || loc1.getYPos() == loc2.getYPos();
+	}
+
+	public boolean isOnSameDiag(BoardLocation loc1, BoardLocation loc2) {
+		if (loc1 == null || loc2 == null || !Board.isReachable(loc1) || !Board.isReachable(loc2))
+			return false;
+		int xDiff = Math.abs(loc1.getXPos() - loc2.getXPos());
+		int yDiff = Math.abs(loc1.getYPos() - loc2.getYPos());
+		return xDiff == yDiff;
+	}
+
+	public static boolean checkIsCompositeUrgent(ArrayList<Pattern> patterns) {
+		for (Pattern pat : patterns) {
+			if (pat.getLocations().size() >= 4)
+				return true;
+		}
+		return false;
+	}
+
+	public static ArrayList<Pattern> removeDuplicates(ArrayList<Pattern> patterns) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		for (Pattern pat : patterns) {
+			boolean predicate = true;
+			for (Pattern pat2 : retVal)
+				if (!pat2.isDifferent(pat)) {
+					predicate = false;
+					break;
+				}
+			if (predicate)
+				retVal.add(pat);
+		}
+		return retVal;
 	}
 }

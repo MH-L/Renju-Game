@@ -115,9 +115,26 @@ public abstract class Algorithm {
 		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
 	}
 
+	public static ArrayList<BoardLocation> findFlexibleLocs(ArrayList<BoardLocation> stones, Board board) {
+		ArrayList<BoardLocation> adjacentLocs = new ArrayList<BoardLocation>();
+		for (BoardLocation location : stones) {
+			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(location);
+			for (BoardLocation adjLoc : adjLocs)
+				if (!adjacentLocs.contains(adjLoc) && Board.isReachable(adjLoc)
+						&& !board.isOccupied(adjLoc))
+					adjacentLocs.add(adjLoc);
+			adjLocs = Board.findJumpLocations(location);
+			for (BoardLocation adj : adjLocs)
+				if (!adjacentLocs.contains(adj) && Board.isReachable(adj)
+						&& !board.isOccupied(adj))
+					adjacentLocs.add(adj);
+		}
+		return adjacentLocs;
+	}
+
 	public abstract ArrayList<BoardLocation> findLocation();
 
-	public abstract BoardLocation findBestLocWhenStuck(ArrayList<BoardLocation> applicableLocs);
+	public abstract BoardLocation findBestLocWhenStuck();
 
 	public BoardLocation makeFirstMoveFirst() {
 		if (Board.getWidth() % 2 == 0) {

@@ -467,6 +467,7 @@ public class BoardChecker {
 			}
 			temp.clear();
 		}
+		patterns = Pattern.removeDuplicates(patterns);
 		return patterns;
 	}
 
@@ -660,13 +661,6 @@ public class BoardChecker {
 	public static Pattern makeContiguousPattern(BoardLocation firstStone,
 			int type, int num, boolean isClosed, Board board) {
 		ArrayList<BoardLocation> locations = new ArrayList<BoardLocation>();
-		if (num != 3 && num != 4)
-			try {
-				throw new InvalidPatternException(
-						"The number of stones is invalid.");
-			} catch (InvalidPatternException e) {
-				e.printStackTrace();
-			}
 		switch (type) {
 		case Pattern.ON_ULDIAG:
 			for (int i = 0; i < num; i++) {

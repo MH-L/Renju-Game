@@ -13,20 +13,20 @@ public class CompositePattern {
 	}
 
 	public static ArrayList<CompositePattern> makeCompositePats(ArrayList<Pattern> pats) {
-		Pattern.removeDuplicates(pats);
+		ArrayList<Pattern> duplicatedRemoved = Pattern.removeDuplicates(pats);
 		ArrayList<CompositePattern> Cpatterns = new ArrayList<CompositePattern>();
 		ArrayList<Integer> checkedIndexes = new ArrayList<Integer>();
 		ArrayList<Pattern> curList = new ArrayList<Pattern>();
-		for (int i = 0; i < pats.size(); i++) {
+		for (int i = 0; i < duplicatedRemoved.size(); i++) {
 			if (checkedIndexes.contains(i))
 				continue;
 			checkedIndexes.add(i);
-			Pattern pat = pats.get(i);
+			Pattern pat = duplicatedRemoved.get(i);
 			curList.add(pat);
-			for (int j = i + 1; j < pats.size(); j++) {
+			for (int j = i + 1; j < duplicatedRemoved.size(); j++) {
 				if (checkedIndexes.contains(j))
 					continue;
-				Pattern pat2 = pats.get(j);
+				Pattern pat2 = duplicatedRemoved.get(j);
 				if (pat.isIntersecting(pat2)) {
 					curList.add(pat2);
 					checkedIndexes.add(j);
