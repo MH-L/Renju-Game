@@ -47,7 +47,7 @@ public class MainTest {
 			writer.println("The first line");
 			writer.println("The second line");
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1000; i++) {
 				logger = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Logs.txt", "UTF-8");
 				logger.println("The current iteration count is " + i);
 				logger.println("The current stats is:");

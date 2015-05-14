@@ -45,6 +45,13 @@ public class IntermediateAlgorithmTest {
 		ArrayList<BoardLocation> retVal = firstAi.intermediateAttack();
 		assertFalse(retVal.isEmpty());
 		firstGameBoard.reset();
+		firstGameBoard.updateBoard(new BoardLocation(3,3), true);
+		firstGameBoard.updateBoard(new BoardLocation(4,4), true);
+		firstGameBoard.updateBoard(new BoardLocation(6,4), true);
+		assertEquals(firstAi.getSelfStone().size(), 3);
+		retVal = firstAi.intermediateAttack();
+		assertFalse(retVal.isEmpty());
+		assertTrue(retVal.contains(new BoardLocation(7,3)));
 	}
 
 	@Test

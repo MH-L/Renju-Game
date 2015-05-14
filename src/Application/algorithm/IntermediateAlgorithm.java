@@ -236,4 +236,25 @@ public class IntermediateAlgorithm extends Algorithm {
 		return retVal;
 	}
 
+	public ArrayList<BoardLocation> findFlexibleLocs() {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> selfStones = getSelfStone();
+		ArrayList<BoardLocation> adjacentLocs = new ArrayList<BoardLocation>();
+		for (BoardLocation location : selfStones) {
+			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(location);
+			for (BoardLocation adjLoc : adjLocs)
+				if (!adjacentLocs.contains(adjLoc))
+					adjacentLocs.add(adjLoc);
+			adjLocs = Board.findJumpLocations(location);
+			for (BoardLocation adj : adjLocs)
+				if (!adjacentLocs.contains(adj))
+					adjacentLocs.add(adj);
+		}
+
+		for (BoardLocation candidate : adjacentLocs) {
+
+		}
+		return retVal;
+	}
+
 }

@@ -21,18 +21,27 @@ public class CompositePatternTest {
 		BoardLocation _3 = new BoardLocation(9,8);
 		BoardLocation _4 = new BoardLocation(8,7);
 		BoardLocation _5 = new BoardLocation(8,6);
+		BoardLocation _6 = new BoardLocation(10,11);
+		BoardLocation _7 = new BoardLocation(11,12);
+		BoardLocation _8 = new BoardLocation(12,13);
 		ArrayList<BoardLocation> locs1 = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> locs2 = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> locs3 = new ArrayList<BoardLocation>();
 		locs1.add(_1);
 		locs1.add(_2);
 		locs1.add(_3);
 		locs2.add(_2);
 		locs2.add(_4);
 		locs2.add(_5);
-		patterns.add(new ContOpenPattern(locs1, 2, null));
-		patterns.add(new ContOpenPattern(locs2, 1, null));
+		locs3.add(_6);
+		locs3.add(_7);
+		locs3.add(_8);
+		patterns.add(new ContOpenPattern(locs1, 1, null));
+		patterns.add(new ContOpenPattern(locs2, 2, null));
 		ArrayList<CompositePattern> result = CompositePattern.makeCompositePats(patterns);
 		assertFalse(result.isEmpty());
+		patterns.clear();
+		patterns.add(new ContOpenPattern(locs1, 2, null));
 	}
 
 }

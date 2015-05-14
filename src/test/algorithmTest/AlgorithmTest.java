@@ -106,4 +106,30 @@ public class AlgorithmTest {
 		ArrayList<Pattern> toFilter = BoardChecker.checkAllPatterns(bd, true);
 		assertEquals(toFilter.size(), 0);
 	}
+
+	@Test
+	public void testFilterBlockingLocsAtk() throws InvalidIndexException {
+		Board bd = alg.getBoard();
+		bd.reset();
+		bd.updateBoard(new BoardLocation(12,12), true);
+		bd.updateBoard(new BoardLocation(11,12), true);
+		bd.updateBoard(new BoardLocation(10,12), true);
+		bd.updateBoard(new BoardLocation(13,12), false);
+		bd.updateBoard(new BoardLocation(9,11), false);
+		bd.updateBoard(new BoardLocation(9,10), false);
+		bd.updateBoard(new BoardLocation(9,9), false);
+		ArrayList<BoardLocation> blockingLocs = new ArrayList<BoardLocation>();
+		blockingLocs.add(new BoardLocation(9,8));
+		blockingLocs.add(new BoardLocation(9,12));
+		ArrayList<BoardLocation> result = alg.filterBlockingLocsAtk(blockingLocs);
+		assertEquals(result.size(), 1);
+		assertEquals(result.get(0), new BoardLocation(9,12));
+	}
+
+	@Test
+	public void testMakeMoveEnd() {
+		Board board = alg.getBoard();
+		board.reset();
+
+	}
 }

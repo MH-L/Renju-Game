@@ -256,8 +256,10 @@ public abstract class Algorithm {
 			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
 			return filtered.get(0);
 		}
+		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
+		if (blockingComps.size() != 0)
+			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
 		ArrayList<BoardLocation> locations = calculateAttack();
-		locations.addAll(blockPotentialCompositePat());
 		return processLocs(locations);
 	}
 
