@@ -357,6 +357,25 @@ public class Board implements Serializable {
 		return diags;
 	}
 
+	public static boolean checkArrayWinning(int[] array) {
+		int consectCount = 0;
+		int prev = EMPTY_SPOT;
+		for (int i = 0; i < array.length; i++) {
+			if (prev == array[i] && array[i] != EMPTY_SPOT)
+				consectCount ++;
+			else {
+				if (array[i] != EMPTY_SPOT)
+					consectCount = 1;
+				else
+					consectCount = 0;
+			}
+			prev = array[i];
+			if (consectCount >= NUM_STONES_TO_WIN)
+				return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Checks the rows to see if there are five stones in a row that belongs to
 	 * the same player.
@@ -364,24 +383,9 @@ public class Board implements Serializable {
 	 * @return True if there is such combination, false if there is not.
 	 */
 	public boolean checkrow() {
-		int consectCount = 0;
-		int prev = EMPTY_SPOT;
 		for (int[] array : this.rows) {
-			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != EMPTY_SPOT)
-					consectCount++;
-				else {
-					if (array[i] != EMPTY_SPOT)
-						consectCount = 1;
-					else
-						consectCount = 0;
-				}
-				prev = array[i];
-				if (consectCount >= NUM_STONES_TO_WIN)
-					return true;
-			}
-			prev = 0;
-			consectCount = 0;
+			if (checkArrayWinning(array))
+				return true;
 		}
 		return false;
 	}
@@ -393,24 +397,9 @@ public class Board implements Serializable {
 	 * @return True if there are, false if cannot find such combination.
 	 */
 	public boolean checkcol() {
-		int consectCount = 0;
-		int prev = EMPTY_SPOT;
 		for (int[] array : this.columns) {
-			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != EMPTY_SPOT)
-					consectCount++;
-				else {
-					if (array[i] != EMPTY_SPOT)
-						consectCount = 1;
-					else
-						consectCount = 0;
-				}
-				prev = array[i];
-				if (consectCount >= NUM_STONES_TO_WIN)
-					return true;
-			}
-			prev = 0;
-			consectCount = 0;
+			if (checkArrayWinning(array))
+				return true;
 		}
 		return false;
 	}
@@ -422,47 +411,15 @@ public class Board implements Serializable {
 	 * @return True if there are, false if cannot find such combination.
 	 */
 	public boolean checkdiag() {
-		int consectCount = 0;
-		int prev = EMPTY_SPOT;
 		for (int[] array : this.diagonals_Uleft) {
-			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != EMPTY_SPOT)
-					consectCount++;
-				else {
-					if (array[i] != EMPTY_SPOT)
-						consectCount = 1;
-					else
-						consectCount = 0;
-				}
-				prev = array[i];
-				if (consectCount >= NUM_STONES_TO_WIN)
-					return true;
-			}
-			prev = EMPTY_SPOT;
-			consectCount = 0;
+			if (checkArrayWinning(array))
+				return true;
 		}
-
-		consectCount = 0;
-		prev = EMPTY_SPOT;
 
 		for (int[] array : this.diagonals_Uright) {
-			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] != EMPTY_SPOT)
-					consectCount++;
-				else {
-					if (array[i] != EMPTY_SPOT)
-						consectCount = 1;
-					else
-						consectCount = 0;
-				}
-				prev = array[i];
-				if (consectCount >= NUM_STONES_TO_WIN)
-					return true;
-			}
-			prev = EMPTY_SPOT;
-			consectCount = 0;
+			if (checkArrayWinning(array))
+				return true;
 		}
-
 		return false;
 	}
 
@@ -682,183 +639,6 @@ public class Board implements Serializable {
 		return !isInCorner(loc)
 				&& (loc.getXPos() == 0 || loc.getXPos() == width - 1
 						|| loc.getYPos() == 0 || loc.getYPos() == height - 1);
-	}
-
-	/**
-	 * Render the board on console.
-	 *
-	 * @param mode
-	 *            Classic mode -- display empty spot as "-", first player's
-	 *            stone as "X" and second player's stone as "O". Fancy mode --
-	 *            displays empty spot as an empty square, first player's stone
-	 *            as an empty circle, second player's stone as a solid circle.
-	 */
-	public void renderBoard(int mode) {
-		System.out.println("   A B C D E F G H I J K L M N O P");
-		char firstPlayerChar;
-		char secondPlayerChar;
-		char emptyLocChar;
-		if (mode == CLASSIC_MODE) {
-			firstPlayerChar = 'X';
-			secondPlayerChar = 'O';
-			emptyLocChar = '-';
-		} else {
-			firstPlayerChar = '\u25CF';
-			secondPlayerChar = '\u25CB';
-			emptyLocChar = '\u25A1';
-		}
-
-		for (int i = 0; i < this.basicGrid.length; i++) {
-			System.out.print(i + 1);
-			if (i < 9)
-				System.out.print("\u0020\u0020");
-			else
-				System.out.print("\u0020");
-			for (int j = 0; j < this.basicGrid[0].length; j++) {
-				if (this.basicGrid[i][j] == EMPTY_SPOT)
-					System.out.print(emptyLocChar + "\u0020");
-				else if (this.basicGrid[i][j] == FIRST_PLAYER)
-					System.out.print(firstPlayerChar + "\u0020");
-				else
-					System.out.print(secondPlayerChar + "\u0020");
-			}
-			System.out.print('\n');
-		}
-	}
-
-	/**
-	 * Resets the board to the init board. Also changes other fields associated
-	 * with the board.
-	 */
-	public void reset() {
-		this.basicGrid = initGrid();
-		for (int i = 0; i < this.rows.size(); i++)
-			for (int j = 0; j < this.rows.get(0).length; j++)
-				this.getRows().get(i)[j] = EMPTY_SPOT;
-
-		for (int i = 0; i < this.columns.size(); i++)
-			for (int j = 0; j < this.columns.get(0).length; j++)
-				this.getColumns().get(i)[j] = EMPTY_SPOT;
-
-		for (int i = 0; i < this.diagonals_Uleft.size(); i++)
-			for (int j = 0; j < this.diagonals_Uleft.get(i).length; j++)
-				this.getULDiags().get(i)[j] = EMPTY_SPOT;
-
-		for (int i = 0; i < this.diagonals_Uright.size(); i++)
-			for (int j = 0; j < this.diagonals_Uright.get(i).length; j++)
-				this.getURDiags().get(i)[j] = EMPTY_SPOT;
-		this.player1Stone.clear();
-		this.player2Stone.clear();
-
-	}
-
-	/**
-	 * The function updates the board given the location and the player.
-	 *
-	 * @param loc
-	 *            Indicates the board location to place the stone
-	 * @param player
-	 *            True means it is player's stone, otherwise it is computer's
-	 *            stone.
-	 * @return false if it did not succeed. true if succeeded
-	 * @throws InvalidIndexException
-	 */
-	public boolean updateBoard(BoardLocation loc, boolean first)
-			throws InvalidIndexException {
-		if (!isReachable(loc))
-			throw new InvalidIndexException(
-					"The location indexes is out of bound!");
-		int col_num = loc.getXPos();
-		int row_num = loc.getYPos();
-		if (this.isOccupied(loc))
-			return false;
-		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
-
-		this.basicGrid[row_num][col_num] = marker;
-		this.getColumns().get(col_num)[row_num] = marker;
-		this.getRows().get(row_num)[col_num] = marker;
-		int indexURDiag = getURDiagIndex(loc);
-		int indexULDiag = getULDiagIndex(loc);
-		if (indexURDiag >= width)
-			this.getURDiags().get(indexURDiag)[width - 1 - col_num] = marker;
-		else
-			this.getURDiags().get(indexURDiag)[row_num] = marker;
-		if (indexULDiag >= width)
-			this.getULDiags().get(indexULDiag)[col_num] = marker;
-		else
-			this.getULDiags().get(indexULDiag)[row_num] = marker;
-		if (first)
-			this.player1Stone.add(loc);
-		else
-			this.player2Stone.add(loc);
-		return true;
-
-	}
-
-	/**
-	 * Withdraws the given move on board. There is no stone after withdrawal.
-	 *
-	 * @param lastMove
-	 *            The BoardLocation to withdraw.
-	 * @throws InvalidIndexException
-	 *             If the given BoardLocation is unreachable.
-	 */
-	public void withdrawMove(BoardLocation lastMove)
-			throws InvalidIndexException {
-		if (!isReachable(lastMove)) {
-			throw new InvalidIndexException(
-					"The location to withdraw is invalid.");
-		}
-		int x_coord = lastMove.getXPos();
-		int y_coord = lastMove.getYPos();
-		int indexUL = y_coord - x_coord + width - 1;
-		int indexUR = y_coord + x_coord;
-		int ULIndex = indexUL >= width ? x_coord : y_coord;
-		int URIndex = indexUR >= width ? width - 1 - x_coord : y_coord;
-		this.basicGrid[y_coord][x_coord] = 0;
-		this.getColumns().get(x_coord)[y_coord] = EMPTY_SPOT;
-		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
-		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
-		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
-		if (player1Stone.contains(lastMove))
-			this.player1Stone.remove(lastMove);
-		else
-			this.player2Stone.remove(lastMove);
-
-	}
-
-	/**
-	 * Converts the diagonal index and the subIndex in a diagonal to x and y
-	 * coordinates on board.
-	 *
-	 * @param diagIndex
-	 *            The index of the diagonal on board.
-	 * @param subIndex
-	 *            The index of the location on the given diagonal
-	 * @param isUL
-	 *            Whether the diagonal is from upper-left to bottom-right.
-	 * @return A BoardLocation as the result of the conversion.
-	 */
-	public static BoardLocation convertDiagToXY(int diagIndex, int subIndex,
-			boolean isUL) {
-		assert (diagIndex > -1 && diagIndex < diag && subIndex > -1 && subIndex < (diagIndex > (diag - 1) / 2 ? diag
-				- diagIndex
-				: diagIndex + 1));
-		if (isUL)
-			if (diagIndex < height)
-				return new BoardLocation(subIndex, subIndex - diagIndex + width
-						- 1);
-			else
-				return new BoardLocation(diagIndex + subIndex - width + 1,
-						subIndex);
-		else {
-			if (diagIndex < height)
-				return new BoardLocation(subIndex, diagIndex - subIndex);
-			else
-				return new BoardLocation(diagIndex + subIndex - width + 1,
-						width - 1 - subIndex);
-		}
-
 	}
 
 	/**
@@ -1131,7 +911,6 @@ public class Board implements Serializable {
 		} else if (pat.getClass() == DiscOpenPattern.class
 				|| pat.getClass() == DiscClosedPattern.class) {
 			int[] array;
-			ArrayList<Pattern> patternsFound;
 			switch (pat.getType()) {
 			case Pattern.ON_ROW:
 				array = this.getRowByIndex(firstStone.getYPos());
@@ -1149,15 +928,215 @@ public class Board implements Serializable {
 				array = new int[1];
 				break;
 			}
-			patternsFound = BoardChecker.checkOpenPatCont(array, 0,
-					pat.getType(), true, 4, this);
-			if (patternsFound.size() != 0
-					&& pat.getLocations().contains(
-							patternsFound.get(0).getLocations().get(0)))
-				return true;
+//			patternsFound = BoardChecker.checkOpenPatCont(array, 0,
+//					pat.getType(), true, 4, this);
+//			if (patternsFound.size() != 0
+//					&& pat.getLocations().contains(
+//							patternsFound.get(0).getLocations().get(0)))
+//				return true;
+			array = array.clone();
+			for (int i = 0; i < array.length; i++) {
+				if (array[i] == Board.EMPTY_SPOT) {
+					boolean interrupted = false;
+					array[i] = blocker;
+					for (int j = 0; j < array.length; j++) {
+						if (array[j] == Board.EMPTY_SPOT)
+							array[j] = checker;
+						else
+							continue;
+						if (checkArrayWinning(array)) {
+							array[j] = EMPTY_SPOT;
+							interrupted = true;
+							continue;
+						}
+						array[j] = EMPTY_SPOT;
+					}
+					if (!interrupted)
+						return false;
+					array[i] = Board.EMPTY_SPOT;
+				}
+			}
+			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Render the board on console.
+	 *
+	 * @param mode
+	 *            Classic mode -- display empty spot as "-", first player's
+	 *            stone as "X" and second player's stone as "O". Fancy mode --
+	 *            displays empty spot as an empty square, first player's stone
+	 *            as an empty circle, second player's stone as a solid circle.
+	 */
+	public void renderBoard(int mode) {
+		System.out.println("   A B C D E F G H I J K L M N O P");
+		char firstPlayerChar;
+		char secondPlayerChar;
+		char emptyLocChar;
+		if (mode == CLASSIC_MODE) {
+			firstPlayerChar = 'X';
+			secondPlayerChar = 'O';
+			emptyLocChar = '-';
+		} else {
+			firstPlayerChar = '\u25CF';
+			secondPlayerChar = '\u25CB';
+			emptyLocChar = '\u25A1';
+		}
+
+		for (int i = 0; i < this.basicGrid.length; i++) {
+			System.out.print(i + 1);
+			if (i < 9)
+				System.out.print("\u0020\u0020");
+			else
+				System.out.print("\u0020");
+			for (int j = 0; j < this.basicGrid[0].length; j++) {
+				if (this.basicGrid[i][j] == EMPTY_SPOT)
+					System.out.print(emptyLocChar + "\u0020");
+				else if (this.basicGrid[i][j] == FIRST_PLAYER)
+					System.out.print(firstPlayerChar + "\u0020");
+				else
+					System.out.print(secondPlayerChar + "\u0020");
+			}
+			System.out.print('\n');
+		}
+	}
+
+	/**
+	 * Resets the board to the init board. Also changes other fields associated
+	 * with the board.
+	 */
+	public void reset() {
+		this.basicGrid = initGrid();
+		for (int i = 0; i < this.rows.size(); i++)
+			for (int j = 0; j < this.rows.get(0).length; j++)
+				this.getRows().get(i)[j] = EMPTY_SPOT;
+
+		for (int i = 0; i < this.columns.size(); i++)
+			for (int j = 0; j < this.columns.get(0).length; j++)
+				this.getColumns().get(i)[j] = EMPTY_SPOT;
+
+		for (int i = 0; i < this.diagonals_Uleft.size(); i++)
+			for (int j = 0; j < this.diagonals_Uleft.get(i).length; j++)
+				this.getULDiags().get(i)[j] = EMPTY_SPOT;
+
+		for (int i = 0; i < this.diagonals_Uright.size(); i++)
+			for (int j = 0; j < this.diagonals_Uright.get(i).length; j++)
+				this.getURDiags().get(i)[j] = EMPTY_SPOT;
+		this.player1Stone.clear();
+		this.player2Stone.clear();
+
+	}
+
+	/**
+	 * The function updates the board given the location and the player.
+	 *
+	 * @param loc
+	 *            Indicates the board location to place the stone
+	 * @param player
+	 *            True means it is player's stone, otherwise it is computer's
+	 *            stone.
+	 * @return false if it did not succeed. true if succeeded
+	 * @throws InvalidIndexException
+	 */
+	public boolean updateBoard(BoardLocation loc, boolean first)
+			throws InvalidIndexException {
+		if (!isReachable(loc))
+			throw new InvalidIndexException(
+					"The location indexes is out of bound!");
+		int col_num = loc.getXPos();
+		int row_num = loc.getYPos();
+		if (this.isOccupied(loc))
+			return false;
+		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+
+		this.basicGrid[row_num][col_num] = marker;
+		this.getColumns().get(col_num)[row_num] = marker;
+		this.getRows().get(row_num)[col_num] = marker;
+		int indexURDiag = getURDiagIndex(loc);
+		int indexULDiag = getULDiagIndex(loc);
+		if (indexURDiag >= width)
+			this.getURDiags().get(indexURDiag)[width - 1 - col_num] = marker;
+		else
+			this.getURDiags().get(indexURDiag)[row_num] = marker;
+		if (indexULDiag >= width)
+			this.getULDiags().get(indexULDiag)[col_num] = marker;
+		else
+			this.getULDiags().get(indexULDiag)[row_num] = marker;
+		if (first)
+			this.player1Stone.add(loc);
+		else
+			this.player2Stone.add(loc);
+		return true;
+
+	}
+
+	/**
+	 * Withdraws the given move on board. There is no stone after withdrawal.
+	 *
+	 * @param lastMove
+	 *            The BoardLocation to withdraw.
+	 * @throws InvalidIndexException
+	 *             If the given BoardLocation is unreachable.
+	 */
+	public void withdrawMove(BoardLocation lastMove)
+			throws InvalidIndexException {
+		if (!isReachable(lastMove)) {
+			throw new InvalidIndexException(
+					"The location to withdraw is invalid.");
+		}
+		int x_coord = lastMove.getXPos();
+		int y_coord = lastMove.getYPos();
+		int indexUL = y_coord - x_coord + width - 1;
+		int indexUR = y_coord + x_coord;
+		int ULIndex = indexUL >= width ? x_coord : y_coord;
+		int URIndex = indexUR >= width ? width - 1 - x_coord : y_coord;
+		this.basicGrid[y_coord][x_coord] = 0;
+		this.getColumns().get(x_coord)[y_coord] = EMPTY_SPOT;
+		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
+		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
+		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
+		if (player1Stone.contains(lastMove))
+			this.player1Stone.remove(lastMove);
+		else
+			this.player2Stone.remove(lastMove);
+
+	}
+
+	/**
+	 * Converts the diagonal index and the subIndex in a diagonal to x and y
+	 * coordinates on board.
+	 *
+	 * @param diagIndex
+	 *            The index of the diagonal on board.
+	 * @param subIndex
+	 *            The index of the location on the given diagonal
+	 * @param isUL
+	 *            Whether the diagonal is from upper-left to bottom-right.
+	 * @return A BoardLocation as the result of the conversion.
+	 */
+	public static BoardLocation convertDiagToXY(int diagIndex, int subIndex,
+			boolean isUL) {
+		assert (diagIndex > -1 && diagIndex < diag && subIndex > -1 && subIndex < (diagIndex > (diag - 1) / 2 ? diag
+				- diagIndex
+				: diagIndex + 1));
+		if (isUL)
+			if (diagIndex < height)
+				return new BoardLocation(subIndex, subIndex - diagIndex + width
+						- 1);
+			else
+				return new BoardLocation(diagIndex + subIndex - width + 1,
+						subIndex);
+		else {
+			if (diagIndex < height)
+				return new BoardLocation(subIndex, diagIndex - subIndex);
+			else
+				return new BoardLocation(diagIndex + subIndex - width + 1,
+						width - 1 - subIndex);
+		}
+
 	}
 
 	/**

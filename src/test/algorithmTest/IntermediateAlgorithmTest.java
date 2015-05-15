@@ -163,4 +163,42 @@ public class IntermediateAlgorithmTest {
 		assertEquals(result, new BoardLocation(4,6));
 	}
 
+	@Test
+	public void testMakeMoveEnd() throws InvalidIndexException {
+		// Test failures.
+		secondGameBoard.reset();
+		secondGameBoard.updateBoard(new BoardLocation(4,11), false);
+		secondGameBoard.updateBoard(new BoardLocation(6,11), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,11), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,11), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,10), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,9), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,9), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,6), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,6), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,5), false);
+		secondGameBoard.updateBoard(new BoardLocation(6,4), false);
+		secondGameBoard.updateBoard(new BoardLocation(5,12), true);
+		secondGameBoard.updateBoard(new BoardLocation(5,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(5,3), true);
+		secondGameBoard.updateBoard(new BoardLocation(6,9), true);
+		secondGameBoard.updateBoard(new BoardLocation(6,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(6,5), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,9), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,6), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,5), true);
+		secondGameBoard.renderBoard(2);
+		BoardLocation loc = ai.makeMoveEnd();
+		assertTrue(loc != null);
+	}
+
 }

@@ -10,6 +10,7 @@ import model.BoardLocation;
 import org.junit.Before;
 import org.junit.Test;
 
+import algorithm.BoardChecker;
 import algorithm.ContClosedPattern;
 import algorithm.ContOpenPattern;
 import algorithm.Pattern;
@@ -570,5 +571,25 @@ public class BoardTest {
 				bd.findBlockedStones(testLocations, Pattern.ON_ULDIAG),
 				bd.findBlockingLocs(testLocations, Pattern.ON_ULDIAG));
 		assertFalse(bd.isPatternWinning(pat));
+		bd.reset();
+		bd.updateBoard(new BoardLocation(1,1), true);
+		bd.updateBoard(new BoardLocation(1,2), true);
+		bd.updateBoard(new BoardLocation(1,3), true);
+		bd.updateBoard(new BoardLocation(1,4), true);
+		bd.updateBoard(new BoardLocation(1,6), true);
+		ArrayList<Pattern> patternsOnBoard = BoardChecker.checkAllPatterns(bd, true);
+		assertEquals(patternsOnBoard.size(), 1);
+		Pattern firstPat = patternsOnBoard.get(0);
+		assertTrue(bd.isPatternWinning(firstPat));
+		bd.updateBoard(new BoardLocation(1,0), true);
+		bd.withdrawMove(new BoardLocation(1,4));
+		bd.withdrawMove(new BoardLocation(1,6));
+		bd.updateBoard(new BoardLocation(1,5), true);
+		bd.renderBoard(2);
+		patternsOnBoard = BoardChecker.checkAllPatterns(bd, true);
+		assertEquals(patternsOnBoard.size(), 1);
+		firstPat = patternsOnBoard.get(0);
+		assertFalse(bd.isPatternWinning(firstPat));
+
 	}
 }
