@@ -130,6 +130,8 @@ public class Board implements Serializable {
 		this.diagonals_Uright = initDiags();
 		this.player1Stone = new ArrayList<BoardLocation>();
 		this.player2Stone = new ArrayList<BoardLocation>();
+		this.firstPattern = new ArrayList<Pattern>();
+		this.secondPattern = new ArrayList<Pattern>();
 	}
 
 	public static int getWidth() {

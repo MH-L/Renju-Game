@@ -777,8 +777,43 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static ArrayList<Pattern> checkAllPatternsSameLine(BoardLocation loc, Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, true, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, false));
+
+		return retVal;
+	}
+
 	public static ArrayList<Pattern> checkAllSpecifiedPatternsArd(boolean first, int num,
 			Board board, BoardLocation loc, boolean isContinuous, boolean isOpen) {
+		ArrayList<Pattern> retVal = checkAllPatternSameLineSpecified(first, num, board, loc, isContinuous, isOpen);
+		Iterator<Pattern> patternIter = retVal.iterator();
+		while(patternIter.hasNext()) {
+			Pattern pat = patternIter.next();
+			if (!pat.getLocations().contains(loc)) {
+				patternIter.remove();
+			}
+		}
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternSameLineSpecified(boolean first, int num, Board board, BoardLocation loc,
+			boolean isContinuous, boolean isOpen) {
 		ArrayList<Pattern> retVal;
 		int ULDiagIndex = Board.getULDiagIndex(loc);
 		int URDiagIndex = Board.getURDiagIndex(loc);
@@ -833,23 +868,82 @@ public class BoardChecker {
 			}
 		}
 
-		Iterator<Pattern> patternIter = retVal.iterator();
-		while(patternIter.hasNext()) {
-			Pattern pat = patternIter.next();
-			if (!pat.getLocations().contains(loc)) {
-				patternIter.remove();
-			}
-		}
 		return retVal;
 	}
 
 	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean first) {
+		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(newMove, board, first);
+		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
+		ArrayList<Pattern> secondPatterns = board.getSecondPattern();
+		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
+		Iterator<Pattern> secondPatIter = secondPatterns.iterator();
+		if (first) {
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					firstPatIter.remove();
+			}
 
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.getBlockingLocs().contains(newMove))
+					secondPatIter.remove();
+			}
+
+			firstPatterns.addAll(patternsColinear);
+		} else {
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					firstPatIter.remove();
+			}
+
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.getLocations().contains(newMove))
+					secondPatIter.remove();
+			}
+
+			secondPatterns.addAll(patternsColinear);
+		}
 	}
 
 	public static void updatePatternsOnWithdraw(Board board, BoardLocation lastMove, boolean first) {
-		// TODO Auto-generated method stub
+		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(lastMove, board, first);
+		ArrayList<Pattern> opponentColinearPatterns = checkAllPatternsSameLine(lastMove, board, first);
+		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
+		ArrayList<Pattern> secondPatterns = board.getSecondPattern();
+		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
+		Iterator<Pattern> secondPatIter = secondPatterns.iterator();
+		if (first) {
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					firstPatIter.remove();
+			}
 
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					secondPatIter.remove();
+			}
+			secondPatterns.addAll(opponentColinearPatterns);
+			firstPatterns.addAll(patternsColinear);
+		} else {
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					secondPatIter.remove();
+			}
+
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					firstPatIter.remove();
+			}
+
+			secondPatterns.addAll(patternsColinear);
+		}
 	}
 
 }

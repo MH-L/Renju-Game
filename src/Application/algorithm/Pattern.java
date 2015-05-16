@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.awt.SecondaryLoop;
 import java.util.ArrayList;
 
 import model.Board;
@@ -22,6 +23,10 @@ public abstract class Pattern {
 	 * List of BoardLocations that can block the pattern and are unoccupied.
 	 */
 	private ArrayList<BoardLocation> blockingLocs;
+	/**
+	 * Indicating whether the pattern is on a row, a column or a diagonal (with upper
+	 * -right and upper-left specified).
+	 */
 	private int type;
 
 	/**
@@ -42,6 +47,7 @@ public abstract class Pattern {
 	public static final int ON_URDIAG = 4;
 
 	public Pattern(ArrayList<BoardLocation> locations, int type, ArrayList<BoardLocation> blockingLocs) {
+		assert (locations.size() > 2);
 		this.constituent = locations;
 		this.type = type;
 		this.blockingLocs = blockingLocs;
@@ -215,5 +221,21 @@ public abstract class Pattern {
 				retVal.add(pat);
 		}
 		return retVal;
+	}
+
+	public boolean isOnSameLine(BoardLocation loc) {
+		BoardLocation firstLoc = constituent.get(0);
+		BoardLocation secondLoc = constituent.get(1);
+		int result1 = BoardLocation.isOnSameLine(firstLoc, loc);
+		int result2 = BoardLocation.isOnSameLine(secondLoc, loc);
+		if (result1 == BoardLocation.ARE_SAME_LOC)
+			if (result2 != 0)
+				return true;
+		if (result2 == BoardLocation.ARE_SAME_LOC)
+			if (result1 != 0)
+				return true;
+		if (result1 == result2 && result1 != 0)
+			return true;
+		return false;
 	}
 }
