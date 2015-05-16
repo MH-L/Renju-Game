@@ -893,15 +893,15 @@ public class BoardChecker {
 			firstPatterns.addAll(patternsColinear);
 		} else {
 			while (secondPatIter.hasNext()) {
-				Pattern curPattern = firstPatIter.next();
+				Pattern curPattern = secondPatIter.next();
 				if (curPattern.isOnSameLine(newMove))
-					firstPatIter.remove();
+					secondPatIter.remove();
 			}
 
 			while (firstPatIter.hasNext()) {
-				Pattern curPattern = secondPatIter.next();
+				Pattern curPattern = firstPatIter.next();
 				if (curPattern.getLocations().contains(newMove))
-					secondPatIter.remove();
+					firstPatIter.remove();
 			}
 
 			secondPatterns.addAll(patternsColinear);
@@ -910,7 +910,7 @@ public class BoardChecker {
 
 	public static void updatePatternsOnWithdraw(Board board, BoardLocation lastMove, boolean first) {
 		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(lastMove, board, first);
-		ArrayList<Pattern> opponentColinearPatterns = checkAllPatternsSameLine(lastMove, board, first);
+		ArrayList<Pattern> opponentColinearPatterns = checkAllPatternsSameLine(lastMove, board, !first);
 		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
 		ArrayList<Pattern> secondPatterns = board.getSecondPattern();
 		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
@@ -931,13 +931,13 @@ public class BoardChecker {
 			firstPatterns.addAll(patternsColinear);
 		} else {
 			while (secondPatIter.hasNext()) {
-				Pattern curPattern = firstPatIter.next();
+				Pattern curPattern = secondPatIter.next();
 				if (curPattern.isOnSameLine(lastMove))
 					secondPatIter.remove();
 			}
 
 			while (firstPatIter.hasNext()) {
-				Pattern curPattern = secondPatIter.next();
+				Pattern curPattern = firstPatIter.next();
 				if (curPattern.isOnSameLine(lastMove))
 					firstPatIter.remove();
 			}

@@ -475,4 +475,26 @@ public class BoardCheckerTest {
 				(new BoardLocation(10,15), board, false);
 		assertEquals(result2.size(), 1);
 	}
+
+	@Test
+	public void testUpdatePatternsForBoard() throws InvalidIndexException {
+		board.reset();
+		board.updateBoard(new BoardLocation(1,1), false);
+		board.updateBoard(new BoardLocation(1,2), false);
+		board.updateBoard(new BoardLocation(1,3), false);
+		board.updateBoard(new BoardLocation(7,8), true);
+		board.updateBoard(new BoardLocation(7,9), true);
+		board.updateBoard(new BoardLocation(7,10), true);
+		assertEquals(board.getSecondPattern().size(), 1);
+		assertEquals(board.getFirstPattern().size(), 1);
+		board.updateBoard(new BoardLocation(1,0), true);
+		assertEquals(board.getSecondPattern().size(), 0);
+		board.updateBoard(new BoardLocation(1,4), false);
+		assertEquals(board.getSecondPattern().size(), 1);
+		board.withdrawMove(new BoardLocation(1,4));
+		assertEquals(board.getSecondPattern().size(), 0);
+		board.withdrawMove(new BoardLocation(1,0));
+		board.renderBoard(2);
+		assertEquals(board.getSecondPattern().size(), 1);
+	}
 }

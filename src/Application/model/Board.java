@@ -107,6 +107,16 @@ public class Board implements Serializable {
 	 */
 	private ArrayList<Pattern> secondPattern;
 	/**
+	 * Locations where after the first player places a stone,
+	 * an urgent composite pattern forms.
+	 */
+	private ArrayList<BoardLocation> firstCriticalLocs;
+	/**
+	 * Locations where after the second player places a stone,
+	 * an urgent composite pattern forms.
+	 */
+	private ArrayList<BoardLocation> secondCriticalLocs;
+	/**
 	 * A default constructor. Makes a default board of size 16.
 	 */
 	public Board() {
@@ -272,6 +282,14 @@ public class Board implements Serializable {
 
 	public ArrayList<Pattern> getSecondPattern() {
 		return secondPattern;
+	}
+
+	public ArrayList<BoardLocation> getFirstCriticalLocs() {
+		return firstCriticalLocs;
+	}
+
+	public ArrayList<BoardLocation> getSecondCriticalLocs() {
+		return secondCriticalLocs;
 	}
 
 	public static BoardLocation getInvalidBoardLocation() {
@@ -1045,6 +1063,8 @@ public class Board implements Serializable {
 				this.getURDiags().get(i)[j] = EMPTY_SPOT;
 		this.player1Stone.clear();
 		this.player2Stone.clear();
+		this.firstPattern.clear();
+		this.secondPattern.clear();
 
 	}
 
