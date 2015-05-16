@@ -99,6 +99,14 @@ public class Board implements Serializable {
 	 */
 	private ArrayList<BoardLocation> player2Stone;
 	/**
+	 * Patterns for player 1.
+	 */
+	private ArrayList<Pattern> firstPattern;
+	/**
+	 * Patterns for player 2.
+	 */
+	private ArrayList<Pattern> secondPattern;
+	/**
 	 * A default constructor. Makes a default board of size 16.
 	 */
 	public Board() {
@@ -254,6 +262,14 @@ public class Board implements Serializable {
 	 */
 	public int getTotalStones() {
 		return this.player1Stone.size() + this.player2Stone.size();
+	}
+
+	public ArrayList<Pattern> getFirstPattern() {
+		return firstPattern;
+	}
+
+	public ArrayList<Pattern> getSecondPattern() {
+		return secondPattern;
 	}
 
 	public static BoardLocation getInvalidBoardLocation() {
@@ -1069,6 +1085,7 @@ public class Board implements Serializable {
 			this.player1Stone.add(loc);
 		else
 			this.player2Stone.add(loc);
+		BoardChecker.updatePatternOnUpdate(this, loc, first);
 		return true;
 
 	}
@@ -1087,6 +1104,7 @@ public class Board implements Serializable {
 			throw new InvalidIndexException(
 					"The location to withdraw is invalid.");
 		}
+		boolean first;
 		int x_coord = lastMove.getXPos();
 		int y_coord = lastMove.getYPos();
 		int indexUL = y_coord - x_coord + width - 1;
@@ -1098,10 +1116,15 @@ public class Board implements Serializable {
 		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
 		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
 		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
-		if (player1Stone.contains(lastMove))
+		if (player1Stone.contains(lastMove)) {
 			this.player1Stone.remove(lastMove);
-		else
+			first = true;
+		}
+		else {
 			this.player2Stone.remove(lastMove);
+			first = false;
+		}
+		BoardChecker.updatePatternsOnWithdraw(this, lastMove, first);
 
 	}
 

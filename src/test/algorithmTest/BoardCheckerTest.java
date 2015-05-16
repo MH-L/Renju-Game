@@ -449,4 +449,30 @@ public class BoardCheckerTest {
 		assertEquals(allSubPatterns.size(), 2);
 		board.renderBoard(2);
 	}
+
+	@Test
+	public void testCheckAllPatternsArd() throws InvalidIndexException {
+		board.reset();
+		board.updateBoard(new BoardLocation(10,11), false);
+		board.updateBoard(new BoardLocation(10,12), false);
+		board.updateBoard(new BoardLocation(10,13), false);
+		board.updateBoard(new BoardLocation(10,15), false);
+		board.updateBoard(new BoardLocation(2,3), false);
+		board.updateBoard(new BoardLocation(2,4), false);
+		board.updateBoard(new BoardLocation(2,5), false);
+		board.updateBoard(new BoardLocation(9,12), false);
+		board.updateBoard(new BoardLocation(8,12), false);
+		ArrayList<Pattern> result = BoardChecker.checkAllPatternsAroundLoc
+				(new BoardLocation(10,12), board, false);
+		assertEquals(result.size(), 2);
+		ArrayList<Pattern> result2 = BoardChecker.checkAllPatternsAroundLoc
+				(new BoardLocation(10,11), board, false);
+		assertEquals(result2.size(), 1);
+		board.updateBoard(new BoardLocation(10,1), false);
+		board.updateBoard(new BoardLocation(10,2), false);
+		board.updateBoard(new BoardLocation(10,3), false);
+		result2 = BoardChecker.checkAllPatternsAroundLoc
+				(new BoardLocation(10,15), board, false);
+		assertEquals(result2.size(), 1);
+	}
 }

@@ -34,6 +34,7 @@ public class IntermediateAlgorithmTest {
 		assertEquals(firstGameBoard, firstAi.getBoard());
 		assertEquals(secondGameBoard, ai.getBoard());
 	}
+
 	@Test
 	public void testIntermediateAttack() throws InvalidIndexException {
 		firstGameBoard.updateBoard(new BoardLocation(5,8), true);

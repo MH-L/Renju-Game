@@ -843,4 +843,13 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean first) {
+
+	}
+
+	public static void updatePatternsOnWithdraw(Board board, BoardLocation lastMove, boolean first) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
