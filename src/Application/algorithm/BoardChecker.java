@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import utils.DeepCopy;
 import model.Board;
 import model.BoardLocation;
+import model.VirtualBoard;
+import exceptions.InvalidIndexException;
 import exceptions.InvalidPatternException;
 
 /**
@@ -46,6 +49,73 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static ArrayList<CompositePattern> checkAllCompositePatterns(Board board, boolean isFirst) {
+		ArrayList<Pattern> patternsFound = checkAllPatterns(board, isFirst);
+		ArrayList<CompositePattern> retVal = CompositePattern.makeCompositePats(patternsFound);
+		return retVal;
+	}
+
+	public static ArrayList<CompositePattern> checkAllCompositePatternsArd(Board board,
+			boolean isFirst, BoardLocation loc) {
+		ArrayList<Pattern> patternsFound = checkAllPatternsAroundLoc(loc, board, isFirst);
+		ArrayList<CompositePattern> retVal = CompositePattern.makeCompositePats(patternsFound);
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllContPatterns(Board board, boolean isFirst) {
+		ArrayList<Pattern> retVal = checkBoardClosedPatCont(board, isFirst, 4);
+		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 5));
+		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 6));
+		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 3));
+		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 4));
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternsAroundLoc(BoardLocation loc,
+			Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, false));
+
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternsSameLine(BoardLocation loc, Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, true, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, false));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, false));
+
+		return retVal;
+	}
+
 	public static ArrayList<Pattern> checkAllSubPatterns(Board board, boolean first) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
 		retVal.addAll(checkBoardOpenPatDisc(board, first, 2));
@@ -53,6 +123,78 @@ public class BoardChecker {
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
 		Algorithm.filterOutDeadPats(retVal, first, board);
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllSpecifiedPatternsArd(boolean first, int num,
+			Board board, BoardLocation loc, boolean isContinuous, boolean isOpen) {
+		ArrayList<Pattern> retVal = checkAllPatternSameLineSpecified(first, num, board, loc, isContinuous, isOpen);
+		Iterator<Pattern> patternIter = retVal.iterator();
+		while(patternIter.hasNext()) {
+			Pattern pat = patternIter.next();
+			if (!pat.getLocations().contains(loc)) {
+				patternIter.remove();
+			}
+		}
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternSameLineSpecified(boolean first, int num, Board board, BoardLocation loc,
+			boolean isContinuous, boolean isOpen) {
+		ArrayList<Pattern> retVal;
+		int ULDiagIndex = Board.getULDiagIndex(loc);
+		int URDiagIndex = Board.getURDiagIndex(loc);
+		int rowIndex = loc.getYPos();
+		int colIndex = loc.getXPos();
+		int[] ULDiag = board.getULDiagByIndex(ULDiagIndex);
+		int[] URDiag = board.getURDiagByIndex(URDiagIndex);
+		int[] row = board.getRowByIndex(rowIndex);
+		int[] col = board.getColumnByIndex(colIndex);
+
+		if (isContinuous)
+			if (isOpen) {
+				retVal = checkOpenPatCont(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkOpenPatCont(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkOpenPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkOpenPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+			else {
+				retVal = checkClosedPatCont(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkClosedPatCont(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkClosedPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkClosedPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+		else {
+			if (isOpen) {
+				retVal = checkOpenPatDisc(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkOpenPatDisc(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkOpenPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkOpenPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+			else {
+				retVal = checkClosedPatDisc(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkClosedPatDisc(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkClosedPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkClosedPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+		}
+
 		return retVal;
 	}
 
@@ -746,131 +888,6 @@ public class BoardChecker {
 		return false;
 	}
 
-	public static ArrayList<Pattern> checkAllContPatterns(Board board, boolean isFirst) {
-		ArrayList<Pattern> retVal = checkBoardClosedPatCont(board, isFirst, 4);
-		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 5));
-		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 6));
-		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 3));
-		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 4));
-		return retVal;
-	}
-
-	public static ArrayList<Pattern> checkAllPatternsAroundLoc(BoardLocation loc, Board board, boolean first) {
-		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
-		if (loc == null || !Board.isReachable(loc))
-			return retVal;
-
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, true));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, false));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, false));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, false));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, false));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, false));
-		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, false));
-
-		return retVal;
-	}
-
-	public static ArrayList<Pattern> checkAllPatternsSameLine(BoardLocation loc, Board board, boolean first) {
-		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
-		if (loc == null || !Board.isReachable(loc))
-			return retVal;
-
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, true, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, true));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, true, false));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, false));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, false));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 6, board, loc, false, false));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, false));
-		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, false));
-
-		return retVal;
-	}
-
-	public static ArrayList<Pattern> checkAllSpecifiedPatternsArd(boolean first, int num,
-			Board board, BoardLocation loc, boolean isContinuous, boolean isOpen) {
-		ArrayList<Pattern> retVal = checkAllPatternSameLineSpecified(first, num, board, loc, isContinuous, isOpen);
-		Iterator<Pattern> patternIter = retVal.iterator();
-		while(patternIter.hasNext()) {
-			Pattern pat = patternIter.next();
-			if (!pat.getLocations().contains(loc)) {
-				patternIter.remove();
-			}
-		}
-		return retVal;
-	}
-
-	public static ArrayList<Pattern> checkAllPatternSameLineSpecified(boolean first, int num, Board board, BoardLocation loc,
-			boolean isContinuous, boolean isOpen) {
-		ArrayList<Pattern> retVal;
-		int ULDiagIndex = Board.getULDiagIndex(loc);
-		int URDiagIndex = Board.getURDiagIndex(loc);
-		int rowIndex = loc.getYPos();
-		int colIndex = loc.getXPos();
-		int[] ULDiag = board.getULDiagByIndex(ULDiagIndex);
-		int[] URDiag = board.getURDiagByIndex(URDiagIndex);
-		int[] row = board.getRowByIndex(rowIndex);
-		int[] col = board.getColumnByIndex(colIndex);
-
-		if (isContinuous)
-			if (isOpen) {
-				retVal = checkOpenPatCont(row, rowIndex, Pattern.ON_ROW,
-						first, num, board);
-				retVal.addAll(checkOpenPatCont(col, colIndex, Pattern.ON_COL,
-						first, num, board));
-				retVal.addAll(checkOpenPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
-						first, num, board));
-				retVal.addAll(checkOpenPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
-						first, num, board));
-			}
-			else {
-				retVal = checkClosedPatCont(row, rowIndex, Pattern.ON_ROW,
-						first, num, board);
-				retVal.addAll(checkClosedPatCont(col, colIndex, Pattern.ON_COL,
-						first, num, board));
-				retVal.addAll(checkClosedPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
-						first, num, board));
-				retVal.addAll(checkClosedPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
-						first, num, board));
-			}
-		else {
-			if (isOpen) {
-				retVal = checkOpenPatDisc(row, rowIndex, Pattern.ON_ROW,
-						first, num, board);
-				retVal.addAll(checkOpenPatDisc(col, colIndex, Pattern.ON_COL,
-						first, num, board));
-				retVal.addAll(checkOpenPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
-						first, num, board));
-				retVal.addAll(checkOpenPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
-						first, num, board));
-			}
-			else {
-				retVal = checkClosedPatDisc(row, rowIndex, Pattern.ON_ROW,
-						first, num, board);
-				retVal.addAll(checkClosedPatDisc(col, colIndex, Pattern.ON_COL,
-						first, num, board));
-				retVal.addAll(checkClosedPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
-						first, num, board));
-				retVal.addAll(checkClosedPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
-						first, num, board));
-			}
-		}
-
-		return retVal;
-	}
-
 	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean first) {
 		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(newMove, board, first);
 		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
@@ -944,6 +961,70 @@ public class BoardChecker {
 
 			secondPatterns.addAll(patternsColinear);
 		}
+	}
+
+	public static void updateCriticalLocsOnUpdate(Board board, BoardLocation newLoc, boolean first) {
+		ArrayList<BoardLocation> firstCriticals = board.getFirstCriticalLocs();
+		ArrayList<BoardLocation> secondCriticals = board.getSecondCriticalLocs();
+		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		if (first) {
+			Iterator<BoardLocation> secondIter = secondCriticals.iterator();
+			while (secondIter.hasNext()) {
+				BoardLocation curLoc = secondIter.next();
+				try {
+					vBoard.updateBoard(curLoc, false);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(board, first, curLoc);
+				CompositePattern.filterUrgentComposites(composites);
+				if (composites.isEmpty())
+					secondIter.remove();
+				try {
+					vBoard.withdrawMove(curLoc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+
+			if (firstCriticals.contains(newLoc)) {
+				firstCriticals.remove(newLoc);
+				return;
+			}
+		} else {
+			Iterator<BoardLocation> firstIter = firstCriticals.iterator();
+			while (firstIter.hasNext()) {
+				BoardLocation curLoc = firstIter.next();
+				try {
+					vBoard.updateBoard(curLoc, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(board, first, curLoc);
+				CompositePattern.filterUrgentComposites(composites);
+				if (composites.isEmpty())
+					firstIter.remove();
+				try {
+					vBoard.withdrawMove(curLoc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+
+			if (secondCriticals.contains(newLoc)) {
+				secondCriticals.remove(newLoc);
+				return;
+			}
+		}
+	}
+
+	public static void updateCriticalLocsOnWithdraw(Board board, BoardLocation newLoc, boolean first) {
+		ArrayList<BoardLocation> firstCriticals = board.getFirstCriticalLocs();
+		ArrayList<BoardLocation> secondCriticals = board.getSecondCriticalLocs();
 	}
 
 }

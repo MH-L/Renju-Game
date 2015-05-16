@@ -142,6 +142,8 @@ public class Board implements Serializable {
 		this.player2Stone = new ArrayList<BoardLocation>();
 		this.firstPattern = new ArrayList<Pattern>();
 		this.secondPattern = new ArrayList<Pattern>();
+		this.firstCriticalLocs = new ArrayList<BoardLocation>();
+		this.secondCriticalLocs = new ArrayList<BoardLocation>();
 	}
 
 	public static int getWidth() {
@@ -964,12 +966,7 @@ public class Board implements Serializable {
 				array = new int[1];
 				break;
 			}
-//			patternsFound = BoardChecker.checkOpenPatCont(array, 0,
-//					pat.getType(), true, 4, this);
-//			if (patternsFound.size() != 0
-//					&& pat.getLocations().contains(
-//							patternsFound.get(0).getLocations().get(0)))
-//				return true;
+
 			array = array.clone();
 			for (int i = 0; i < array.length; i++) {
 				if (array[i] == Board.EMPTY_SPOT) {
@@ -1065,6 +1062,8 @@ public class Board implements Serializable {
 		this.player2Stone.clear();
 		this.firstPattern.clear();
 		this.secondPattern.clear();
+		this.firstCriticalLocs.clear();
+		this.secondCriticalLocs.clear();
 
 	}
 
