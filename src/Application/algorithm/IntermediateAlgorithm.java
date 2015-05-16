@@ -11,6 +11,7 @@ import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
 	private boolean isIntermediateAvailable = false;
+	private boolean AiHasUrgentComposite = false;
 
 	public IntermediateAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
@@ -164,8 +165,21 @@ public class IntermediateAlgorithm extends Algorithm {
 				continue;
 			}
 			ArrayList<Pattern> patternsFound = BoardChecker.checkAllPatterns(vBoard, isFirst);
-			if (patternsFound.size() >= 2) {
+			ArrayList<CompositePattern> composites = CompositePattern.makeCompositePats(patternsFound);
+			if (!composites.isEmpty()) {
 				retVal.add(loc);
+			}
+			CompositePattern.filterUrgentComposites(composites);
+			if (composites.size() != 0) {
+				AiHasUrgentComposite = true;
+				try {
+					vBoard.withdrawMove(loc);
+				} catch (InvalidIndexException e) {
+
+				}
+				retVal.clear();
+				retVal.add(loc);
+				return retVal;
 			}
 			try {
 				vBoard.withdrawMove(loc);
@@ -275,11 +289,17 @@ public class IntermediateAlgorithm extends Algorithm {
 		}
 	}
 
+	public ArrayList<BoardLocation> doOtherCheck(ArrayList<Pattern> otherPatterns) {
+		return null;
+	}
+
 	@Override
 	public ArrayList<BoardLocation> calculateAttack() {
 		ArrayList<BoardLocation> composites = intermediateAttack();
-		if (!composites.isEmpty() && isIntermediateAvailable)
+		if (!composites.isEmpty() && isIntermediateAvailable) {
+			isIntermediateAvailable = false;
 			return composites;
+		}
 		ArrayList<BoardLocation> previousStones = isFirst ? getBoard()
 				.getPlayer1Stone() : getBoard().getPlayer2Stone();
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
@@ -334,16 +354,34 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation makeMoveEnd() {
-		BoardLocation result = doFundamentalCheck();
-		if (result != null)
-			return result;
+		isIntermediateAvailable = false;
+		AiHasUrgentComposite = false;
+		BoardLocation result2 = doFundamentalCheck();
+		if (result2 != null)
+			return result2;
+
+		ArrayList<BoardLocation> locations = calculateAttack();
+		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
+		if (!AiHasUrgentComposite) {
+			if (patterns.size() != 0) {
+				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+				if (result.size() != 0) {
+					BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
+					return blockAttack;
+				}
+				ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
+				return filtered.get(0);
+			}
+		}
+		if (AiHasUrgentComposite && locations.size() > 0)
+			return locations.get(0);
 		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
 		ArrayList<BoardLocation> filtered = filterBlockingLocsAtk(blockingComps);
 		if (filtered.size() != 0)
 			return filtered.get(getRandNum(filtered.size()) - 1);
 		else if (blockingComps.size() != 0)
 			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
-		ArrayList<BoardLocation> locations = calculateAttack();
 		return processLocs(locations);
 	}
 
@@ -406,16 +444,7 @@ public class IntermediateAlgorithm extends Algorithm {
 					return retLoc;
 			}
 		}
-		if (patterns.size() != 0) {
-			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (result.size() != 0) {
-				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
-				return blockAttack;
-			}
-			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
-			return filtered.get(0);
-		}
+
 		return null;
 	}
 

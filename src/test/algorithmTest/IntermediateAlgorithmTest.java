@@ -199,6 +199,29 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.renderBoard(2);
 		BoardLocation loc = ai.makeMoveEnd();
 		assertTrue(loc != null);
+		assertTrue(loc.equals(new BoardLocation(5,11))
+				|| loc.equals(new BoardLocation(8,11)));
+		secondGameBoard.reset();
+		secondGameBoard.updateBoard(new BoardLocation(5,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,9), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,10), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,6), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,5), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,9), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,6), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,11), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,9), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,6), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,6), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,4), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,8), true);
+		secondGameBoard.renderBoard(2);
+		BoardLocation retVal2 = ai.makeMoveEnd();
+		assertEquals(retVal2, new BoardLocation(6,8));
 	}
 
 }

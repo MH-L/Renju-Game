@@ -2,6 +2,7 @@ package algorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 import model.Board;
 import model.BoardLocation;
@@ -751,6 +752,94 @@ public class BoardChecker {
 		retVal.addAll(checkBoardClosedPatCont(board, isFirst, 6));
 		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 3));
 		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 4));
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternsAroundLoc(BoardLocation loc, Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 6, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, false));
+
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllSpecifiedPatternsArd(boolean first, int num,
+			Board board, BoardLocation loc, boolean isContinuous, boolean isOpen) {
+		ArrayList<Pattern> retVal;
+		int ULDiagIndex = Board.getULDiagIndex(loc);
+		int URDiagIndex = Board.getURDiagIndex(loc);
+		int rowIndex = loc.getYPos();
+		int colIndex = loc.getXPos();
+		int[] ULDiag = board.getULDiagByIndex(ULDiagIndex);
+		int[] URDiag = board.getURDiagByIndex(URDiagIndex);
+		int[] row = board.getRowByIndex(rowIndex);
+		int[] col = board.getColumnByIndex(colIndex);
+
+		if (isContinuous)
+			if (isOpen) {
+				retVal = checkOpenPatCont(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkOpenPatCont(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkOpenPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkOpenPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+			else {
+				retVal = checkClosedPatCont(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkClosedPatCont(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkClosedPatCont(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkClosedPatCont(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+		else {
+			if (isOpen) {
+				retVal = checkOpenPatDisc(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkOpenPatDisc(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkOpenPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkOpenPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+			else {
+				retVal = checkClosedPatDisc(row, rowIndex, Pattern.ON_ROW,
+						first, num, board);
+				retVal.addAll(checkClosedPatDisc(col, colIndex, Pattern.ON_COL,
+						first, num, board));
+				retVal.addAll(checkClosedPatDisc(ULDiag, ULDiagIndex, Pattern.ON_ULDIAG,
+						first, num, board));
+				retVal.addAll(checkClosedPatDisc(URDiag, URDiagIndex, Pattern.ON_URDIAG,
+						first, num, board));
+			}
+		}
+
+		Iterator<Pattern> patternIter = retVal.iterator();
+		while(patternIter.hasNext()) {
+			Pattern pat = patternIter.next();
+			if (!pat.getLocations().contains(loc)) {
+				patternIter.remove();
+			}
+		}
 		return retVal;
 	}
 
