@@ -155,13 +155,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
-		for (BoardLocation loc : aiLoc) {
-			ArrayList<BoardLocation> adjLocs = Board.findAdjacentLocs(loc);
-			adjLocs.addAll(Board.findJumpLocations(loc));
-			for (BoardLocation loc2 : adjLocs)
-				if (!candidates.contains(loc2))
-					candidates.add(loc2);
-		}
+		candidates = Algorithm.findFlexibleLocs(aiLoc, getBoard());
 		for (BoardLocation loc : candidates) {
 			try {
 				vBoard.updateBoardLite(loc, isFirst);

@@ -45,8 +45,13 @@ public abstract class Game {
 	 * 		thrown if the move chosen is invalid
 	 */
 	public void makeMove() throws InvalidIndexException {
-		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active()))
+		if (!board.updateBoard(activePlayer.makeMove(), isPlayer1Active())) {
+			if (getActivePlayer().getClass() == AI.class) {
+				board.printPlayerStoneList(true);
+				board.printPlayerStoneList(false);
+			}
 			throw new InvalidIndexException("The index you entered is not valid!");
+		}
 		toggleActivePlayer();
 
 	}

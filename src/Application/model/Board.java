@@ -1645,4 +1645,16 @@ public class Board implements Serializable {
 		return true;
 	}
 
+	public void printPlayerStoneList(boolean first) {
+		ArrayList<BoardLocation> locationsToPrint;
+		if (first)
+			locationsToPrint = player1Stone;
+		else
+			locationsToPrint = player2Stone;
+		for (int i = 0; i < locationsToPrint.size(); i++) {
+			BoardLocation curLoc = locationsToPrint.get(i);
+			System.out.format("%d.(%d,%d)\n", i, curLoc.getYPos(), curLoc.getXPos());
+		}
+	}
+
 }
