@@ -41,14 +41,20 @@ public class MainTest {
 		int whiteWinCount = 0;
 		int boardFullCount = 0;
 		int totalMove = 0;
+		long iterationTime = 0;
 		try {
 			writer = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Stats.txt",
 					"UTF-8");
 			writer.println("The first line");
 			writer.println("The second line");
-
+			long currentTime = System.nanoTime();
 			for (int i = 0; i < 1200; i++) {
+				long iterationStartTime = System.nanoTime();
+				long timeElapsed = System.nanoTime() - currentTime;
 				logger = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Logs.txt", "UTF-8");
+				logger.println("Total time elapsed from the start of the iteration: " +
+						timeElapsed);
+				logger.println("The time it took for the last iteration to run:" + iterationTime);
 				logger.println("The current iteration count is " + i);
 				logger.println("The current stats is:");
 				logger.println("Black win count: " + blackWinCount);
@@ -58,7 +64,7 @@ public class MainTest {
 				logger.println("Please wait with patience.");
 				logger.close();
 				game = new AiVersusAi(Game.Difficulty.NOVICE,
-						Game.Difficulty.INTERMEDIATE);
+						Game.Difficulty.NOVICE);
 				while (!isWinning() && !boardFull()) {
 					try {
 						game.makeMove();
@@ -86,6 +92,7 @@ public class MainTest {
 					boardFullCount ++;
 					System.out.println("There are no more moves left. You both came to a draw!");
 				}
+				iterationTime = System.nanoTime() - iterationStartTime;
 			}
 			writer.println("The black win count is: " + blackWinCount);
 			writer.println("The white win count is: " + whiteWinCount);
