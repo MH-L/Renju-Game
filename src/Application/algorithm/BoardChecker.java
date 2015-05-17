@@ -972,18 +972,18 @@ public class BoardChecker {
 			while (secondIter.hasNext()) {
 				BoardLocation curLoc = secondIter.next();
 				try {
-					vBoard.updateBoard(curLoc, false);
+					vBoard.updateBoardLite(curLoc, false);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
 
 				ArrayList<CompositePattern> composites =
-						checkAllCompositePatternsArd(board, first, curLoc);
+						checkAllCompositePatternsArd(board, false, curLoc);
 				CompositePattern.filterUrgentComposites(composites);
 				if (composites.isEmpty())
 					secondIter.remove();
 				try {
-					vBoard.withdrawMove(curLoc);
+					vBoard.withdrawMoveLite(curLoc);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -999,7 +999,7 @@ public class BoardChecker {
 				if (firstCriticals.contains(relevant))
 					continue;
 				try {
-					vBoard.updateBoard(relevant, true);
+					vBoard.updateBoardLite(relevant, true);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1010,7 +1010,7 @@ public class BoardChecker {
 				if (!composites.isEmpty())
 					firstCriticals.add(relevant);
 				try {
-					vBoard.withdrawMove(relevant);
+					vBoard.withdrawMoveLite(relevant);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1020,18 +1020,18 @@ public class BoardChecker {
 			while (firstIter.hasNext()) {
 				BoardLocation curLoc = firstIter.next();
 				try {
-					vBoard.updateBoard(curLoc, true);
+					vBoard.updateBoardLite(curLoc, true);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
 
 				ArrayList<CompositePattern> composites =
-						checkAllCompositePatternsArd(board, first, curLoc);
+						checkAllCompositePatternsArd(board, true, curLoc);
 				CompositePattern.filterUrgentComposites(composites);
 				if (composites.isEmpty())
 					firstIter.remove();
 				try {
-					vBoard.withdrawMove(curLoc);
+					vBoard.withdrawMoveLite(curLoc);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1048,7 +1048,7 @@ public class BoardChecker {
 				if (firstCriticals.contains(relevant))
 					continue;
 				try {
-					vBoard.updateBoard(relevant, true);
+					vBoard.updateBoardLite(relevant, false);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1059,7 +1059,7 @@ public class BoardChecker {
 				if (!composites.isEmpty())
 					secondCriticals.add(relevant);
 				try {
-					vBoard.withdrawMove(relevant);
+					vBoard.withdrawMoveLite(relevant);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1067,7 +1067,7 @@ public class BoardChecker {
 		}
 	}
 
-	public static void updateCriticalLocsOnWithdraw(Board board, BoardLocation newLoc, boolean first) {
+	public static void updateCriticalLocsOnWithdraw(Board board, BoardLocation lastMove, boolean first) {
 		ArrayList<BoardLocation> firstCriticals = board.getFirstCriticalLocs();
 		ArrayList<BoardLocation> secondCriticals = board.getSecondCriticalLocs();
 		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
@@ -1076,7 +1076,7 @@ public class BoardChecker {
 			while (firstIter.hasNext()) {
 				BoardLocation current = firstIter.next();
 				try {
-					vBoard.updateBoard(current, true);
+					vBoard.updateBoardLite(current, true);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1087,7 +1087,7 @@ public class BoardChecker {
 				if (composites.isEmpty())
 					firstIter.remove();
 				try {
-					vBoard.withdrawMove(current);
+					vBoard.withdrawMoveLite(current);
 				} catch (InvalidIndexException e) {
 					continue;				}
 			}
@@ -1098,7 +1098,7 @@ public class BoardChecker {
 				if (secondCriticals.contains(flexible))
 					continue;
 				try {
-					vBoard.updateBoard(flexible, false);
+					vBoard.updateBoardLite(flexible, false);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1109,7 +1109,7 @@ public class BoardChecker {
 				if (!composites.isEmpty())
 					secondCriticals.add(flexible);
 				try {
-					vBoard.withdrawMove(flexible);
+					vBoard.withdrawMoveLite(flexible);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1119,7 +1119,7 @@ public class BoardChecker {
 			while (secondIter.hasNext()) {
 				BoardLocation current = secondIter.next();
 				try {
-					vBoard.updateBoard(current, true);
+					vBoard.updateBoardLite(current, false);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1130,7 +1130,7 @@ public class BoardChecker {
 				if (composites.isEmpty())
 					secondIter.remove();
 				try {
-					vBoard.withdrawMove(current);
+					vBoard.withdrawMoveLite(current);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1142,7 +1142,7 @@ public class BoardChecker {
 				if (firstCriticals.contains(flexible))
 					continue;
 				try {
-					vBoard.updateBoard(flexible, true);
+					vBoard.updateBoardLite(flexible, true);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -1153,7 +1153,7 @@ public class BoardChecker {
 				if (!composites.isEmpty())
 					firstCriticals.add(flexible);
 				try {
-					vBoard.withdrawMove(flexible);
+					vBoard.withdrawMoveLite(flexible);
 				} catch (InvalidIndexException e) {
 					continue;
 				}

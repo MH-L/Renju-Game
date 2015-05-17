@@ -1107,8 +1107,8 @@ public class Board implements Serializable {
 		else
 			this.player2Stone.add(loc);
 		BoardChecker.updatePatternOnUpdate(this, loc, first);
+		BoardChecker.updateCriticalLocsOnUpdate(this, loc, first);
 		return true;
-
 	}
 
 	/**
@@ -1146,7 +1146,7 @@ public class Board implements Serializable {
 			first = false;
 		}
 		BoardChecker.updatePatternsOnWithdraw(this, lastMove, first);
-
+		BoardChecker.updateCriticalLocsOnWithdraw(this, lastMove, first);
 	}
 
 	/**
