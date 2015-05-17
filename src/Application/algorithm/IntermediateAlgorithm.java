@@ -34,17 +34,19 @@ public class IntermediateAlgorithm extends Algorithm {
 		for (int i = 0; i < applicableLocs.size(); i++) {
 			BoardLocation loc = applicableLocs.get(i);
 			try {
-				vBoard.updateBoard(loc, isFirst);
+				vBoard.updateBoardLite(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> allSubs = BoardChecker.checkAllSubPatterns(vBoard, isFirst);
+			ArrayList<Pattern> allSubs =
+					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
+//			ArrayList<Pattern> allSubs = BoardChecker.checkAllSubPatterns(vBoard, isFirst);
 			if (allSubs.size() > maxSubs) {
 				maxIndex = i;
 				maxSubs = allSubs.size();
 			}
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -69,7 +71,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		for (BoardLocation loc : candidates) {
 			boolean applicable = true;
 			try {
-				vBoard.updateBoard(loc, isFirst);
+				vBoard.updateBoardLite(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -77,7 +79,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			onlyTesting.remove(loc);
 			for (BoardLocation loc2 : onlyTesting) {
 				try {
-					vBoard.updateBoard(loc2, !isFirst);
+					vBoard.updateBoardLite(loc2, !isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -87,7 +89,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				if (otherComposites.size() > 0) {
 					try {
 						applicable = false;
-						vBoard.withdrawMove(loc2);
+						vBoard.withdrawMoveLite(loc2);
 					} catch (InvalidIndexException e) {
 						break;
 					}
@@ -95,7 +97,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				}
 
 				try {
-					vBoard.withdrawMove(loc2);
+					vBoard.withdrawMoveLite(loc2);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -104,7 +106,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				retVal.add(loc);
 			}
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException i) {
 				continue;
 			}
@@ -117,22 +119,23 @@ public class IntermediateAlgorithm extends Algorithm {
 		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
 		for (BoardLocation loc : candidates) {
 			try {
-				vBoard.updateBoard(loc, !isFirst);
+				vBoard.updateBoardLite(loc, !isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
-			ArrayList<CompositePattern> composites = CompositePattern.makeCompositePats(allPatterns);
+//			ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
+			ArrayList<CompositePattern> composites =
+					BoardChecker.checkAllCompositePatternsArd(vBoard, !isFirst, loc);
 			if (composites.size() > 0) {
 				try {
-					vBoard.withdrawMove(loc);
+					vBoard.withdrawMoveLite(loc);
 				} catch (InvalidIndexException e) {
 					return true;
 				}
 				return true;
 			}
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -160,12 +163,13 @@ public class IntermediateAlgorithm extends Algorithm {
 		}
 		for (BoardLocation loc : candidates) {
 			try {
-				vBoard.updateBoard(loc, isFirst);
+				vBoard.updateBoardLite(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patternsFound = BoardChecker.checkAllPatterns(vBoard, isFirst);
-			ArrayList<CompositePattern> composites = CompositePattern.makeCompositePats(patternsFound);
+//			ArrayList<Pattern> patternsFound = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<CompositePattern> composites =
+					BoardChecker.checkAllCompositePatternsArd(vBoard, isFirst, loc);
 			if (!composites.isEmpty()) {
 				retVal.add(loc);
 			}
@@ -173,7 +177,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			if (composites.size() != 0) {
 				AiHasUrgentComposite = true;
 				try {
-					vBoard.withdrawMove(loc);
+					vBoard.withdrawMoveLite(loc);
 				} catch (InvalidIndexException e) {
 
 				}
@@ -182,7 +186,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				return retVal;
 			}
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -205,13 +209,13 @@ public class IntermediateAlgorithm extends Algorithm {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		for (BoardLocation loc : relevantLocs) {
 			try {
-				vBoard.updateBoard(loc, isFirst);
+				vBoard.updateBoardLite(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			if (!BoardChecker.checkAllPatterns(vBoard, isFirst).isEmpty()) {
+			if (!BoardChecker.checkAllPatternsAroundLoc(loc, vBoard, isFirst).isEmpty()) {
 				try {
-					vBoard.withdrawMove(loc);
+					vBoard.withdrawMoveLite(loc);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -235,12 +239,13 @@ public class IntermediateAlgorithm extends Algorithm {
 
 			for (BoardLocation test : newRelLocs) {
 				try {
-					vBoard.updateBoard(test, isFirst);
+					vBoard.updateBoardLite(test, isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
 
-				ArrayList<Pattern> allPatterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+				ArrayList<Pattern> allPatterns =
+						BoardChecker.checkAllPatternsAroundLoc(test, vBoard, isFirst);
 				ArrayList<CompositePattern> allComposites = CompositePattern.makeCompositePats(allPatterns);
 
 				if (!allComposites.isEmpty())
@@ -250,7 +255,7 @@ public class IntermediateAlgorithm extends Algorithm {
 					bestLocs.add(test);
 
 				try {
-					vBoard.withdrawMove(test);
+					vBoard.withdrawMoveLite(test);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -266,7 +271,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				retVal.add(loc);
 
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -320,7 +325,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		while (iter.hasNext()) {
 			BoardLocation adjacentLoc = iter.next();
 			try {
-				vBoard.updateBoard(adjacentLoc, isFirst);
+				vBoard.updateBoardLite(adjacentLoc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -337,7 +342,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			if (patterns.size() != 0)
 				retVal.add(adjacentLoc);
 			try {
-				vBoard.withdrawMove(adjacentLoc);
+				vBoard.withdrawMoveLite(adjacentLoc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -395,7 +400,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		for (int i = 0; i < locations.size(); i++) {
 			BoardLocation location = locations.get(i);
 			try {
-				vBoard.updateBoard(location, isFirst);
+				vBoard.updateBoardLite(location, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -410,7 +415,7 @@ public class IntermediateAlgorithm extends Algorithm {
 					return location;
 			}
 			try {
-				vBoard.withdrawMove(location);
+				vBoard.withdrawMoveLite(location);
 			} catch (InvalidIndexException e) {
 				continue;
 			}

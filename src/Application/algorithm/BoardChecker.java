@@ -78,6 +78,7 @@ public class BoardChecker {
 			return retVal;
 
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 5, board, loc, false, true));
@@ -100,6 +101,7 @@ public class BoardChecker {
 			return retVal;
 
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, true, true));
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 3, board, loc, false, true));
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 4, board, loc, false, true));
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 5, board, loc, false, true));
@@ -122,6 +124,16 @@ public class BoardChecker {
 		retVal.addAll(checkBoardOpenPatCont(board, first, 2));
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
 		retVal.addAll(checkBoardClosedPatDisc(board, first, 3));
+		Algorithm.filterOutDeadPats(retVal, first, board);
+		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllSubPatternsArd(BoardLocation loc, Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, false));
 		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
@@ -996,7 +1008,7 @@ public class BoardChecker {
 			ArrayList<BoardLocation> flexibleLocs = Algorithm.
 					findFlexibleLocs(board.getPlayer1Stone(), board);
 			for (BoardLocation relevant : flexibleLocs) {
-				if (firstCriticals.contains(relevant))
+				if (firstCriticals.contains(relevant) || board.isOccupied(relevant))
 					continue;
 				try {
 					vBoard.updateBoardLite(relevant, true);
@@ -1045,7 +1057,7 @@ public class BoardChecker {
 			ArrayList<BoardLocation> flexibleLocs =
 					Algorithm.findFlexibleLocs(board.getPlayer2Stone(), board);
 			for (BoardLocation relevant : flexibleLocs) {
-				if (firstCriticals.contains(relevant))
+				if (secondCriticals.contains(relevant) || board.isOccupied(relevant))
 					continue;
 				try {
 					vBoard.updateBoardLite(relevant, false);
@@ -1095,7 +1107,7 @@ public class BoardChecker {
 			ArrayList<BoardLocation> flexibleLocs =
 					Algorithm.findFlexibleLocs(board.getPlayer2Stone(), board);
 			for (BoardLocation flexible : flexibleLocs) {
-				if (secondCriticals.contains(flexible))
+				if (secondCriticals.contains(flexible) || board.isOccupied(flexible))
 					continue;
 				try {
 					vBoard.updateBoardLite(flexible, false);
@@ -1139,7 +1151,7 @@ public class BoardChecker {
 			ArrayList<BoardLocation> flexibleLocs =
 					Algorithm.findFlexibleLocs(board.getPlayer1Stone(), board);
 			for (BoardLocation flexible : flexibleLocs) {
-				if (firstCriticals.contains(flexible))
+				if (firstCriticals.contains(flexible) || board.isOccupied(flexible))
 					continue;
 				try {
 					vBoard.updateBoardLite(flexible, true);

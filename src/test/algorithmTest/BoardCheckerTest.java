@@ -509,6 +509,14 @@ public class BoardCheckerTest {
 	    board.updateBoard(new BoardLocation(4,6), false);
 	    assertEquals(board.getFirstCriticalLocs().size(), 0);
 	    assertEquals(board.getSecondCriticalLocs().size(), 1);
+	    board.updateBoard(new BoardLocation(4,7), false);
+	    ArrayList<BoardLocation> locs = board.getSecondCriticalLocs();
+	    assertEquals(board.getSecondCriticalLocs().size(), 1);
+	    board.updateBoard(new BoardLocation(4,4), true);
+	    assertEquals(board.getSecondCriticalLocs().size(), 0);
+	    board.withdrawMove(new BoardLocation(4,4));
+	    board.withdrawMove(new BoardLocation(4,7));
+	    assertEquals(board.getSecondCriticalLocs().size(), 1);
 	}
 
 	@Test

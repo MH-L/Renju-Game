@@ -28,7 +28,6 @@ public abstract class Algorithm {
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		for (BoardLocation stone : previousStones) {
 			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
-//			curCandidates.addAll(Board.findJumpLocations(stone));
 			for (BoardLocation loc : curCandidates) {
 				if (!candidates.contains(loc) && Board.isReachable(loc)
 						&& !board.isOccupied(loc))
@@ -43,22 +42,22 @@ public abstract class Algorithm {
 		while (iter.hasNext()) {
 			BoardLocation adjacentLoc = iter.next();
 			try {
-				vBoard.updateBoard(adjacentLoc, isFirst);
+				vBoard.updateBoardLite(adjacentLoc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard,
-					isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.
+					checkAllPatternsAroundLoc(adjacentLoc, vBoard, isFirst);
 			for (Pattern pat : patterns)
 				if (board.isPatternWinning(pat)) {
 					retVal.clear();
 					retVal.add(adjacentLoc);
 					return retVal;
 				}
-			if (BoardChecker.checkAllPatterns(vBoard, isFirst).size() != 0)
+			if (patterns.size() != 0)
 				retVal.add(adjacentLoc);
 			try {
-				vBoard.withdrawMove(adjacentLoc);
+				vBoard.withdrawMoveLite(adjacentLoc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -77,17 +76,18 @@ public abstract class Algorithm {
 		this.vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		for (BoardLocation location : locations) {
 			try {
-				vBoard.updateBoard(location, isFirst);
+				vBoard.updateBoardLite(location, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.
+					checkAllPatternsAroundLoc(location, vBoard, isFirst);
 			for (Pattern pat : patterns) {
 				if (vBoard.isPatternWinning(pat))
 					return location;
 			}
 			try {
-				vBoard.withdrawMove(location);
+				vBoard.withdrawMoveLite(location);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -114,6 +114,10 @@ public abstract class Algorithm {
 		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
 	}
 
+	public abstract ArrayList<BoardLocation> findLocation();
+
+	public abstract BoardLocation findBestLocWhenStuck();
+
 	public static ArrayList<BoardLocation> findFlexibleLocs(ArrayList<BoardLocation> stones, Board board) {
 		ArrayList<BoardLocation> adjacentLocs = new ArrayList<BoardLocation>();
 		for (BoardLocation location : stones) {
@@ -130,10 +134,6 @@ public abstract class Algorithm {
 		}
 		return adjacentLocs;
 	}
-
-	public abstract ArrayList<BoardLocation> findLocation();
-
-	public abstract BoardLocation findBestLocWhenStuck();
 
 	public BoardLocation makeFirstMoveFirst() {
 		if (Board.getWidth() % 2 == 0) {
@@ -239,6 +239,7 @@ public abstract class Algorithm {
 	}
 
 	public BoardLocation doFundamentalCheck() {
+		// TODO optimize this!
 		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
@@ -247,6 +248,7 @@ public abstract class Algorithm {
 			if (board.isPatternWinning(pat))
 				return findWinningLoc(pat);
 		}
+		// TODO optimize this!
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
@@ -264,9 +266,9 @@ public abstract class Algorithm {
 		}
 		if (patterns.size() != 0) {
 			ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-//			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-			if (tofilter.size() != 0) {
-				BoardLocation blockAttack = tofilter.get(getRandNum(tofilter.size()) - 1);
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
 				return blockAttack;
 			}
 			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
@@ -289,9 +291,9 @@ public abstract class Algorithm {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		for (Pattern pat : patterns) {
 			ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
-			ArrayList<BoardLocation> constituents = pat.getBlockingLocs();
+			ArrayList<BoardLocation> blockingLocs = pat.getBlockingLocs();
 			if (pat.getClass() != DiscOpenPattern.class) {
-				for (BoardLocation loc : constituents) {
+				for (BoardLocation loc : blockingLocs) {
 					if (!retVal.contains(loc))
 						retVal.add(loc);
 				}
@@ -317,7 +319,7 @@ public abstract class Algorithm {
 					break;
 				}
 				BoardLocation firstStone = pat.findFirstStone();
-				for (BoardLocation location : constituents) {
+				for (BoardLocation location : blockingLocs) {
 					int xInc = location.getXPos() - firstStone.getXPos();
 					int yInc = location.getYPos() - firstStone.getYPos();
 					if (xInc == ((DiscOpenPattern) pat).getBubbleIndex() * secondIncrement
@@ -363,14 +365,14 @@ public abstract class Algorithm {
 					&& !board.isOccupied(firstCandidate)
 					&& !locations.contains(firstCandidate)) {
 				try {
-					vBoard.updateBoard(firstCandidate, isFirst);
+					vBoard.updateBoardLite(firstCandidate, isFirst);
 					if (vBoard.checkcol() || vBoard.checkrow() || vBoard.checkdiag())
 						return firstCandidate;
 				} catch (InvalidIndexException e) {
 					continue;
 				}
 				try {
-					vBoard.withdrawMove(firstCandidate);
+					vBoard.withdrawMoveLite(firstCandidate);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -380,7 +382,7 @@ public abstract class Algorithm {
 					&& !board.isOccupied(secondCandidate)
 					&& !locations.contains(secondCandidate)) {
 				try {
-					vBoard.updateBoard(secondCandidate, isFirst);
+					vBoard.updateBoardLite(secondCandidate, isFirst);
 					if (vBoard.checkcol() || vBoard.checkrow()
 							|| vBoard.checkdiag())
 						return secondCandidate;
@@ -388,7 +390,7 @@ public abstract class Algorithm {
 					continue;
 				}
 				try {
-					vBoard.withdrawMove(secondCandidate);
+					vBoard.withdrawMoveLite(secondCandidate);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -430,15 +432,15 @@ public abstract class Algorithm {
 			if (retVal.contains(blockingloc))
 				continue;
 			try {
-				vBoard.updateBoard(blockingloc, isFirst);
+				vBoard.updateBoardLite(blockingloc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> pats = BoardChecker.checkAllPatterns(vBoard,
+			ArrayList<Pattern> pats = BoardChecker.checkAllPatternsAroundLoc(blockingloc, vBoard,
 					isFirst);
 			if (pats.size() > prevSize) {
 				try {
-					vBoard.withdrawMove(blockingloc);
+					vBoard.withdrawMoveLite(blockingloc);
 					retVal.add(blockingloc);
 				} catch (InvalidIndexException e) {
 					continue;
@@ -452,7 +454,7 @@ public abstract class Algorithm {
 				}
 			}
 			try {
-				vBoard.withdrawMove(blockingloc);
+				vBoard.withdrawMoveLite(blockingloc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -525,7 +527,7 @@ public abstract class Algorithm {
 			if (Board.isReachable(first) && !board.isOccupied(first)
 					&& !boardLocs.contains(first)) {
 				try {
-					vBoard.updateBoard(first, isFirst);
+					vBoard.updateBoardLite(first, isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -536,7 +538,7 @@ public abstract class Algorithm {
 						return first;
 				}
 				try {
-					vBoard.withdrawMove(first);
+					vBoard.withdrawMoveLite(first);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -544,7 +546,7 @@ public abstract class Algorithm {
 			if (Board.isReachable(second) && !board.isOccupied(second)
 					&& !boardLocs.contains(second)) {
 				try {
-					vBoard.updateBoard(second, isFirst);
+					vBoard.updateBoardLite(second, isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
@@ -555,7 +557,7 @@ public abstract class Algorithm {
 						return second;
 				}
 				try {
-					vBoard.withdrawMove(second);
+					vBoard.withdrawMoveLite(second);
 				} catch (InvalidIndexException e) {
 					continue;
 				}

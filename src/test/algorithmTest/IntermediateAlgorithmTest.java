@@ -158,7 +158,7 @@ public class IntermediateAlgorithmTest {
 		firstGameBoard.updateBoard(new BoardLocation(1,7), false);
 		firstGameBoard.updateBoard(new BoardLocation(5,3), false);
 		firstGameBoard.updateBoard(new BoardLocation(3,4), false);
-		firstGameBoard.renderBoard(2);
+//		firstGameBoard.renderBoard(2);
 		BoardLocation result = firstAi.findBestLocWhenStuck();
 		assertTrue(result != null);
 		assertEquals(result, new BoardLocation(4,6));
@@ -197,7 +197,7 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.updateBoard(new BoardLocation(9,10), true);
 		secondGameBoard.updateBoard(new BoardLocation(10,8), true);
 		secondGameBoard.updateBoard(new BoardLocation(9,5), true);
-		secondGameBoard.renderBoard(2);
+//		secondGameBoard.renderBoard(2);
 		BoardLocation loc = ai.makeMoveEnd();
 		assertTrue(loc != null);
 		assertTrue(loc.equals(new BoardLocation(5,11))
@@ -220,7 +220,7 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.updateBoard(new BoardLocation(10,6), true);
 		secondGameBoard.updateBoard(new BoardLocation(10,4), true);
 		secondGameBoard.updateBoard(new BoardLocation(10,8), true);
-		secondGameBoard.renderBoard(2);
+//		secondGameBoard.renderBoard(2);
 		BoardLocation retVal2 = ai.makeMoveEnd();
 		assertEquals(retVal2, new BoardLocation(6,8));
 	}
