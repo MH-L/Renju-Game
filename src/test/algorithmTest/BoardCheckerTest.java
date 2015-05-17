@@ -497,4 +497,33 @@ public class BoardCheckerTest {
 		board.renderBoard(2);
 		assertEquals(board.getSecondPattern().size(), 1);
 	}
+
+	@Test
+	public void testUpdateCriticalLocationsOnChange() throws InvalidIndexException {
+	    board.reset();
+	    board.updateBoard(new BoardLocation(1,1), false);
+	    board.updateBoard(new BoardLocation(2,2), false);
+	    board.updateBoard(new BoardLocation(3,3), false);
+	    board.updateBoard(new BoardLocation(0,0), true);
+	    board.updateBoard(new BoardLocation(4,5), false);
+	    board.updateBoard(new BoardLocation(4,6), false);
+	    assertEquals(board.getFirstCriticalLocs().size(), 0);
+	    assertEquals(board.getSecondCriticalLocs().size(), 1);
+	}
+
+	@Test
+	public void testCheckAllCompositePatterns() throws InvalidIndexException {
+		board.reset();
+	    board.updateBoard(new BoardLocation(1,1), false);
+	    board.updateBoard(new BoardLocation(2,2), false);
+	    board.updateBoard(new BoardLocation(3,3), false);
+	    board.updateBoard(new BoardLocation(0,0), true);
+	    board.updateBoard(new BoardLocation(4,5), false);
+	    board.updateBoard(new BoardLocation(4,6), false);
+	    assertEquals(BoardChecker.checkAllCompositePatternsArd
+	    		(board, false, new BoardLocation(4,5)).size(), 0);
+	    board.updateBoard(new BoardLocation(4,4), false);
+	    assertEquals(BoardChecker.checkAllCompositePatternsArd
+	    		(board, false, new BoardLocation(4,4)).size(), 1);
+	}
 }
