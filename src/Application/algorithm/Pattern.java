@@ -1,6 +1,6 @@
 package algorithm;
 
-import java.awt.SecondaryLoop;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import model.Board;
@@ -14,7 +14,11 @@ import model.BoardLocation;
  * @Date 2015/4/14
  *
  */
-public abstract class Pattern {
+public abstract class Pattern implements Serializable{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 6541637730096562122L;
 	/**
 	 * List of stones forming the pattern.
 	 */

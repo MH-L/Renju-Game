@@ -993,6 +993,28 @@ public class BoardChecker {
 				firstCriticals.remove(newLoc);
 				return;
 			}
+			ArrayList<BoardLocation> flexibleLocs = Algorithm.
+					findFlexibleLocs(board.getPlayer1Stone(), board);
+			for (BoardLocation relevant : flexibleLocs) {
+				if (firstCriticals.contains(relevant))
+					continue;
+				try {
+					vBoard.updateBoard(relevant, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, true, relevant);
+				CompositePattern.filterUrgentComposites(composites);
+				if (!composites.isEmpty())
+					firstCriticals.add(relevant);
+				try {
+					vBoard.withdrawMove(relevant);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
 		} else {
 			Iterator<BoardLocation> firstIter = firstCriticals.iterator();
 			while (firstIter.hasNext()) {
@@ -1019,12 +1041,124 @@ public class BoardChecker {
 				secondCriticals.remove(newLoc);
 				return;
 			}
+
+			ArrayList<BoardLocation> flexibleLocs =
+					Algorithm.findFlexibleLocs(board.getPlayer2Stone(), board);
+			for (BoardLocation relevant : flexibleLocs) {
+				if (firstCriticals.contains(relevant))
+					continue;
+				try {
+					vBoard.updateBoard(relevant, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, false, relevant);
+				CompositePattern.filterUrgentComposites(composites);
+				if (!composites.isEmpty())
+					secondCriticals.add(relevant);
+				try {
+					vBoard.withdrawMove(relevant);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
 		}
 	}
 
 	public static void updateCriticalLocsOnWithdraw(Board board, BoardLocation newLoc, boolean first) {
 		ArrayList<BoardLocation> firstCriticals = board.getFirstCriticalLocs();
 		ArrayList<BoardLocation> secondCriticals = board.getSecondCriticalLocs();
+		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
+		if (first) {
+			Iterator<BoardLocation> firstIter = firstCriticals.iterator();
+			while (firstIter.hasNext()) {
+				BoardLocation current = firstIter.next();
+				try {
+					vBoard.updateBoard(current, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, true, current);
+				CompositePattern.filterUrgentComposites(composites);
+				if (composites.isEmpty())
+					firstIter.remove();
+				try {
+					vBoard.withdrawMove(current);
+				} catch (InvalidIndexException e) {
+					continue;				}
+			}
+
+			ArrayList<BoardLocation> flexibleLocs =
+					Algorithm.findFlexibleLocs(board.getPlayer2Stone(), board);
+			for (BoardLocation flexible : flexibleLocs) {
+				if (secondCriticals.contains(flexible))
+					continue;
+				try {
+					vBoard.updateBoard(flexible, false);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, false, flexible);
+				CompositePattern.filterUrgentComposites(composites);
+				if (!composites.isEmpty())
+					secondCriticals.add(flexible);
+				try {
+					vBoard.withdrawMove(flexible);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+		} else {
+			Iterator<BoardLocation> secondIter = secondCriticals.iterator();
+			while (secondIter.hasNext()) {
+				BoardLocation current = secondIter.next();
+				try {
+					vBoard.updateBoard(current, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, false, current);
+				CompositePattern.filterUrgentComposites(composites);
+				if (composites.isEmpty())
+					secondIter.remove();
+				try {
+					vBoard.withdrawMove(current);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+
+			ArrayList<BoardLocation> flexibleLocs =
+					Algorithm.findFlexibleLocs(board.getPlayer1Stone(), board);
+			for (BoardLocation flexible : flexibleLocs) {
+				if (firstCriticals.contains(flexible))
+					continue;
+				try {
+					vBoard.updateBoard(flexible, true);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+
+				ArrayList<CompositePattern> composites =
+						checkAllCompositePatternsArd(vBoard, true, flexible);
+				CompositePattern.filterUrgentComposites(composites);
+				if (!composites.isEmpty())
+					firstCriticals.add(flexible);
+				try {
+					vBoard.withdrawMove(flexible);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+		}
 	}
 
 }
