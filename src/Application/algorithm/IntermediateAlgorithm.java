@@ -28,7 +28,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		ArrayList<BoardLocation> applicableLocs = Algorithm.findFlexibleLocs(getSelfStone(), getBoard());
 		if (applicableLocs.isEmpty())
-			return null;
+			return getBoard().findEmptyLocSpiral();
 		int maxIndex = 0;
 		int maxSubs = -1;
 		for (int i = 0; i < applicableLocs.size(); i++) {
@@ -110,6 +110,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException i) {
 				continue;
 			}
+			onlyTesting.clear();
 		}
 		return retVal;
 	}
@@ -329,7 +330,8 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllContPatterns(vBoard, isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.
+					checkAllContPatternsArd(adjacentLoc, vBoard, isFirst);
 			ArrayList<Pattern> candidatePats = BoardChecker.checkAllPatterns(vBoard, isFirst);
 			for (Pattern pat : patterns)
 				if (getBoard().isPatternWinning(pat)) {
@@ -366,6 +368,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			return result2;
 
 		ArrayList<BoardLocation> locations = calculateAttack();
+		// TODO optimize this!
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
 		if (!AiHasUrgentComposite) {
 			if (patterns.size() != 0) {
@@ -404,8 +407,10 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
-			ArrayList<Pattern> subPatterns = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<Pattern> patterns = BoardChecker.
+					checkAllPatternsAroundLoc(location, vBoard, isFirst);
+			ArrayList<Pattern> subPatterns = BoardChecker.
+					checkAllSubPatternsArd(location, vBoard, isFirst);
 			if (subPatterns.size() > maxSize) {
 				maxIndex = i;
 				maxSize = subPatterns.size();
