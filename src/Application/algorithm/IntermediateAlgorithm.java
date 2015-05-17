@@ -11,8 +11,6 @@ import model.VirtualBoard;
 
 public class IntermediateAlgorithm extends Algorithm {
 	private boolean isIntermediateAvailable = false;
-	private boolean AiHasUrgentComposite = false;
-
 	public IntermediateAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
 	}
@@ -170,7 +168,6 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 			CompositePattern.filterUrgentComposites(composites);
 			if (composites.size() != 0) {
-				AiHasUrgentComposite = true;
 				try {
 					vBoard.withdrawMoveLite(loc);
 				} catch (InvalidIndexException e) {
@@ -326,7 +323,8 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 			ArrayList<Pattern> patterns = BoardChecker.
 					checkAllContPatternsArd(adjacentLoc, vBoard, isFirst);
-			ArrayList<Pattern> candidatePats = BoardChecker.checkAllPatterns(vBoard, isFirst);
+			ArrayList<Pattern> candidatePats = BoardChecker.
+					checkAllContPatternsArd(adjacentLoc, vBoard, isFirst);
 			for (Pattern pat : patterns)
 				if (getBoard().isPatternWinning(pat)) {
 					retVal.clear();
@@ -356,15 +354,15 @@ public class IntermediateAlgorithm extends Algorithm {
 	@Override
 	public BoardLocation makeMoveEnd() {
 		isIntermediateAvailable = false;
-		AiHasUrgentComposite = false;
 		BoardLocation result2 = doFundamentalCheck();
 		if (result2 != null)
 			return result2;
 
-		ArrayList<BoardLocation> locations = calculateAttack();
+		ArrayList<BoardLocation> criticalLocations = isFirst ?
+				getBoard().getFirstCriticalLocs() : getBoard().getSecondCriticalLocs();
 		// TODO optimize this!
 		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
-		if (!AiHasUrgentComposite) {
+		if (criticalLocations.isEmpty()) {
 			if (patterns.size() != 0) {
 				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
@@ -376,7 +374,8 @@ public class IntermediateAlgorithm extends Algorithm {
 				return filtered.get(0);
 			}
 		}
-		if (AiHasUrgentComposite && locations.size() > 0)
+		ArrayList<BoardLocation> locations = calculateAttack();
+		if (!criticalLocations.isEmpty() && locations.size() > 0)
 			return locations.get(0);
 		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
 		ArrayList<BoardLocation> filtered = filterBlockingLocsAtk(blockingComps);
@@ -425,7 +424,11 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation doFundamentalCheck() {
-		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(getBoard(), isFirst);
+		BoardLocation opponentLastMove = getBoard().getMostRecentMove(!isFirst);
+		BoardLocation selfLastMove = getBoard().getMostRecentMove(isFirst);
+
+		ArrayList<Pattern> selfPatterns = BoardChecker.
+				checkAllPatternsAroundLoc(selfLastMove, getBoard(), isFirst);
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
@@ -433,7 +436,8 @@ public class IntermediateAlgorithm extends Algorithm {
 			if (getBoard().isPatternWinning(pat))
 				return findWinningLoc(pat);
 		}
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
+		ArrayList<Pattern> patterns = BoardChecker.
+				checkAllPatternsAroundLoc(opponentLastMove, getBoard(), !isFirst);
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
 			ArrayList<BoardLocation> result = extractBlockingLocs(urgents);

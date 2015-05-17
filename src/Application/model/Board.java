@@ -237,6 +237,13 @@ public class Board implements Serializable {
 		return player2Stone;
 	}
 
+	public BoardLocation getMostRecentMove(boolean isFirst) {
+		if (getTotalStones() < 2)
+			return null;
+		return isFirst ? player1Stone.get(player1Stone.size() - 1)
+				: player2Stone.get(player2Stone.size() - 1);
+	}
+
 	public static int getURDiagIndex(BoardLocation loc) {
 		return loc.getXPos() + loc.getYPos();
 	}
