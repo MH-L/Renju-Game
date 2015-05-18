@@ -346,11 +346,14 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
 		if (!criticalLocations.isEmpty())
 			return criticalLocations.get(0);
+		ArrayList<BoardLocation> flexibles = findFlexibleLocs(getSelfStone(), getBoard());
+		BoardLocation strategicLoc = attackContinuously(flexibles, 5);
+		if (strategicLoc != null)
+			return strategicLoc;
 		if (!opponentComposites.isEmpty()) {
 			ArrayList<BoardLocation> bestDefence = attackOnlyUrgent(tofilter);
 			if (bestDefence.size() > 0)
 				return (findLocWithMostConnection(bestDefence));
-			ArrayList<BoardLocation> flexibles = findFlexibleLocs(getSelfStone(), getBoard());
 			ArrayList<BoardLocation> urgentLocs = attackOnlyUrgent(flexibles);
 
 			if (!flexibles.isEmpty()) {

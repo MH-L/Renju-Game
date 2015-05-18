@@ -635,13 +635,15 @@ public abstract class Algorithm {
 	 * Check whether AI can attack continuously and win.
 	 * @param availableLocs Locations available for the current attack.
 	 * @param maxDepth Maximum depth of the board tree.
-	 * @return An arrayList of locations where AI can make move to win.
+	 * @return A BoardLocation where AI can make move to win.
 	 */
-	public ArrayList<BoardLocation> attackContinuously(ArrayList<BoardLocation> availableLocs, int maxDepth) {
-		BoardTree tree = new BoardTree(getBoard());
+	public BoardLocation attackContinuously
+			(ArrayList<BoardLocation> availableLocs, int maxDepth) {
+		if (maxDepth <= 0)
+			return null;
 		ArrayList<BoardLocation> attackingLocs = attackOnlyUrgent(availableLocs);
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		for (BoardLocation attackingLoc : attackingLocs) {
-			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 			try {
 				vBoard.updateBoard(attackingLoc, isFirst);
 			} catch (InvalidIndexException e) {
@@ -654,10 +656,41 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			BoardTree toAppend = new BoardTree(vBoard);
-			tree.appendChild(toAppend);
+			ArrayList<Pattern> opponentPatterns = BoardChecker.
+					checkAllPatternsAroundLoc(tackleLocation, vBoard, !isFirst);
+			opponentPatterns = filterUrgentPats(opponentPatterns, false);
+			if (!opponentPatterns.isEmpty()) {
+				try {
+					vBoard.withdrawMove(tackleLocation);
+					vBoard.withdrawMove(attackingLoc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				continue;
+			}
+			ArrayList<BoardLocation> criticalLocs = isFirst ? vBoard.getFirstCriticalLocs() :
+				vBoard.getSecondCriticalLocs();
+			if (!criticalLocs.isEmpty())
+				return attackingLoc;
+			Algorithm helperAlg = new IntermediateAlgorithm(vBoard, isFirst);
+			ArrayList<BoardLocation> selfStonesForHelper = isFirst ?
+					vBoard.getPlayer1Stone() : vBoard.getPlayer2Stone();
+			ArrayList<BoardLocation> relevantLocs =
+					Algorithm.findFlexibleLocs(selfStonesForHelper, board);
+			BoardLocation deepCalc = helperAlg.attackContinuously(relevantLocs, maxDepth - 1);
+			if (deepCalc != null)
+				return attackingLoc;
+			else {
+				try {
+					vBoard.withdrawMove(tackleLocation);
+					vBoard.withdrawMove(attackingLoc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				continue;
+			}
 		}
-		return availableLocs;
+		return null;
 	}
 
 	/**

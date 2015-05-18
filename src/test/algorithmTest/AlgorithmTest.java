@@ -168,4 +168,36 @@ public class AlgorithmTest {
 		retVal = Algorithm.findFlexibleLocs(inputVal, board);
 		assertEquals(retVal.size(), 33);
 	}
+
+	@Test
+	public void testAttackContinuously() throws InvalidIndexException {
+		Board board = alg.getBoard();
+		board.reset();
+		board.updateBoard(new BoardLocation(8,8), true);
+		board.updateBoard(new BoardLocation(8,7), false);
+		board.updateBoard(new BoardLocation(9,9), true);
+		board.updateBoard(new BoardLocation(7,8), false);
+		board.updateBoard(new BoardLocation(8,10), true);
+		board.updateBoard(new BoardLocation(10,9), false);
+		board.updateBoard(new BoardLocation(10,8), true);
+		board.updateBoard(new BoardLocation(11,7), false);
+		board.updateBoard(new BoardLocation(7,9), true);
+		board.updateBoard(new BoardLocation(7,10), false);
+		board.updateBoard(new BoardLocation(6,8), true);
+		board.updateBoard(new BoardLocation(5,7), false);
+		board.updateBoard(new BoardLocation(8,9), true);
+		board.updateBoard(new BoardLocation(6,9), false);
+		board.renderBoard(2);
+		BoardLocation strategyLoc = alg.attackContinuously
+				(Algorithm.findFlexibleLocs(board.getPlayer1Stone(), board), 5);
+		assertTrue(strategyLoc != null);
+		board.updateBoard(new BoardLocation(7,11), true);
+		board.updateBoard(new BoardLocation(6,12), false);
+		strategyLoc = alg.attackContinuously
+				(Algorithm.findFlexibleLocs(board.getPlayer1Stone(), board), 4);
+		assertTrue(strategyLoc != null);
+		board.updateBoard(new BoardLocation(9,11), true);
+		board.updateBoard(new BoardLocation(10,12), false);
+		assertEquals(board.getFirstCriticalLocs().size(), 1);
+	}
 }

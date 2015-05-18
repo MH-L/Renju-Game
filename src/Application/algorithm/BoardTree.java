@@ -3,14 +3,22 @@ package algorithm;
 import java.util.ArrayList;
 
 import model.Board;
+import model.BoardLocation;
 
 public class BoardTree {
 	private ArrayList<BoardTree> children;
 	private Board node;
+	private BoardLocation lastMove = null;
 
 	public BoardTree(Board board) {
 		this.node = board;
 		this.children = null;
+	}
+
+	public BoardTree(Board board, BoardLocation lastMove) {
+		this.node = board;
+		this.children = null;
+		this.lastMove = lastMove;
 	}
 
 	public void appendChild(BoardTree tree) {
@@ -39,5 +47,9 @@ public class BoardTree {
 
 	public Board getNode() {
 		return node;
+	}
+
+	public BoardLocation getLastMove() {
+		return lastMove;
 	}
 }
