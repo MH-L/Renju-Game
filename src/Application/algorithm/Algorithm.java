@@ -647,6 +647,15 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
+			Algorithm solver = new BasicAlgorithm(vBoard, !isFirst);
+			BoardLocation tackleLocation = solver.makeMoveEnd();
+			try {
+				vBoard.updateBoard(tackleLocation, !isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			BoardTree toAppend = new BoardTree(vBoard);
+			tree.appendChild(toAppend);
 		}
 		return availableLocs;
 	}
