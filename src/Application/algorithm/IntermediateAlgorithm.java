@@ -361,7 +361,8 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> criticalLocations = isFirst ?
 				getBoard().getFirstCriticalLocs() : getBoard().getSecondCriticalLocs();
 		// TODO optimize this!
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(getBoard(), !isFirst);
+		ArrayList<Pattern> patterns = isFirst ?
+				getBoard().getSecondPattern() : getBoard().getFirstPattern();
 		if (criticalLocations.isEmpty()) {
 			if (patterns.size() != 0) {
 				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
@@ -373,6 +374,8 @@ public class IntermediateAlgorithm extends Algorithm {
 				ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
 				return filtered.get(0);
 			}
+		} else {
+			return criticalLocations.get(0);
 		}
 		ArrayList<BoardLocation> locations = calculateAttack();
 		if (!criticalLocations.isEmpty() && locations.size() > 0)
@@ -424,11 +427,8 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation doFundamentalCheck() {
-		BoardLocation opponentLastMove = getBoard().getMostRecentMove(!isFirst);
-		BoardLocation selfLastMove = getBoard().getMostRecentMove(isFirst);
-
-		ArrayList<Pattern> selfPatterns = BoardChecker.
-				checkAllPatternsAroundLoc(selfLastMove, getBoard(), isFirst);
+		ArrayList<Pattern> selfPatterns = isFirst ?
+				getBoard().getFirstPattern() : getBoard().getSecondPattern();
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
@@ -436,8 +436,8 @@ public class IntermediateAlgorithm extends Algorithm {
 			if (getBoard().isPatternWinning(pat))
 				return findWinningLoc(pat);
 		}
-		ArrayList<Pattern> patterns = BoardChecker.
-				checkAllPatternsAroundLoc(opponentLastMove, getBoard(), !isFirst);
+		ArrayList<Pattern> patterns = isFirst ?
+				getBoard().getSecondPattern() : getBoard().getFirstPattern();
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
 			ArrayList<BoardLocation> result = extractBlockingLocs(urgents);

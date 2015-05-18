@@ -66,6 +66,7 @@ public class BoardChecker {
 		ArrayList<Pattern> retVal = checkBoardClosedPatCont(board, isFirst, 4);
 		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 3));
 		retVal.addAll(checkBoardOpenPatCont(board, isFirst, 4));
+		Algorithm.filterOutDeadPats(retVal, isFirst, board);
 		return retVal;
 	}
 
@@ -73,6 +74,7 @@ public class BoardChecker {
 		ArrayList<Pattern> retVal = checkAllSpecifiedPatternsArd(isFirst, 3, board, loc, true, true);
 		retVal.addAll(checkAllSpecifiedPatternsArd(isFirst, 4, board, loc, true, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(isFirst, 4, board, loc, true, false));
+		Algorithm.filterOutDeadPats(retVal, isFirst, board);
 		return retVal;
 	}
 
@@ -97,6 +99,7 @@ public class BoardChecker {
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 7, board, loc, false, false));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 8, board, loc, false, false));
 
+		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
 
@@ -120,6 +123,7 @@ public class BoardChecker {
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 7, board, loc, false, false));
 		retVal.addAll(checkAllPatternSameLineSpecified(first, 8, board, loc, false, false));
 
+		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
 
@@ -153,6 +157,7 @@ public class BoardChecker {
 				patternIter.remove();
 			}
 		}
+		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
 
@@ -212,6 +217,7 @@ public class BoardChecker {
 			}
 		}
 
+		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
 	}
 
@@ -907,6 +913,7 @@ public class BoardChecker {
 
 	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean first) {
 		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(newMove, board, first);
+		ArrayList<Pattern> opponentColinear = checkAllPatternsSameLine(newMove, board, !first);
 		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
 		ArrayList<Pattern> secondPatterns = board.getSecondPattern();
 		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
@@ -920,11 +927,12 @@ public class BoardChecker {
 
 			while (secondPatIter.hasNext()) {
 				Pattern curPattern = secondPatIter.next();
-				if (curPattern.getBlockingLocs().contains(newMove))
+				if (curPattern.isOnSameLine(newMove))
 					secondPatIter.remove();
 			}
 
 			firstPatterns.addAll(patternsColinear);
+			secondPatterns.addAll(opponentColinear);
 		} else {
 			while (secondPatIter.hasNext()) {
 				Pattern curPattern = secondPatIter.next();
@@ -934,11 +942,12 @@ public class BoardChecker {
 
 			while (firstPatIter.hasNext()) {
 				Pattern curPattern = firstPatIter.next();
-				if (curPattern.getLocations().contains(newMove))
+				if (curPattern.isOnSameLine(newMove))
 					firstPatIter.remove();
 			}
 
 			secondPatterns.addAll(patternsColinear);
+			firstPatterns.addAll(opponentColinear);
 		}
 	}
 
@@ -995,7 +1004,7 @@ public class BoardChecker {
 				}
 
 				ArrayList<CompositePattern> composites =
-						checkAllCompositePatternsArd(board, false, curLoc);
+						checkAllCompositePatternsArd(vBoard, false, curLoc);
 				CompositePattern.filterUrgentComposites(composites);
 				if (composites.isEmpty())
 					secondIter.remove();
@@ -1043,7 +1052,7 @@ public class BoardChecker {
 				}
 
 				ArrayList<CompositePattern> composites =
-						checkAllCompositePatternsArd(board, true, curLoc);
+						checkAllCompositePatternsArd(vBoard, true, curLoc);
 				CompositePattern.filterUrgentComposites(composites);
 				if (composites.isEmpty())
 					firstIter.remove();

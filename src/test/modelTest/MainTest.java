@@ -48,7 +48,7 @@ public class MainTest {
 			writer.println("The first line");
 			writer.println("The second line");
 			long currentTime = System.nanoTime();
-			for (int i = 0; i < 1200; i++) {
+			for (int i = 0; i < 6000; i++) {
 				long iterationStartTime = System.nanoTime();
 				long timeElapsed = System.nanoTime() - currentTime;
 				logger = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Logs.txt", "UTF-8");
@@ -63,12 +63,17 @@ public class MainTest {
 				logger.println("Total moves count: " + totalMove);
 				logger.println("Please wait with patience.");
 				logger.close();
-				game = new AiVersusAi(Game.Difficulty.INTERMEDIATE,
+				game = new AiVersusAi(Game.Difficulty.NOVICE,
 						Game.Difficulty.INTERMEDIATE);
 				while (!isWinning() && !boardFull()) {
 					try {
 						game.makeMove();
 						totalMove ++;
+//						try {
+////							Thread.sleep(1000);
+//						} catch (InterruptedException e) {
+//							continue;
+//						}
 					} catch (InvalidIndexException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

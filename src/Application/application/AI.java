@@ -81,7 +81,7 @@ public class AI implements IPlayer {
 		else
 			nextMove = solver.makeMoveEnd();
 		lastMove = nextMove;
-		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getXPos(), nextMove.getYPos());
+		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getYPos(), nextMove.getXPos());
 		return nextMove;
 	}
 
