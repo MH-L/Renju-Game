@@ -27,28 +27,7 @@ public class IntermediateAlgorithm extends Algorithm {
 		ArrayList<BoardLocation> applicableLocs = Algorithm.findFlexibleLocs(getSelfStone(), getBoard());
 		if (applicableLocs.isEmpty())
 			return getBoard().findEmptyLocSpiral();
-		int maxIndex = 0;
-		int maxSubs = -1;
-		for (int i = 0; i < applicableLocs.size(); i++) {
-			BoardLocation loc = applicableLocs.get(i);
-			try {
-				vBoard.updateBoardLite(loc, isFirst);
-			} catch (InvalidIndexException e) {
-				continue;
-			}
-			ArrayList<Pattern> allSubs =
-					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
-			if (allSubs.size() > maxSubs) {
-				maxIndex = i;
-				maxSubs = allSubs.size();
-			}
-			try {
-				vBoard.withdrawMoveLite(loc);
-			} catch (InvalidIndexException e) {
-				continue;
-			}
-		}
-		return applicableLocs.get(maxIndex);
+		return findLocWithMostConnection(applicableLocs);
 	}
 
 	public VirtualBoard getVirtualBoard() {
@@ -362,20 +341,36 @@ public class IntermediateAlgorithm extends Algorithm {
 		// Already optimized version.
 		ArrayList<Pattern> patterns = isFirst ?
 				getBoard().getSecondPattern() : getBoard().getFirstPattern();
-		if (criticalLocations.isEmpty()) {
-			if (patterns.size() != 0) {
-				ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
-				ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
-				if (result.size() != 0) {
-					BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
-					return blockAttack;
-				}
-				ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
-				return filtered.get(0);
-			}
-		} else {
+		ArrayList<CompositePattern> opponentComposites =
+				CompositePattern.makeCompositePats(patterns);
+		ArrayList<BoardLocation> tofilter = extractBlockingLocs(patterns);
+		if (!criticalLocations.isEmpty())
 			return criticalLocations.get(0);
+		if (!opponentComposites.isEmpty()) {
+			ArrayList<BoardLocation> bestDefence = attackOnlyUrgent(tofilter);
+			if (bestDefence.size() > 0)
+				return (findLocWithMostConnection(bestDefence));
+			ArrayList<BoardLocation> flexibles = findFlexibleLocs(getSelfStone(), getBoard());
+			ArrayList<BoardLocation> urgentLocs = attackOnlyUrgent(flexibles);
+
+			if (!flexibles.isEmpty()) {
+				BoardLocation defenceUsingUrgent = findLocWithMostConnection(urgentLocs);
+				if (defenceUsingUrgent != null)
+					return defenceUsingUrgent;
+			}
 		}
+
+
+		if (patterns.size() != 0) {
+			ArrayList<BoardLocation> result = filterBlockingLocsAtk(tofilter);
+			if (result.size() != 0) {
+				BoardLocation blockAttack = result.get(getRandNum(result.size()) - 1);
+				return blockAttack;
+			}
+			ArrayList<BoardLocation> filtered = keepOnlyBubble(patterns);
+			return filtered.get(0);
+		}
+
 		ArrayList<BoardLocation> locations = calculateAttack();
 		if (!criticalLocations.isEmpty() && locations.size() > 0)
 			return locations.get(0);

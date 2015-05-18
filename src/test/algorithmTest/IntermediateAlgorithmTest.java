@@ -430,6 +430,20 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.updateBoard(new BoardLocation(8,9), true);
 		secondGameBoard.renderBoard(2);
 		BoardLocation resultsss = ai.makeMoveEnd();
+		secondGameBoard.reset();
+		secondGameBoard.updateBoard(new BoardLocation(8,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(9,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(10,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(10,10), true);
+		secondGameBoard.renderBoard(2);
+		BoardLocation forUrgent = ai.makeMoveEnd();
+		assertTrue(forUrgent.getYPos() == 11);
+		assertTrue(forUrgent.getXPos() == 7);
 	}
 
 }

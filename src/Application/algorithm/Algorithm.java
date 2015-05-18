@@ -612,7 +612,7 @@ public abstract class Algorithm {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
 		for (BoardLocation loc : locationsAvailable) {
 			try {
-				vBoard.updateBoard(loc, isFirst);
+				vBoard.updateBoardLite(loc, isFirst);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
@@ -623,12 +623,67 @@ public abstract class Algorithm {
 			if (foundPatterns.size() > 0)
 				retVal.add(loc);
 			try {
-				vBoard.withdrawMove(loc);
+				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
 		}
 		return retVal;
+	}
+
+	/**
+	 * Check whether AI can attack continuously and win.
+	 * @param availableLocs Locations available for the current attack.
+	 * @param maxDepth Maximum depth of the board tree.
+	 * @return An arrayList of locations where AI can make move to win.
+	 */
+	public ArrayList<BoardLocation> attackContinuously(ArrayList<BoardLocation> availableLocs, int maxDepth) {
+		BoardTree tree = new BoardTree(getBoard());
+		ArrayList<BoardLocation> attackingLocs = attackOnlyUrgent(availableLocs);
+		for (BoardLocation attackingLoc : attackingLocs) {
+			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+			try {
+				vBoard.updateBoard(attackingLoc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return availableLocs;
+	}
+
+	/**
+	 * Find the boardLocation which can form the most
+	 * sub-patterns if updated.
+	 * @param locations
+	 * 		Locations available.
+	 * @return The location which can form the most sub-patterns if updated.
+	 */
+	public BoardLocation findLocWithMostConnection(ArrayList<BoardLocation> locations) {
+		if (locations.isEmpty())
+			return null;
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		BoardLocation maxLocation = null;
+		int maxConnection = -1;
+		for (BoardLocation loc : locations) {
+			try {
+				vBoard.updateBoardLite(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+
+			ArrayList<Pattern> allSubPatterns =
+					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
+			if (allSubPatterns.size() > maxConnection) {
+				maxConnection = allSubPatterns.size();
+				maxLocation = loc;
+			}
+			try {
+				vBoard.withdrawMoveLite(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return maxLocation;
 	}
 
 }

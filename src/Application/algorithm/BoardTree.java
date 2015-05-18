@@ -6,10 +6,10 @@ import model.Board;
 
 public class BoardTree {
 	private ArrayList<BoardTree> children;
-	private static Board node;
+	private Board node;
 
 	public BoardTree(Board board) {
-		setNode(board);
+		this.node = board;
 		this.children = null;
 	}
 
@@ -37,11 +37,7 @@ public class BoardTree {
 		return maxDepth;
 	}
 
-	public static Board getNode() {
+	public Board getNode() {
 		return node;
-	}
-
-	public static void setNode(Board node) {
-		BoardTree.node = node;
 	}
 }
