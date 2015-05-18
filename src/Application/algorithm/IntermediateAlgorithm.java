@@ -38,7 +38,6 @@ public class IntermediateAlgorithm extends Algorithm {
 			}
 			ArrayList<Pattern> allSubs =
 					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
-//			ArrayList<Pattern> allSubs = BoardChecker.checkAllSubPatterns(vBoard, isFirst);
 			if (allSubs.size() > maxSubs) {
 				maxIndex = i;
 				maxSubs = allSubs.size();
@@ -360,7 +359,7 @@ public class IntermediateAlgorithm extends Algorithm {
 
 		ArrayList<BoardLocation> criticalLocations = isFirst ?
 				getBoard().getFirstCriticalLocs() : getBoard().getSecondCriticalLocs();
-		// TODO optimize this!
+		// Already optimized version.
 		ArrayList<Pattern> patterns = isFirst ?
 				getBoard().getSecondPattern() : getBoard().getFirstPattern();
 		if (criticalLocations.isEmpty()) {

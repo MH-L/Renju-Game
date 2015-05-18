@@ -600,4 +600,35 @@ public abstract class Algorithm {
 		return new ArrayList<BoardLocation>();
 	}
 
+	/**
+	 * Find locations where urgent patterns can be formed.
+	 * @param locationsAvailable
+	 * 		A list of all locations available, often obtained by
+	 * 		findFlexibleLocs().
+	 * @return An arraylist of locations where urgent patterns can be formed.
+	 */
+	public ArrayList<BoardLocation> attackOnlyUrgent(ArrayList<BoardLocation> locationsAvailable) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		for (BoardLocation loc : locationsAvailable) {
+			try {
+				vBoard.updateBoard(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+
+			ArrayList<Pattern> foundPatterns =
+					BoardChecker.checkAllPatternsAroundLoc(loc, vBoard, isFirst);
+			foundPatterns = filterUrgentPats(foundPatterns, true);
+			if (foundPatterns.size() > 0)
+				retVal.add(loc);
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return retVal;
+	}
+
 }
