@@ -404,7 +404,11 @@ public class IntermediateAlgorithm extends Algorithm {
 				// Basically gives up.
 				return getBoard().findEmptyLocSpiral();
 			}
-
+			ArrayList<BoardLocation> attackingLocs = filterBlockingLocsAtk(tackleLocs);
+			if (attackingLocs.isEmpty())
+				return findLocWithMostConnection(tackleLocs);
+			else
+				return findLocWithMostConnection(attackingLocs);
 		}
 
 		ArrayList<BoardLocation> locations = calculateAttack();
@@ -436,6 +440,11 @@ public class IntermediateAlgorithm extends Algorithm {
 					: vBoard.getFirstCriticalLocs();
 			if (opponentCriticals.isEmpty())
 				retVal.add(possibleLoc);
+			try {
+				vBoard.withdrawMove(possibleLoc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
 		}
 		return retVal;
 	}
@@ -509,7 +518,85 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation makeSecondMoveFirst() {
-		return null;
+		ArrayList<BoardLocation> opponent = getOpponentStone();
+		ArrayList<BoardLocation> self = getSelfStone();
+		BoardLocation selfOnlyStone = self.get(0);
+		BoardLocation opponentOnlyStone = opponent.get(0);
+		int xIncrement = selfOnlyStone.getXPos() - opponentOnlyStone.getXPos();
+		int yIncrement = selfOnlyStone.getYPos() - opponentOnlyStone.getYPos();
+		int distance = Board.findDistance(selfOnlyStone, opponentOnlyStone);
+		if (distance == 1) {
+			ArrayList<BoardLocation> locs = Board.findAdjacentLocs(selfOnlyStone);
+			int firstRnd = getRandNum(2);
+			int secondRnd = getRandNum(2);
+			int thirdRnd = getRandNum(2);
+			if (firstRnd == 2 && secondRnd == 2 && thirdRnd == 2) {
+				BoardLocation candidateLoc = new BoardLocation(opponentOnlyStone.getYPos() - yIncrement,
+						opponentOnlyStone.getXPos() - xIncrement);
+				if (Board.isReachable(candidateLoc))
+					return candidateLoc;
+			} else {
+				ArrayList<BoardLocation> applicable = Board.findAdjacentLocs(selfOnlyStone);
+				ArrayList<BoardLocation> candidate = new ArrayList<BoardLocation>();
+				for (BoardLocation loc : applicable) {
+					if (getBoard().isOccupied(loc))
+						continue;
+					if (Board.findDistance(loc, selfOnlyStone) == firstRnd)
+						candidate.add(loc);
+				}
+
+				Iterator<BoardLocation> iter = candidate.iterator();
+				while (iter.hasNext()) {
+					BoardLocation curLoc = iter.next();
+					if (BoardChecker.checkAllSubPatternsArd(curLoc, getBoard(), true).isEmpty())
+						iter.remove();
+				}
+				if (candidate.isEmpty())
+					return getBoard().findEmptyLocSpiral();
+				return candidate.get(getRandNum(candidate.size()) - 1);
+			}
+		} else if (distance == 2 && Math.abs(xIncrement) == 1 && Math.abs(yIncrement) == 1) {
+			int randSeed = getRandNum(3);
+			ArrayList<BoardLocation> applicable = Board.findAdjacentLocs(opponentOnlyStone);
+			applicable = filterWithDesiredDist(selfOnlyStone, 2, applicable);
+			ArrayList<BoardLocation> aroundSelfLocs = Board.findAdjacentLocs(selfOnlyStone);
+			ArrayList<BoardLocation> oneStep = filterWithDesiredDist(selfOnlyStone, 1, aroundSelfLocs);
+			ArrayList<BoardLocation> twoStep = filterWithDesiredDist(selfOnlyStone, 2, aroundSelfLocs);
+			if (randSeed == 3) {
+				if (!twoStep.isEmpty())
+					return twoStep.get(getRandNum(twoStep.size()) - 1);
+			} else if (randSeed == 2) {
+				if (!oneStep.isEmpty())
+					return oneStep.get(getRandNum(oneStep.size()) - 1);
+			} else {
+				if (!applicable.isEmpty())
+					return applicable.get(getRandNum(applicable.size()) - 1);
+			}
+			return getBoard().findEmptyLocSpiral();
+		} else {
+			ArrayList<BoardLocation> applicable = Board.findAdjacentLocs(opponentOnlyStone);
+			Iterator<BoardLocation> iter = applicable.iterator();
+			vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+			while (iter.hasNext()) {
+				BoardLocation loc = iter.next();
+				try {
+					vBoard.updateBoard(loc, isFirst);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+				if (BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst).isEmpty())
+					iter.remove();
+				try {
+					vBoard.withdrawMove(loc);
+				} catch (InvalidIndexException e) {
+					continue;
+				}
+			}
+			if (applicable.isEmpty())
+				return getBoard().findEmptyLocSpiral();
+			return applicable.get(getRandNum(applicable.size()) - 1);
+		}
+		return getBoard().findEmptyLocSpiral();
 	}
 
 	@Override
@@ -526,7 +613,6 @@ public class IntermediateAlgorithm extends Algorithm {
 		int randNum = getRandNum(2);
 		ArrayList<BoardLocation> locs = Board.findAdjacentLocs(selfOnlyStone);
 		ArrayList<BoardLocation> candidate = new ArrayList<BoardLocation>();
-		ArrayList<BoardLocation> one = new ArrayList<BoardLocation>();
 		for (BoardLocation location : locs) {
 			if (getBoard().isOccupied(location))
 				continue;

@@ -333,6 +333,22 @@ public class Board implements Serializable {
 		this.player2Stone = player2Stone;
 	}
 
+	protected void setFirstPattern(ArrayList<Pattern> firstPattern) {
+		this.firstPattern = firstPattern;
+	}
+
+	protected void setSecondPattern(ArrayList<Pattern> secondPattern) {
+		this.secondPattern = secondPattern;
+	}
+
+	protected void setFirstCriticalLocs(ArrayList<BoardLocation> firstCriticals) {
+		this.firstCriticalLocs = firstCriticals;
+	}
+
+	protected void setSecondCriticalLocs(ArrayList<BoardLocation> secondCriticals) {
+		this.secondCriticalLocs = secondCriticals;
+	}
+
 	/**
 	 * Initialize all grids on the board. The init grid has no stones on it.
 	 * Each entry is just 0.
@@ -1600,11 +1616,23 @@ public class Board implements Serializable {
 		result = prime
 				* result
 				+ ((diagonals_Uright == null) ? 0 : diagonals_Uright.hashCode());
+		result = prime
+				* result
+				+ ((firstCriticalLocs == null) ? 0 : firstCriticalLocs
+						.hashCode());
+		result = prime * result
+				+ ((firstPattern == null) ? 0 : firstPattern.hashCode());
 		result = prime * result
 				+ ((player1Stone == null) ? 0 : player1Stone.hashCode());
 		result = prime * result
 				+ ((player2Stone == null) ? 0 : player2Stone.hashCode());
 		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		result = prime
+				* result
+				+ ((secondCriticalLocs == null) ? 0 : secondCriticalLocs
+						.hashCode());
+		result = prime * result
+				+ ((secondPattern == null) ? 0 : secondPattern.hashCode());
 		return result;
 	}
 
@@ -1634,6 +1662,16 @@ public class Board implements Serializable {
 				return false;
 		} else if (!diagonals_Uright.equals(other.diagonals_Uright))
 			return false;
+		if (firstCriticalLocs == null) {
+			if (other.firstCriticalLocs != null)
+				return false;
+		} else if (!firstCriticalLocs.equals(other.firstCriticalLocs))
+			return false;
+		if (firstPattern == null) {
+			if (other.firstPattern != null)
+				return false;
+		} else if (!firstPattern.equals(other.firstPattern))
+			return false;
 		if (player1Stone == null) {
 			if (other.player1Stone != null)
 				return false;
@@ -1648,6 +1686,16 @@ public class Board implements Serializable {
 			if (other.rows != null)
 				return false;
 		} else if (!rows.equals(other.rows))
+			return false;
+		if (secondCriticalLocs == null) {
+			if (other.secondCriticalLocs != null)
+				return false;
+		} else if (!secondCriticalLocs.equals(other.secondCriticalLocs))
+			return false;
+		if (secondPattern == null) {
+			if (other.secondPattern != null)
+				return false;
+		} else if (!secondPattern.equals(other.secondPattern))
 			return false;
 		return true;
 	}

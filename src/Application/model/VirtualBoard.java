@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
+import algorithm.Pattern;
 import exceptions.InvalidIndexException;
 
 /**
@@ -24,14 +25,17 @@ public class VirtualBoard extends Board {
 	public static VirtualBoard getVBoard(Board board) {
 		return new VirtualBoard(board.getGrids(), board.getRows(),
 				board.getColumns(), board.getULDiags(), board.getURDiags(),
-				board.getPlayer1Stone(), board.getPlayer2Stone());
+				board.getPlayer1Stone(), board.getPlayer2Stone(), board.getFirstPattern(),
+				board.getSecondPattern(), board.getFirstCriticalLocs(), board.getSecondCriticalLocs());
 	}
 
 	@SuppressWarnings("unchecked")
 	private VirtualBoard(int[][] grids, ArrayList<int[]> rows,
 			ArrayList<int[]> cols, ArrayList<int[]> uldiags,
 			ArrayList<int[]> urdiags, ArrayList<BoardLocation> player1locs,
-			ArrayList<BoardLocation> player2locs) {
+			ArrayList<BoardLocation> player2locs, ArrayList<Pattern> firstPatterns,
+			ArrayList<Pattern> secondPatterns, ArrayList<BoardLocation> firstCriticalLocs,
+			ArrayList<BoardLocation> secondCriticalLocs) {
 		setBasicGrid((int[][]) grids.clone());
 		setRows((ArrayList<int[]>) rows.clone());
 		setColumns((ArrayList<int[]>) cols.clone());
@@ -42,6 +46,10 @@ public class VirtualBoard extends Board {
 		stepsToFuture = 0;
 		additionalP1stones = new ArrayList<BoardLocation>();
 		additionalP2stones = new ArrayList<BoardLocation>();
+		setFirstPattern(firstPatterns);
+		setSecondPattern(secondPatterns);
+		setFirstCriticalLocs(firstCriticalLocs);
+		setSecondCriticalLocs(secondCriticalLocs);
 		lastUpdateChanged = false;
 	}
 
@@ -73,6 +81,7 @@ public class VirtualBoard extends Board {
 	public void withdrawMove(BoardLocation location) throws InvalidIndexException {
 		if (!lastUpdateChanged)
 			return;
+		stepsToFuture--;
 		super.withdrawMove(location);
 	}
 
