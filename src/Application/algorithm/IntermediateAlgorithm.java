@@ -36,14 +36,31 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> filteredRetVal = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> intermediateLocations = new ArrayList<BoardLocation>();
+		candidates = Algorithm.findFlexibleLocs(getOpponentStone(), getBoard());
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.getBoard()));
 		if (!checkOtherCompositeAtk(vBoard)) {
 			return new ArrayList<BoardLocation>();
 		}
-		ArrayList<BoardLocation> onlyTesting = new ArrayList<BoardLocation>();
-		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
-		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
-		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
+		for (BoardLocation loc : candidates) {
+			try {
+				vBoard.updateBoard(loc, !isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			if (!BoardChecker.checkAllCompositePatternsArd(vBoard, !isFirst, loc).isEmpty()) {
+				retVal.add(loc);
+			}
+			try {
+				vBoard.withdrawMove(loc);
+			} catch (InvalidIndexException i) {
+				continue;
+			}
+		}
+
 		for (BoardLocation loc : candidates) {
 			boolean applicable = true;
 			try {
@@ -51,17 +68,16 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			onlyTesting.addAll(candidates);
-			onlyTesting.remove(loc);
-			for (BoardLocation loc2 : onlyTesting) {
+			intermediateLocations.addAll(candidates);
+			intermediateLocations.remove(loc);
+			for (BoardLocation loc2 : intermediateLocations) {
 				try {
 					vBoard.updateBoardLite(loc2, !isFirst);
 				} catch (InvalidIndexException e) {
 					continue;
 				}
-				ArrayList<Pattern> allOtherPatterns = BoardChecker.checkAllPatterns(vBoard, !isFirst);
 				ArrayList<CompositePattern> otherComposites =
-						CompositePattern.makeCompositePats(allOtherPatterns);
+						BoardChecker.checkAllCompositePatternsArd(vBoard, !isFirst, loc2);
 				if (otherComposites.size() > 0) {
 					try {
 						applicable = false;
@@ -79,21 +95,25 @@ public class IntermediateAlgorithm extends Algorithm {
 				}
 			}
 			if (applicable) {
-				retVal.add(loc);
+				filteredRetVal.add(loc);
 			}
 			try {
 				vBoard.withdrawMoveLite(loc);
 			} catch (InvalidIndexException i) {
 				continue;
 			}
-			onlyTesting.clear();
+			intermediateLocations.clear();
 		}
-		return retVal;
+
+		retVal.retainAll(filteredRetVal);
+		if (!retVal.isEmpty())
+			return retVal;
+		return filteredRetVal;
 	}
 
 	public boolean checkOtherCompositeAtk(VirtualBoard vBoard) {
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
-		candidates = Algorithm.findFlexibleLocs(getOtherStone(), getBoard());
+		candidates = Algorithm.findFlexibleLocs(getOpponentStone(), getBoard());
 		for (BoardLocation loc : candidates) {
 			try {
 				vBoard.updateBoardLite(loc, !isFirst);
@@ -214,9 +234,8 @@ public class IntermediateAlgorithm extends Algorithm {
 					continue;
 				}
 
-				ArrayList<Pattern> allPatterns =
-						BoardChecker.checkAllPatternsAroundLoc(test, vBoard, isFirst);
-				ArrayList<CompositePattern> allComposites = CompositePattern.makeCompositePats(allPatterns);
+				ArrayList<CompositePattern> allComposites =
+						BoardChecker.checkAllCompositePatternsArd(vBoard, isFirst, test);
 
 				if (!allComposites.isEmpty())
 					possibleLocs.add(test);
@@ -251,7 +270,7 @@ public class IntermediateAlgorithm extends Algorithm {
 			return bestRetVal;
 		}
 		else if (!retVal.isEmpty()) {
-			isIntermediateAvailable = true;
+			isIntermediateAvailable = false;
 			return retVal;
 		}
 		else if (!betterAlt.isEmpty()) {
@@ -331,6 +350,7 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation makeMoveEnd() {
+		// TODO create cache for the continuous attack to win.
 		isIntermediateAvailable = false;
 		BoardLocation result2 = doFundamentalCheck();
 		if (result2 != null)
@@ -347,14 +367,14 @@ public class IntermediateAlgorithm extends Algorithm {
 		if (!criticalLocations.isEmpty())
 			return criticalLocations.get(0);
 		ArrayList<BoardLocation> flexibles = findFlexibleLocs(getSelfStone(), getBoard());
-		BoardLocation strategicLoc = attackContinuously(flexibles, 5);
-		if (strategicLoc != null)
-			return strategicLoc;
+		ArrayList<BoardLocation> urgentLocs = attackOnlyUrgent(flexibles);
+//		BoardLocation strategicLoc = attackContinuously(flexibles, 5);
+//		if (strategicLoc != null)
+//			return strategicLoc;
 		if (!opponentComposites.isEmpty()) {
 			ArrayList<BoardLocation> bestDefence = attackOnlyUrgent(tofilter);
 			if (bestDefence.size() > 0)
 				return (findLocWithMostConnection(bestDefence));
-			ArrayList<BoardLocation> urgentLocs = attackOnlyUrgent(flexibles);
 
 			if (!flexibles.isEmpty()) {
 				BoardLocation defenceUsingUrgent = findLocWithMostConnection(urgentLocs);
@@ -374,8 +394,21 @@ public class IntermediateAlgorithm extends Algorithm {
 			return filtered.get(0);
 		}
 
+		ArrayList<BoardLocation> opponentCriticals = isFirst ? getBoard().getSecondCriticalLocs()
+				: getBoard().getFirstCriticalLocs();
+		if (!opponentCriticals.isEmpty()) {
+			ArrayList<BoardLocation> tackleLocs = blockCriticals();
+			if (tackleLocs.isEmpty()) {
+				if (!urgentLocs.isEmpty())
+					return findLocWithMostConnection(urgentLocs);
+				// Basically gives up.
+				return getBoard().findEmptyLocSpiral();
+			}
+
+		}
+
 		ArrayList<BoardLocation> locations = calculateAttack();
-		if (!criticalLocations.isEmpty() && locations.size() > 0)
+		if (locations.size() > 0)
 			return locations.get(0);
 		ArrayList<BoardLocation> blockingComps = blockPotentialCompositePat();
 		ArrayList<BoardLocation> filtered = filterBlockingLocsAtk(blockingComps);
@@ -384,6 +417,27 @@ public class IntermediateAlgorithm extends Algorithm {
 		else if (blockingComps.size() != 0)
 			return blockingComps.get(getRandNum(blockingComps.size()) - 1);
 		return processLocs(locations);
+	}
+
+	public ArrayList<BoardLocation> blockCriticals() {
+		// TODO Auto-generated method stub
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		ArrayList<BoardLocation> otherStones = getOpponentStone();
+		ArrayList<BoardLocation> flexibles = findFlexibleLocs(otherStones, getBoard());
+		for (BoardLocation possibleLoc : flexibles) {
+			try {
+				vBoard.updateBoard(possibleLoc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+
+			ArrayList<BoardLocation> opponentCriticals = isFirst ? vBoard.getSecondCriticalLocs()
+					: vBoard.getFirstCriticalLocs();
+			if (opponentCriticals.isEmpty())
+				retVal.add(possibleLoc);
+		}
+		return retVal;
 	}
 
 	@Override
@@ -451,6 +505,38 @@ public class IntermediateAlgorithm extends Algorithm {
 		}
 
 		return null;
+	}
+
+	@Override
+	public BoardLocation makeSecondMoveFirst() {
+		return null;
+	}
+
+	@Override
+	public BoardLocation makeSecondMoveSecond() {
+		ArrayList<BoardLocation> opponent = getOpponentStone();
+		ArrayList<BoardLocation> self = getSelfStone();
+		BoardLocation selfOnlyStone = self.get(0);
+		ArrayList<Pattern> opSubPatterns =
+				BoardChecker.checkAllSubPatternsArd(opponent.get(1), getBoard(), true);
+		if (opSubPatterns.size() > 0) {
+			ArrayList<BoardLocation> blockingLocs = opSubPatterns.get(0).getBlockingLocs();
+			return findLocWithMostConnection(blockingLocs);
+		}
+		int randNum = getRandNum(2);
+		ArrayList<BoardLocation> locs = Board.findAdjacentLocs(selfOnlyStone);
+		ArrayList<BoardLocation> candidate = new ArrayList<BoardLocation>();
+		ArrayList<BoardLocation> one = new ArrayList<BoardLocation>();
+		for (BoardLocation location : locs) {
+			if (getBoard().isOccupied(location))
+				continue;
+			if (Board.findDistance(selfOnlyStone, location) == randNum)
+				candidate.add(location);
+		}
+		if (candidate.isEmpty())
+			return getBoard().findEmptyLocSpiral();
+		int randSelection = getRandNum(candidate.size()) - 1;
+		return candidate.get(randSelection);
 	}
 
 }

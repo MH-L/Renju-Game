@@ -110,8 +110,18 @@ public abstract class Algorithm {
 		return isFirst ? this.getBoard().getPlayer1Stone() : this.getBoard().getPlayer2Stone();
 	}
 
-	public ArrayList<BoardLocation> getOtherStone() {
+	public ArrayList<BoardLocation> getOpponentStone() {
 		return isFirst ? this.getBoard().getPlayer2Stone() : this.getBoard().getPlayer1Stone();
+	}
+
+	public ArrayList<BoardLocation> getOpponentCriticals() {
+		return isFirst ? this.getBoard().getSecondCriticalLocs() :
+			this.getBoard().getFirstCriticalLocs();
+	}
+
+	public ArrayList<BoardLocation> getSelfCriticals() {
+		return isFirst ? this.getBoard().getFirstCriticalLocs() :
+			this.getBoard().getSecondCriticalLocs();
 	}
 
 	public abstract ArrayList<BoardLocation> findLocation();
@@ -491,6 +501,41 @@ public abstract class Algorithm {
 		}
 	}
 
+	/**
+	 * Find the boardLocation which can form the most
+	 * sub-patterns if updated.
+	 * @param locations
+	 * 		Locations available.
+	 * @return The location which can form the most sub-patterns if updated.
+	 */
+	public BoardLocation findLocWithMostConnection(ArrayList<BoardLocation> locations) {
+		if (locations.isEmpty())
+			return null;
+		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
+		BoardLocation maxLocation = null;
+		int maxConnection = -1;
+		for (BoardLocation loc : locations) {
+			try {
+				vBoard.updateBoardLite(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+	
+			ArrayList<Pattern> allSubPatterns =
+					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
+			if (allSubPatterns.size() > maxConnection) {
+				maxConnection = allSubPatterns.size();
+				maxLocation = loc;
+			}
+			try {
+				vBoard.withdrawMoveLite(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+		return maxLocation;
+	}
+
 	public BoardLocation extendToWinning(Pattern pat) {
 		// TODO if the pattern is blocked on one side, then
 		// this method might not work.
@@ -582,7 +627,7 @@ public abstract class Algorithm {
 	public ArrayList<BoardLocation> extractAllAdjacentLocs() {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> selfStones = getSelfStone();
-		ArrayList<BoardLocation> otherStones = getOtherStone();
+		ArrayList<BoardLocation> otherStones = getOpponentStone();
 		for (BoardLocation self : selfStones) {
 			ArrayList<BoardLocation> candidates = Board.findAdjacentLocs(self);
 			candidates.addAll(Board.findJumpLocations(self));
@@ -691,41 +736,6 @@ public abstract class Algorithm {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Find the boardLocation which can form the most
-	 * sub-patterns if updated.
-	 * @param locations
-	 * 		Locations available.
-	 * @return The location which can form the most sub-patterns if updated.
-	 */
-	public BoardLocation findLocWithMostConnection(ArrayList<BoardLocation> locations) {
-		if (locations.isEmpty())
-			return null;
-		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(getBoard()));
-		BoardLocation maxLocation = null;
-		int maxConnection = -1;
-		for (BoardLocation loc : locations) {
-			try {
-				vBoard.updateBoardLite(loc, isFirst);
-			} catch (InvalidIndexException e) {
-				continue;
-			}
-
-			ArrayList<Pattern> allSubPatterns =
-					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
-			if (allSubPatterns.size() > maxConnection) {
-				maxConnection = allSubPatterns.size();
-				maxLocation = loc;
-			}
-			try {
-				vBoard.withdrawMoveLite(loc);
-			} catch (InvalidIndexException e) {
-				continue;
-			}
-		}
-		return maxLocation;
 	}
 
 }

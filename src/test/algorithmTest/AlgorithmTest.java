@@ -199,5 +199,26 @@ public class AlgorithmTest {
 		board.updateBoard(new BoardLocation(9,11), true);
 		board.updateBoard(new BoardLocation(10,12), false);
 		assertEquals(board.getFirstCriticalLocs().size(), 1);
+		board.reset();
+		board.updateBoard(new BoardLocation(7,8), true);
+		board.updateBoard(new BoardLocation(6,9), false);
+		board.updateBoard(new BoardLocation(8,8), true);
+		board.updateBoard(new BoardLocation(6,8), false);
+		board.updateBoard(new BoardLocation(8,9), true);
+		board.updateBoard(new BoardLocation(9,8), false);
+		board.updateBoard(new BoardLocation(8,7), true);
+		board.updateBoard(new BoardLocation(8,6), false);
+		board.updateBoard(new BoardLocation(6,7), true);
+		board.updateBoard(new BoardLocation(5,6), false);
+		board.updateBoard(new BoardLocation(7,9), true);
+		board.updateBoard(new BoardLocation(7,7), false);
+		board.updateBoard(new BoardLocation(5,9), true);
+		board.updateBoard(new BoardLocation(9,5), false);
+		board.updateBoard(new BoardLocation(10,4), true);
+		board.updateBoard(new BoardLocation(7,5), false);
+		board.updateBoard(new BoardLocation(9,7), true);
+		board.updateBoard(new BoardLocation(6,9), false);
+		board.renderBoard(2);
+		strategyLoc = alg.makeMoveEnd();
 	}
 }

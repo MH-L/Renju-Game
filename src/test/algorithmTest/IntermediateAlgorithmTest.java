@@ -44,7 +44,7 @@ public class IntermediateAlgorithmTest {
 		firstGameBoard.updateBoard(new BoardLocation(5,9), true);
 		firstGameBoard.updateBoard(new BoardLocation(6,9), true);
 		assertEquals(firstAi.getSelfStone().size(), 5);
-		assertEquals(firstAi.getOtherStone().size(), 1);
+		assertEquals(firstAi.getOpponentStone().size(), 1);
 		ArrayList<BoardLocation> retVal = firstAi.intermediateAttack();
 		assertFalse(retVal.isEmpty());
 		firstGameBoard.reset();
@@ -72,7 +72,7 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.updateBoard(new BoardLocation(12,10), true);
 		assertEquals(ai.getBoard().getTotalStones(), 6);
 		assertEquals(ai.getSelfStone().size(), 1);
-		assertEquals(ai.getOtherStone().size(), 5);
+		assertEquals(ai.getOpponentStone().size(), 5);
 		ArrayList<BoardLocation> retVal = ai.blockPotentialCompositePat();
 		assertFalse(retVal.isEmpty());
 		BoardLocation toTest = retVal.get(0);
@@ -113,10 +113,10 @@ public class IntermediateAlgorithmTest {
 		firstGameBoard.updateBoard(new BoardLocation(10,8), true);
 		firstGameBoard.updateBoard(new BoardLocation(11,1), true);
 		firstGameBoard.updateBoard(new BoardLocation(11,4), true);
-//		firstGameBoard.renderBoard(2);
+		firstGameBoard.renderBoard(2);
 		retVal = firstAi.blockPotentialCompositePat();
 		assertFalse(retVal.isEmpty());
-		assertEquals(retVal.size(), 2);
+		assertEquals(retVal.size(), 1);
 	}
 
 	@Test
@@ -429,6 +429,7 @@ public class IntermediateAlgorithmTest {
 		secondGameBoard.renderBoard(2);
 		secondGameBoard.updateBoard(new BoardLocation(8,9), true);
 		secondGameBoard.renderBoard(2);
+		@SuppressWarnings("unused")
 		BoardLocation resultsss = ai.makeMoveEnd();
 		secondGameBoard.reset();
 		secondGameBoard.updateBoard(new BoardLocation(8,8), true);
@@ -444,6 +445,23 @@ public class IntermediateAlgorithmTest {
 		BoardLocation forUrgent = ai.makeMoveEnd();
 		assertTrue(forUrgent.getYPos() == 11);
 		assertTrue(forUrgent.getXPos() == 7);
+		secondGameBoard.reset();
+		secondGameBoard.updateBoard(new BoardLocation(7,9), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(7,7), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,9), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,10), true);
+		secondGameBoard.updateBoard(new BoardLocation(8,6), false);
+		secondGameBoard.updateBoard(new BoardLocation(8,5), true);
+		secondGameBoard.updateBoard(new BoardLocation(7,8), false);
+		secondGameBoard.updateBoard(new BoardLocation(6,8), true);
+		secondGameBoard.updateBoard(new BoardLocation(5,7), false);
+		secondGameBoard.updateBoard(new BoardLocation(9,9), true);
+		secondGameBoard.renderBoard(2);
+		BoardLocation forBlocking = ai.makeMoveEnd();
+
 	}
 
 }
