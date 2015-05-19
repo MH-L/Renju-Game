@@ -479,11 +479,21 @@ public class BoardChecker {
 		if (array.length < num + 1)
 			return patterns;
 		int prev = Board.EMPTY_SPOT;
+		int prev2 = Board.EMPTY_SPOT;
+		boolean canContinue = true;
 		int count = 0;
 		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
 		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
 		boolean blocked = false;
 		for (int i = 0; i < array.length; i++) {
+			if (array[i] != checker)
+				canContinue = true;
+			if (!canContinue)
+				continue;
+			if (prev2 == checker && prev == Board.EMPTY_SPOT && array[i] == checker) {
+				canContinue = false;
+				continue;
+			}
 			int cur = array[i];
 			if (cur == blocker)
 				blocked = true;
@@ -521,10 +531,18 @@ public class BoardChecker {
 						Pattern candidate = makeContiguousPattern(firstStone,
 								type, num, true, board);
 						patterns.add(candidate);
-					} else if (array[i + 1] == Board.EMPTY_SPOT) {
-						Pattern candidate = makeContiguousPattern(firstStone,
-								type, num, true, board);
-						patterns.add(candidate);
+					} else if (i == array.length - 2) {
+						if (array[i + 1] == Board.EMPTY_SPOT) {
+							Pattern candidate = makeContiguousPattern(firstStone,
+									type, num, true, board);
+							patterns.add(candidate);
+						}
+					} else {
+						if (array[i + 1] == Board.EMPTY_SPOT && array[i + 2] != checker) {
+							Pattern candidate = makeContiguousPattern(firstStone,
+									type, num, true, board);
+							patterns.add(candidate);
+						}
 					}
 				} else {
 					if (i != array.length - 1 && array[i + 1] == blocker) {
@@ -535,6 +553,7 @@ public class BoardChecker {
 				}
 				count = 0;
 			}
+			prev2 = prev;
 			prev = cur;
 		}
 		return patterns;
@@ -560,6 +579,8 @@ public class BoardChecker {
 	public static ArrayList<Pattern> checkClosedPatDisc(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+//		boolean canContinue = true;
+		int prev = Board.EMPTY_SPOT;
 		if (array.length < num + 2)
 			return patterns;
 		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
@@ -572,12 +593,14 @@ public class BoardChecker {
 			int checkerFreq = Collections.frequency(temp, checker);
 			int blockerFreq = Collections.frequency(temp, blocker);
 			int emptyFreq = Collections.frequency(temp, Board.EMPTY_SPOT);
-			if (emptyFreq == 1 && blockerFreq == 1 && checkerFreq == num) {
+			if (emptyFreq == 1 && blockerFreq == 1 && checkerFreq == num
+					&& (!(prev == checker && temp.get(0) == checker))) {
 				if (temp.get(0) == blocker || temp.get(num + 1) == blocker) {
 					int diff = temp.indexOf(blocker)
 							- temp.indexOf(Board.EMPTY_SPOT);
 					if (Math.abs(diff) != 1 && temp.get(0) != Board.EMPTY_SPOT
-							&& temp.get(num + 1) != Board.EMPTY_SPOT) {
+							&& temp.get(num + 1) != Board.EMPTY_SPOT &&
+							((i + temp.size() == array.length) || (array[i + temp.size()] != checker))) {
 						BoardLocation firstStone;
 						// add that pattern to the outcome
 						if (temp.get(0) == blocker) {
@@ -633,6 +656,7 @@ public class BoardChecker {
 				}
 			}
 			temp.clear();
+			prev = array[i];
 		}
 		patterns = Pattern.removeDuplicates(patterns);
 		return patterns;

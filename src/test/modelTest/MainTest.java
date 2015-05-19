@@ -41,7 +41,7 @@ public class MainTest {
 			writer.println("The first line");
 			writer.println("The second line");
 			long currentTime = System.nanoTime();
-			for (int i = 0; i < 6000; i++) {
+			for (int i = 0; i < 20000; i++) {
 				long iterationStartTime = System.nanoTime();
 				long timeElapsed = System.nanoTime() - currentTime;
 				logger = new PrintWriter("C:/Users/Minghao/Desktop/miscellaneous/Logs.txt", "UTF-8");
@@ -63,7 +63,7 @@ public class MainTest {
 						game.makeMove();
 						totalMove ++;
 //						try {
-//							Thread.sleep(1000);
+//							Thread.sleep(700);
 //						} catch (InterruptedException e) {
 //							continue;
 //						}

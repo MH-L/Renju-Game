@@ -186,10 +186,6 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	public ArrayList<BoardLocation> intermediateAttack() {
 		// Check this function since its logic is complicated
-		ArrayList<BoardLocation> composites = compositePatAtk();
-		// If it can form composite patterns, then return such locations.
-		if (!composites.isEmpty())
-			return composites;
 		// Otherwise, try other methods.
 		ArrayList<BoardLocation> bestRetVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -203,14 +199,14 @@ public class IntermediateAlgorithm extends Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			if (!BoardChecker.checkAllPatternsAroundLoc(loc, vBoard, isFirst).isEmpty()) {
-				try {
-					vBoard.withdrawMoveLite(loc);
-				} catch (InvalidIndexException e) {
-					continue;
-				}
-				continue;
-			}
+//			if (!BoardChecker.checkAllPatternsAroundLoc(loc, vBoard, isFirst).isEmpty()) {
+//				try {
+//					vBoard.withdrawMoveLite(loc);
+//				} catch (InvalidIndexException e) {
+//					continue;
+//				}
+//				continue;
+//			}
 			// newRelLocs stores all relevant locations after updating loc
 			// Duplicate removal is necessary since that will greatly
 			// reduce runtime
@@ -289,6 +285,9 @@ public class IntermediateAlgorithm extends Algorithm {
 
 	@Override
 	public ArrayList<BoardLocation> calculateAttack() {
+		ArrayList<BoardLocation> goodList = compositePatAtk();
+		if (!goodList.isEmpty())
+			return goodList;
 		ArrayList<BoardLocation> composites = intermediateAttack();
 		if (!composites.isEmpty() && isIntermediateAvailable) {
 			isIntermediateAvailable = false;
