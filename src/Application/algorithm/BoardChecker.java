@@ -9,7 +9,6 @@ import model.Board;
 import model.BoardLocation;
 import model.VirtualBoard;
 import exceptions.InvalidIndexException;
-import exceptions.InvalidPatternException;
 
 /**
  * Checks works against players, including AI. Check for AI because this helps
@@ -19,41 +18,6 @@ import exceptions.InvalidPatternException;
  *
  */
 public class BoardChecker {
-
-	/**
-	 * Checks for all patterns on board for a given player.
-	 *
-	 * @param board
-	 *            The board where patterns are on.
-	 * @param first
-	 *            Specifies if it is the first player.
-	 * @return An ArrayList of all patterns found on board.
-	 */
-	public static ArrayList<Pattern> checkAllPatterns(Board board, boolean first) {
-		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
-		retVal.addAll(checkBoardOpenPatCont(board, first, 3));
-		retVal.addAll(checkBoardOpenPatCont(board, first, 4));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 3));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 4));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 5));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 6));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 7));
-		retVal.addAll(checkBoardOpenPatDisc(board, first, 8));
-		retVal.addAll(checkBoardClosedPatCont(board, first, 4));
-		retVal.addAll(checkBoardClosedPatDisc(board, first, 4));
-		retVal.addAll(checkBoardClosedPatDisc(board, first, 5));
-		retVal.addAll(checkBoardClosedPatDisc(board, first, 6));
-		retVal.addAll(checkBoardClosedPatDisc(board, first, 7));
-		retVal.addAll(checkBoardClosedPatDisc(board, first, 8));
-		Algorithm.filterOutDeadPats(retVal, first, board);
-		return retVal;
-	}
-
-	public static ArrayList<CompositePattern> checkAllCompositePatterns(Board board, boolean isFirst) {
-		ArrayList<Pattern> patternsFound = checkAllPatterns(board, isFirst);
-		ArrayList<CompositePattern> retVal = CompositePattern.makeCompositePats(patternsFound);
-		return retVal;
-	}
 
 	public static ArrayList<CompositePattern> checkAllCompositePatternsArd(Board board,
 			boolean isFirst, BoardLocation loc) {

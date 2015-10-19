@@ -16,13 +16,11 @@ public class AdvancedAlgorithm extends Algorithm {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	public ArrayList<BoardLocation> findLocation() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public BoardLocation findBestLocWhenStuck() {
 		// TODO Auto-generated method stub
 		return null;

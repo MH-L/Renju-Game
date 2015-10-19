@@ -92,14 +92,12 @@ public class BoardCheckerTest {
 				algorithm.BoardChecker.checkOpenPatCont(
 						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
 						true, 4, board).size(), 0);
-		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
 		board.reset();
 		board.updateBoard(new BoardLocation(3,10), true);
 		board.updateBoard(new BoardLocation(2,10), true);
 		board.updateBoard(new BoardLocation(1,10), true);
 		board.updateBoard(new BoardLocation(0,10), true);
 		board.updateBoard(new BoardLocation(5,10), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
 		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 1);
 		board.reset();
 		board.updateBoard(new BoardLocation(14,0), true);
@@ -107,7 +105,6 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(12,2), true);
 		board.updateBoard(new BoardLocation(11,3), true);
 		board.updateBoard(new BoardLocation(9,5), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, true).size(), 1);
 		assertEquals(BoardChecker.checkBoardOpenPatCont(board, true, 4).size(), 1);
 		board.withdrawMove(new BoardLocation(11,3));
 		board.withdrawMove(new BoardLocation(9,5));
@@ -230,103 +227,6 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(10,3), true);
 		board.updateBoard(new BoardLocation(10,4), false);
 		assertEquals(BoardChecker.checkBoardClosedPatCont(board, true, 4).size(), 1);
-	}
-
-	@Test
-	public void testCheckAllPatterns() throws InvalidIndexException {
-		board.updateBoard(new BoardLocation(5, 3), false);
-		board.updateBoard(new BoardLocation(4, 4), false);
-		board.updateBoard(new BoardLocation(5, 5), false);
-		board.updateBoard(new BoardLocation(6, 6), false);
-		board.updateBoard(new BoardLocation(7, 7), false);
-		board.updateBoard(new BoardLocation(8, 8), true);
-		board.updateBoard(new BoardLocation(6, 2), false);
-		board.updateBoard(new BoardLocation(4, 5), false);
-		board.updateBoard(new BoardLocation(4, 6), false);
-		board.updateBoard(new BoardLocation(4, 7), false);
-		board.updateBoard(new BoardLocation(4, 8), true);
-		board.updateBoard(new BoardLocation(5, 8), true);
-		board.updateBoard(new BoardLocation(6, 8), true);
-		board.renderBoard(2);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 3);
-		board.updateBoard(new BoardLocation(5, 4), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 4);
-		board.updateBoard(new BoardLocation(5, 6), true);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 3);
-		board.updateBoard(new BoardLocation(6, 4), false);
-
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 5);
-		board.updateBoard(new BoardLocation(7, 5), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 7);
-		board.updateBoard(new BoardLocation(8, 7), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 7);
-		board.updateBoard(new BoardLocation(5, 7), false);
-		assertEquals(BoardChecker.checkAllPatterns(board, false).size(), 8);
-		board.reset();
-		board.updateBoard(new BoardLocation(12, 11), true);
-		board.updateBoard(new BoardLocation(13, 10), true);
-		board.updateBoard(new BoardLocation(14, 9), true);
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 1);
-		board.reset();
-		board.updateBoard(new BoardLocation(2, 5), true);
-		board.updateBoard(new BoardLocation(3, 6), true);
-		board.updateBoard(new BoardLocation(5, 8), true);
-		board.updateBoard(new BoardLocation(6, 9), true);
-		board.updateBoard(new BoardLocation(1, 4), false);
-		patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 1);
-		board.reset();
-		board.updateBoard(new BoardLocation(4,4), true);
-		board.updateBoard(new BoardLocation(5,5), true);
-		board.updateBoard(new BoardLocation(7,7), true);
-		board.updateBoard(new BoardLocation(8,8), false);
-		patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 0);
-		board.updateBoard(new BoardLocation(6,6), true);
-		patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 1);
-		board.updateBoard(new BoardLocation(3,3), false);
-		patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 0);
-		board.reset();
-		board.updateBoard(new BoardLocation(8,1), true);
-		board.updateBoard(new BoardLocation(9,0), true);
-		board.updateBoard(new BoardLocation(7,2), true);
-		board.updateBoard(new BoardLocation(6,3), true);
-		board.updateBoard(new BoardLocation(5,4), false);
-		patterns = BoardChecker.checkAllPatterns(board, true);
-		assertEquals(patterns.size(), 0);
-		Board firstGameBoard = new Board();
-		firstGameBoard.updateBoard(new BoardLocation(3,9), false);
-		firstGameBoard.updateBoard(new BoardLocation(4,8), false);
-		firstGameBoard.updateBoard(new BoardLocation(5,7), true);
-		firstGameBoard.updateBoard(new BoardLocation(5,8), true);
-		firstGameBoard.updateBoard(new BoardLocation(5,9), false);
-		firstGameBoard.updateBoard(new BoardLocation(6,8), true);
-		firstGameBoard.updateBoard(new BoardLocation(7,8), true);
-		firstGameBoard.updateBoard(new BoardLocation(7,7), true);
-		firstGameBoard.updateBoard(new BoardLocation(7,9), false);
-		firstGameBoard.updateBoard(new BoardLocation(7,5), false);
-		firstGameBoard.updateBoard(new BoardLocation(8,4), false);
-		firstGameBoard.updateBoard(new BoardLocation(8,6), true);
-		firstGameBoard.updateBoard(new BoardLocation(9,3), true);
-		firstGameBoard.updateBoard(new BoardLocation(8,7), false);
-		firstGameBoard.updateBoard(new BoardLocation(8,8), false);
-		firstGameBoard.updateBoard(new BoardLocation(9,5), true);
-		firstGameBoard.updateBoard(new BoardLocation(9,6), false);
-		firstGameBoard.updateBoard(new BoardLocation(10,2), true);
-		firstGameBoard.updateBoard(new BoardLocation(10,3), false);
-		firstGameBoard.updateBoard(new BoardLocation(10,4), false);
-		firstGameBoard.updateBoard(new BoardLocation(10,5), false);
-		firstGameBoard.updateBoard(new BoardLocation(10,8), true);
-		firstGameBoard.updateBoard(new BoardLocation(11,1), true);
-		firstGameBoard.updateBoard(new BoardLocation(11,4), true);
-		firstGameBoard.updateBoard(new BoardLocation(10,6), false);
-		firstGameBoard.updateBoard(new BoardLocation(5,11), true);
-		firstGameBoard.renderBoard(2);
-//		assertEquals(BoardChecker.checkAllPatterns(firstGameBoard, false).size(), 2);
-		assertEquals(BoardChecker.checkBoardOpenPatDisc(firstGameBoard, false, 3).size(), 1);
 	}
 
 	@Test

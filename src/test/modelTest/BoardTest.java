@@ -577,7 +577,8 @@ public class BoardTest {
 		bd.updateBoard(new BoardLocation(1,3), true);
 		bd.updateBoard(new BoardLocation(1,4), true);
 		bd.updateBoard(new BoardLocation(1,6), true);
-		ArrayList<Pattern> patternsOnBoard = BoardChecker.checkAllPatterns(bd, true);
+		ArrayList<Pattern> patternsOnBoard = BoardChecker.
+				checkAllPatternsAroundLoc(new BoardLocation(1,2), bd, true);
 		assertEquals(patternsOnBoard.size(), 1);
 		Pattern firstPat = patternsOnBoard.get(0);
 		assertTrue(bd.isPatternWinning(firstPat));
@@ -586,7 +587,8 @@ public class BoardTest {
 		bd.withdrawMove(new BoardLocation(1,6));
 		bd.updateBoard(new BoardLocation(1,5), true);
 		bd.renderBoard(2);
-		patternsOnBoard = BoardChecker.checkAllPatterns(bd, true);
+		patternsOnBoard = BoardChecker.
+				checkAllPatternsAroundLoc(new BoardLocation(1,5), bd, true);
 		assertEquals(patternsOnBoard.size(), 1);
 		firstPat = patternsOnBoard.get(0);
 		assertFalse(bd.isPatternWinning(firstPat));

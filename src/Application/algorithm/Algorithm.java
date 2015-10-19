@@ -235,6 +235,10 @@ public abstract class Algorithm {
 		}
 	}
 
+	/**
+	 * Makes move at the beginning.
+	 * @return
+	 */
 	public BoardLocation makeMoveBeginning() {
 		if (board.getTotalStones() == 1)
 			return makeFirstMoveSecond();
@@ -248,9 +252,14 @@ public abstract class Algorithm {
 			return makeMoveEnd();
 	}
 
+	/**
+	 * Kind of ambiguous. TODO finish the doc.
+	 * @return
+	 */
 	public BoardLocation doFundamentalCheck() {
 		// TODO optimize this!
-		ArrayList<Pattern> selfPatterns = BoardChecker.checkAllPatterns(board, isFirst);
+		ArrayList<Pattern> selfPatterns = isFirst ?
+				board.getFirstPattern() : board.getSecondPattern();
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
@@ -259,7 +268,8 @@ public abstract class Algorithm {
 				return findWinningLoc(pat);
 		}
 		// TODO optimize this!
-		ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(board, !isFirst);
+		ArrayList<Pattern> patterns = isFirst ?
+				board.getSecondPattern() : board.getFirstPattern();
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
 		if (urgents.size() != 0) {
 			ArrayList<BoardLocation> result = extractBlockingLocs(urgents);
@@ -286,6 +296,11 @@ public abstract class Algorithm {
 		}
 		return null;
 	}
+
+	/**
+	 * Make move in the end phase.
+	 * @return
+	 */
 	public BoardLocation makeMoveEnd() {
 		BoardLocation result = doFundamentalCheck();
 		if (result != null)
@@ -297,6 +312,11 @@ public abstract class Algorithm {
 		return processLocs(locations);
 	}
 
+	/**
+	 * Keeps only those jump patterns.
+	 * @param patterns
+	 * @return
+	 */
 	public static ArrayList<BoardLocation> keepOnlyBubble(ArrayList<Pattern> patterns) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		for (Pattern pat : patterns) {
@@ -341,6 +361,13 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 * Finds the winning location. A winning locations is a
+	 * location that extends an existing pattern to form five-
+	 * in-a-row.
+	 * @param pat
+	 * @return
+	 */
 	public BoardLocation findWinningLoc(Pattern pat) {
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		ArrayList<BoardLocation> locations = pat.getLocations();
@@ -414,6 +441,13 @@ public abstract class Algorithm {
 		}
 	}
 
+	/**
+	 * Keep only all board locations that are desiredDist from comparer.
+	 * @param comparer
+	 * @param desiredDist
+	 * @param candidate
+	 * @return
+	 */
 	public static ArrayList<BoardLocation> filterWithDesiredDist(
 			BoardLocation comparer, int desiredDist,
 			ArrayList<BoardLocation> candidate) {
@@ -436,7 +470,6 @@ public abstract class Algorithm {
 	public ArrayList<BoardLocation> filterBlockingLocsAtk(
 			ArrayList<BoardLocation> blockingLocs) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
-		int prevSize = BoardChecker.checkAllPatterns(board, isFirst).size();
 		vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(board));
 		for (BoardLocation blockingloc : blockingLocs) {
 			if (retVal.contains(blockingloc))
@@ -448,7 +481,7 @@ public abstract class Algorithm {
 			}
 			ArrayList<Pattern> pats = BoardChecker.checkAllPatternsAroundLoc(blockingloc, vBoard,
 					isFirst);
-			if (pats.size() > prevSize) {
+			if (pats.size() > 0) {
 				try {
 					vBoard.withdrawMoveLite(blockingloc);
 					retVal.add(blockingloc);
@@ -472,6 +505,13 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 * Filter out all patterns that are urgent (i.e. winning
+	 * in one turn if not blocked).
+	 * @param patterns
+	 * @param isSelf
+	 * @return
+	 */
 	public ArrayList<Pattern> filterUrgentPats(
 			ArrayList<Pattern> patterns, boolean isSelf) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
@@ -483,6 +523,13 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 * Filters out all patterns that are dead. By dead it means "unable to
+	 * extend to five stones."
+	 * @param toFilter
+	 * @param isFirst
+	 * @param board
+	 */
 	public static void filterOutDeadPats(ArrayList<Pattern> toFilter, boolean isFirst, Board board) {
 		Iterator<Pattern> iter = toFilter.iterator();
 		while (iter.hasNext()) {
@@ -491,6 +538,12 @@ public abstract class Algorithm {
 		}
 	}
 
+	/**
+	 * Filter out all patterns that are in control.
+	 * @param patterns Patterns to be filtered.
+	 * @param isFirst Indicating which player the method applies to.
+	 * @param board The game board.
+	 */
 	public static void filterOutInControl(ArrayList<Pattern> patterns, boolean isFirst, Board board) {
 		Iterator<Pattern> iter = patterns.iterator();
 		while (iter.hasNext()) {
@@ -520,7 +573,7 @@ public abstract class Algorithm {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-	
+
 			ArrayList<Pattern> allSubPatterns =
 					BoardChecker.checkAllSubPatternsArd(loc, vBoard, isFirst);
 			if (allSubPatterns.size() > maxConnection) {
@@ -536,6 +589,12 @@ public abstract class Algorithm {
 		return maxLocation;
 	}
 
+	/**
+	 * Find location which extends the existing pattern and
+	 * win the game. (i.e. make the other side unable to save.)
+	 * @param pat
+	 * @return
+	 */
 	public BoardLocation extendToWinning(Pattern pat) {
 		// TODO if the pattern is blocked on one side, then
 		// this method might not work.
@@ -576,8 +635,8 @@ public abstract class Algorithm {
 				} catch (InvalidIndexException e) {
 					continue;
 				}
-				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
-						vBoard, isFirst);
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatternsAroundLoc(
+						first, vBoard, isFirst);
 				for (Pattern pat1 : patterns) {
 					if (vBoard.isPatternWinning(pat1))
 						return first;
@@ -595,8 +654,8 @@ public abstract class Algorithm {
 				} catch (InvalidIndexException e) {
 					continue;
 				}
-				ArrayList<Pattern> patterns = BoardChecker.checkAllPatterns(
-						vBoard, isFirst);
+				ArrayList<Pattern> patterns = BoardChecker.checkAllPatternsAroundLoc(
+						second, vBoard, isFirst);
 				for (Pattern pat1 : patterns) {
 					if (vBoard.isPatternWinning(pat1))
 						return second;
@@ -611,6 +670,11 @@ public abstract class Algorithm {
 		return null;
 	}
 
+	/**
+	 * Gets the list of all blocking locations for the given patterns.
+	 * @param patterns
+	 * @return
+	 */
 	public static ArrayList<BoardLocation> extractBlockingLocs(
 			ArrayList<Pattern> patterns) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
@@ -624,6 +688,12 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 * Gets the list of all adjacent locations (both locations next
+	 * to player's stones and jump locations). This method serves as a
+	 * helper.
+	 * @return An arraylist of all adjacent locations.
+	 */
 	public ArrayList<BoardLocation> extractAllAdjacentLocs() {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		ArrayList<BoardLocation> selfStones = getSelfStone();

@@ -103,7 +103,8 @@ public class AlgorithmTest {
 		bd.updateBoard(new BoardLocation(13,12), true);
 		bd.updateBoard(new BoardLocation(12,12), true);
 		bd.updateBoard(new BoardLocation(11,12), false);
-		ArrayList<Pattern> toFilter = BoardChecker.checkAllPatterns(bd, true);
+		ArrayList<Pattern> toFilter = BoardChecker.
+				checkAllPatternsAroundLoc(new BoardLocation(13,12), bd, true);
 		assertEquals(toFilter.size(), 0);
 	}
 
@@ -125,15 +126,8 @@ public class AlgorithmTest {
 		assertEquals(result.size(), 1);
 		assertEquals(result.get(0), new BoardLocation(9,12));
 		bd.reset();
-		bd.updateBoard(new BoardLocation(10,10), false);
-		bd.updateBoard(new BoardLocation(11,10), false);
-		bd.updateBoard(new BoardLocation(13,10), false);
-		bd.updateBoard(new BoardLocation(12,11), true);
 		bd.updateBoard(new BoardLocation(12,9), true);
-		ArrayList<Pattern> whitePatterns =
-				BoardChecker.checkAllPatterns(bd, false);
-		assertEquals(whitePatterns.size(), 1);
-		blockingLocs.clear();
+		bd.updateBoard(new BoardLocation(12,8), true);
 		blockingLocs.add(new BoardLocation(12,10));
 		blockingLocs.add(new BoardLocation(9,10));
 		blockingLocs.add(new BoardLocation(14,10));
