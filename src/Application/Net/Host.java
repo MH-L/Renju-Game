@@ -36,24 +36,20 @@ public class Host extends Player {
 	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
 		// TODO Auto-generated method stub
+		// Need to send the result to the connected socket after
+		// prompting the player for his input.
 		return null;
 	}
 
 	@Override
 	public boolean withdraw() throws WithdrawException {
 		// TODO Auto-generated method stub
+		// In addition to withdraw method of the superclass,
+		// still need to send that to the connected socket.
 		return false;
 	}
 
 	@Override
-	public void forceWithdraw() {
-		// TODO Auto-generated method stub
+	public void forceWithdraw() {}
 
-	}
-
-	@Override
-	public BoardLocation getLastMove() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
