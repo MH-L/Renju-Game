@@ -4,6 +4,7 @@ import exceptions.InvalidIndexException;
 import exceptions.WithdrawException;
 import model.Board;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import static application.Game.*;
@@ -19,6 +20,7 @@ public class Main {
 	private static Scanner reader;
 	private static int dispMode;
 	private static boolean host;
+	private static Network net;
 
 	public static void main(String[] args) {
 		// Get initializations
@@ -40,7 +42,13 @@ public class Main {
 				break;
 			case NETWORK:
 				host = getHost();
+			try {
 				game = new Network(host);
+			} catch (IOException e) {
+				System.out.println("Oops... Unable to start network game"
+						+ " due to bad network status.");
+				return;
+			}
 				break;
 			case AIVERSUSAI:
 				Difficulty diff1 = getDifficulty();
@@ -95,7 +103,61 @@ public class Main {
 
 	private static void playNetwork() {
 		// Network instance should already be instantiated.
+		if (game.getActivePlayer() == null) {
+			throw new RuntimeException("There is no player!");
+		}
+		while (!isWinning() && !boardFull()) {
+            System.out.println("\nPlayer " + getActivePlayerAsString() + ", it is your turn.");
+            try {
+                game.makeMove();
+                game.getBoard().renderBoard(dispMode);
+            } catch (InvalidIndexException e) {
+                switch (e.getMessage()) {
+                    case "x":
+                        actionGameOver();
+                        return;
+                    case "w":
+                        try {
+                            actionWithdraw();
+							System.out.format(
+									"You have %d withdrawals left.\n",
+									((Player) game.getActivePlayer())
+											.getRegrets());
+							System.out.println("Now the board is shown below.");
+							game.getBoard().renderBoard(dispMode);
+                        } catch (WithdrawException e1) {
+                            // Redo this turn since the player is out of withdrawals
+                            continue;
+                        } catch (InvalidIndexException e1) {
+							e1.printStackTrace();
+							System.out.println(e1.getMessage());
+							continue;
+						}
+						break;
+					case "i":
+                        printInstruction();
+                        break;
+                    default:
+                        // TODO fix this since Board also throws the exception which doesn't
+                        // return the command issued as the message
+                        // Could just give a generic response rather than returning the issued command
+                        System.out.println("Your input, [" + e.getMessage() + "] is not a valid command or move.");
+                }
+            }
+        }
+		if (isWinning()) {
+			// get inactive player because the current player was toggled at the
+			// end of the round
+			// if (game.getBoard().getTotalStones() <= 8)
+			// System.err.println("Fuck! This is not even possible!");
+			System.out.println("Player " + getInactivePlayerAsString()
+					+ ", You won!");
+		} else if (boardFull()) {
+			System.out
+					.println("There are no more moves left. You both came to a draw!");
+		}
 
+		reader.close();
 	}
 
 	private static void playLocal() {
