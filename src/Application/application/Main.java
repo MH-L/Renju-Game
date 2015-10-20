@@ -94,6 +94,8 @@ public class Main {
 	}
 
 	private static void playNetwork() {
+		// Network instance should already be instantiated.
+
 	}
 
 	private static void playLocal() {

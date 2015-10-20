@@ -8,16 +8,18 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 
+import model.BoardLocation;
+import exceptions.InvalidIndexException;
+import exceptions.WithdrawException;
+
 /**
  * Created by kelvin on 14/04/15.
  */
-public class Host {
+public class Host extends Player {
     private ServerSocket socket;
-    private IPlayer player;
 
     public Host () throws IOException {
         socket = new ServerSocket(Network.PORT);
-        this.player = new Player();
     }
 
     public void listen() throws IOException {
@@ -28,9 +30,30 @@ public class Host {
         System.out.println("Give this address to your opponent.");
         System.out.println("\n.... Listening for a connection ....");
         socket.accept();
+        System.out.println("Your rival has connected successfully.");
     }
 
-    public IPlayer getPlayer() {
-        return player;
-    }
+	@Override
+	public BoardLocation makeMove() throws InvalidIndexException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean withdraw() throws WithdrawException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void forceWithdraw() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public BoardLocation getLastMove() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

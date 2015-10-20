@@ -15,7 +15,6 @@ public class Network extends Game {
     public static final int HOST = 1;
     public static final int CLIENT = 2;
 
-    private Game game;
     private Host host;
     private Client client;
 
