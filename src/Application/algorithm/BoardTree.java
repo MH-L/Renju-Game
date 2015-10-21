@@ -9,8 +9,10 @@ public class BoardTree {
 	private ArrayList<BoardTree> children;
 	private Board node;
 	private BoardLocation lastMove = null;
+	private int score;
 
 	public BoardTree(Board board) {
+		this.score = 0;
 		this.node = board;
 		this.children = null;
 	}
@@ -51,5 +53,19 @@ public class BoardTree {
 
 	public BoardLocation getLastMove() {
 		return lastMove;
+	}
+
+	public int getScore() {
+		return this.score;
+	}
+
+	public BoardTree getMinMax() {
+		int maxIndex = 0;
+		for (int i = 0; i < children.size(); i++) {
+			if (children.get(i).getScore() > children.get(maxIndex).getScore()) {
+				maxIndex = i
+			}
+		}
+		return children.get(maxIndex);
 	}
 }
