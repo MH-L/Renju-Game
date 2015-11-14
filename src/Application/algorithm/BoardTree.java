@@ -31,7 +31,14 @@ public class BoardTree {
 		this.children = new ArrayList<BoardTree>();
 	}
 
-	public BoardTree(Board board, BoardLocation lastMove, int turn) {
+	/**
+	 * Constructor only for adding board to the children array of
+	 * an existing board.
+	 * @param board
+	 * @param lastMove
+	 * @param turn
+	 */
+	private BoardTree(Board board, BoardLocation lastMove, int turn) {
 		this.turn = turn;
 		// TODO this needs refining.
 		this.score = 0;

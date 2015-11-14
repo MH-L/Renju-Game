@@ -52,4 +52,40 @@ public class CompositePattern {
 	public boolean isUrgent() {
 		return isUrgent;
 	}
+
+	public boolean isFourFour() {
+		int fours = 0;
+		for (Pattern ptn : this.patterns) {
+			if (ptn.getLocations().size() == 4) {
+				fours ++;
+			}
+		}
+
+		return fours >= 2;
+	}
+
+	public boolean isFourThree() {
+		boolean hasFour = false;
+		boolean hasThree = false;
+		for (Pattern ptn : this.patterns) {
+			if (ptn.getLocations().size() == 4) {
+				hasFour = true;
+			} else if (ptn.getLocations().size() == 3) {
+				hasThree = true;
+			}
+		}
+
+		return hasFour && hasThree;
+	}
+
+	public boolean isThreeThree() {
+		int threes = 0;
+		for (Pattern ptn : this.patterns) {
+			if (ptn.getLocations().size() == 3) {
+				threes ++;
+			}
+		}
+
+		return threes >= 2;
+	}
 }

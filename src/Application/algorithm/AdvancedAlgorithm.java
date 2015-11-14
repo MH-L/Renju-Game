@@ -12,7 +12,8 @@ public class AdvancedAlgorithm extends Algorithm {
 
 	public AdvancedAlgorithm(Board board, boolean isFirst) {
 		super(board, isFirst);
-		tree = new BoardTree(getBoard());
+		int turn = isFirst ? Board.TURN_SENTE : Board.TURN_GOTE;
+		tree = new BoardTree(getBoard(), turn);
 		// TODO Auto-generated constructor stub
 	}
 
