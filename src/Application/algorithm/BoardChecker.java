@@ -344,7 +344,7 @@ public class BoardChecker {
 		if (array.length <= numLocs)
 			return patterns;
 		int prev = Board.EMPTY_SPOT;
-		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int checker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
 		for (int i = 0; i < array.length - numLocs; i++) {
 			for (int j = 0; j <= numLocs; j++)
 				temp.add(array[i + j]);
@@ -446,8 +446,8 @@ public class BoardChecker {
 		int prev2 = Board.EMPTY_SPOT;
 		boolean canContinue = true;
 		int count = 0;
-		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
-		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		int checker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
+		int blocker = first ? Board.TURN_GOTE : Board.TURN_SENTE;
 		boolean blocked = false;
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] != checker)
@@ -543,12 +543,11 @@ public class BoardChecker {
 	public static ArrayList<Pattern> checkClosedPatDisc(int[] array,
 			int arrayIndex, int type, boolean first, int num, Board board) {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
-//		boolean canContinue = true;
 		int prev = Board.EMPTY_SPOT;
 		if (array.length < num + 2)
 			return patterns;
-		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
-		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		int checker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
+		int blocker = first ? Board.TURN_GOTE : Board.TURN_SENTE;
 		ArrayList<Integer> temp = new ArrayList<Integer>();
 		for (int i = 0; i < array.length - num - 1; i++) {
 			for (int j = 0; j <= num + 1; j++) {
@@ -649,7 +648,7 @@ public class BoardChecker {
 		ArrayList<Pattern> patterns = new ArrayList<Pattern>();
 		if (array.length < num)
 			return patterns;
-		int checker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int checker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
 		if (array.length < 2)
 			return patterns;
 		else {
@@ -860,7 +859,7 @@ public class BoardChecker {
 	public static boolean isOpenPatInControl(Board board, ContOpenPattern pat, boolean first) {
 		if (pat.getLocations().size() != 3)
 			return false;
-		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		int blocker = first ? Board.TURN_GOTE : Board.TURN_SENTE;
 		BoardLocation firstStone = pat.getLocations().get(0);
 		switch (pat.getType()) {
 		case Pattern.ON_ROW:

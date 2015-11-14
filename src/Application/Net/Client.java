@@ -27,10 +27,6 @@ public class Client extends Player {
         socket.connect(new InetSocketAddress(addr, Network.PORT), CONNECTION_TIME_OUT);
     }
 
-    public IPlayer getPlayer() {
-        return player;
-    }
-
 	@Override
 	public BoardLocation makeMove() throws InvalidIndexException {
 		// TODO Auto-generated method stub

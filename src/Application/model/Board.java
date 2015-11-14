@@ -40,11 +40,11 @@ public class Board implements Serializable {
 	/**
 	 * Value of a grid if it is occupied by the first player.
 	 */
-	public static final int FIRST_PLAYER = 1;
+	public static final int TURN_SENTE = 1;
 	/**
 	 * Value of a grid if it is occupied by the second player.
 	 */
-	public static final int SECOND_PLAYER = 2;
+	public static final int TURN_GOTE = 2;
 	/**
 	 * Display mode -- classic mode.
 	 */
@@ -495,7 +495,7 @@ public class Board implements Serializable {
 		int prev = EMPTY_SPOT;
 		for (int[] array : this.rows) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] == FIRST_PLAYER)
+				if (prev == array[i] && array[i] == TURN_SENTE)
 					consectCount++;
 				else {
 					if (array[i] != EMPTY_SPOT)
@@ -517,7 +517,7 @@ public class Board implements Serializable {
 
 		for (int[] array : this.columns) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] == FIRST_PLAYER)
+				if (prev == array[i] && array[i] == TURN_SENTE)
 					consectCount++;
 				else {
 					if (array[i] != EMPTY_SPOT)
@@ -538,7 +538,7 @@ public class Board implements Serializable {
 
 		for (int[] array : this.diagonals_Uleft) {
 			for (int i : array) {
-				if (prev == i && i == FIRST_PLAYER)
+				if (prev == i && i == TURN_SENTE)
 					consectCount++;
 				else {
 					if (i != EMPTY_SPOT)
@@ -559,7 +559,7 @@ public class Board implements Serializable {
 
 		for (int[] array : this.diagonals_Uright) {
 			for (int i = 0; i < array.length; i++) {
-				if (prev == array[i] && array[i] == FIRST_PLAYER)
+				if (prev == array[i] && array[i] == TURN_SENTE)
 					consectCount++;
 				else {
 					if (array[i] != EMPTY_SPOT)
@@ -712,7 +712,7 @@ public class Board implements Serializable {
 	 * @return True if the pattern has potential, false otherwise.
 	 */
 	public boolean isPatternDead(Pattern pat, boolean first) {
-		int blocker = first ? Board.SECOND_PLAYER : Board.FIRST_PLAYER;
+		int blocker = first ? Board.TURN_GOTE : Board.TURN_SENTE;
 		BoardLocation firstStone = pat.findFirstStone();
 		if (pat.getClass().equals(ContOpenPattern.class)
 				|| pat.getClass().equals(ContClosedPattern.class)) {
@@ -915,8 +915,8 @@ public class Board implements Serializable {
 	public boolean isPatternWinning(Pattern pat) {
 		BoardLocation firstStone = pat.findFirstStone();
 		int checker = basicGrid[firstStone.getYPos()][firstStone.getXPos()];
-		int blocker = checker == Board.FIRST_PLAYER ? Board.SECOND_PLAYER
-				: Board.FIRST_PLAYER;
+		int blocker = checker == Board.TURN_SENTE ? Board.TURN_GOTE
+				: Board.TURN_SENTE;
 		if (pat.getClass() == ContOpenPattern.class) {
 			if (pat.getLocations().size() == 4) {
 				switch (pat.getType()) {
@@ -1051,7 +1051,7 @@ public class Board implements Serializable {
 			for (int j = 0; j < this.basicGrid[0].length; j++) {
 				if (this.basicGrid[i][j] == EMPTY_SPOT)
 					System.out.print(emptyLocChar + "\u0020");
-				else if (this.basicGrid[i][j] == FIRST_PLAYER)
+				else if (this.basicGrid[i][j] == TURN_SENTE)
 					System.out.print(firstPlayerChar + "\u0020");
 				else
 					System.out.print(secondPlayerChar + "\u0020");
@@ -1110,7 +1110,7 @@ public class Board implements Serializable {
 		int row_num = loc.getYPos();
 		if (this.isOccupied(loc))
 			return false;
-		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int marker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
 
 		this.basicGrid[row_num][col_num] = marker;
 		this.getColumns().get(col_num)[row_num] = marker;

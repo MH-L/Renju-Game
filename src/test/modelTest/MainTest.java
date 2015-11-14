@@ -56,8 +56,8 @@ public class MainTest {
 				logger.println("Total moves count: " + totalMove);
 				logger.println("Please wait with patience.");
 				logger.close();
-				game = new AiVersusAi(Game.Difficulty.INTERMEDIATE,
-						Game.Difficulty.NOVICE);
+				game = new AiVersusAi(Game.Difficulty.NOVICE,
+						Game.Difficulty.INTERMEDIATE);
 				while (!isWinning() && !boardFull()) {
 					try {
 						game.makeMove();

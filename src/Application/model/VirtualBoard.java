@@ -93,7 +93,7 @@ public class VirtualBoard extends Board {
 		int row_num = loc.getYPos();
 		if (this.isOccupied(loc))
 			return false;
-		int marker = first ? Board.FIRST_PLAYER : Board.SECOND_PLAYER;
+		int marker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
 
 		this.getGrids()[row_num][col_num] = marker;
 		this.getColumns().get(col_num)[row_num] = marker;
