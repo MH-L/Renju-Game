@@ -907,7 +907,7 @@ public class Board implements Serializable {
 	/**
 	 * Check if a pattern is a must-win pattern. A pattern is a must-win if the
 	 * pattern consists of four board locations and cannot be blocked
-	 * efficiently (open four).
+	 * by putting a stone in one end.
 	 *
 	 * @param pat
 	 * @return
@@ -1709,6 +1709,68 @@ public class Board implements Serializable {
 		for (int i = 0; i < locationsToPrint.size(); i++) {
 			BoardLocation curLoc = locationsToPrint.get(i);
 			System.out.format("%d.(%d,%d)\n", i, curLoc.getYPos(), curLoc.getXPos());
+		}
+	}
+
+	/**
+	 * This function only updates the board, without doing any analysis on patterns
+	 * and board locations, for improved time usage.
+	 * @param loc
+	 * @param first
+	 * @return true if update success, false if failure
+	 * @throws InvalidIndexException
+	 */
+	public boolean updateBoardLite(BoardLocation loc, boolean first) throws InvalidIndexException {
+		if (!isReachable(loc))
+			throw new InvalidIndexException(
+					"The location indexes is out of bound!");
+		int col_num = loc.getXPos();
+		int row_num = loc.getYPos();
+		if (this.isOccupied(loc))
+			return false;
+		int marker = first ? Board.TURN_SENTE : Board.TURN_GOTE;
+
+		this.getGrids()[row_num][col_num] = marker;
+		this.getColumns().get(col_num)[row_num] = marker;
+		this.getRows().get(row_num)[col_num] = marker;
+		int indexURDiag = getURDiagIndex(loc);
+		int indexULDiag = getULDiagIndex(loc);
+		if (indexURDiag >= getWidth())
+			this.getURDiags().get(indexURDiag)[getWidth() - 1 - col_num] = marker;
+		else
+			this.getURDiags().get(indexURDiag)[row_num] = marker;
+		if (indexULDiag >= getWidth())
+			this.getULDiags().get(indexULDiag)[col_num] = marker;
+		else
+			this.getULDiags().get(indexULDiag)[row_num] = marker;
+		if (first)
+			this.getPlayer1Stone().add(loc);
+		else
+			this.getPlayer2Stone().add(loc);
+		return true;
+	}
+
+	public void withdrawMoveLite(BoardLocation lastMove) throws InvalidIndexException {
+		if (!isReachable(lastMove)) {
+			throw new InvalidIndexException(
+					"The location to withdraw is invalid.");
+		}
+		int x_coord = lastMove.getXPos();
+		int y_coord = lastMove.getYPos();
+		int indexUL = y_coord - x_coord + getWidth() - 1;
+		int indexUR = y_coord + x_coord;
+		int ULIndex = indexUL >= getWidth() ? x_coord : y_coord;
+		int URIndex = indexUR >= getWidth() ? getWidth() - 1 - x_coord : y_coord;
+		this.getGrids()[y_coord][x_coord] = 0;
+		this.getColumns().get(x_coord)[y_coord] = EMPTY_SPOT;
+		this.getRows().get(y_coord)[x_coord] = EMPTY_SPOT;
+		this.getULDiags().get(indexUL)[ULIndex] = EMPTY_SPOT;
+		this.getURDiags().get(indexUR)[URIndex] = EMPTY_SPOT;
+		if (getPlayer1Stone().contains(lastMove)) {
+			this.getPlayer1Stone().remove(lastMove);
+		}
+		else {
+			this.getPlayer2Stone().remove(lastMove);
 		}
 	}
 

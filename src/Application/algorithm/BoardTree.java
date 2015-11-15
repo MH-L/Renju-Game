@@ -94,6 +94,8 @@ public class BoardTree {
 	}
 
 	public static int evalBoard(Board board, int turn) {
+		Algorithm alg = new BasicAlgorithm(board, turn == Board.TURN_SENTE);
+		ArrayList<BoardLocation> feasibleMoves = alg.generateFeasibleMoves();
 		return 0;
 	}
 
@@ -102,9 +104,14 @@ public class BoardTree {
 	}
 
 	public void addChild(int xcoord, int ycoord) {
-		VirtualBoard vBoard = (VirtualBoard) DeepCopy.copy(this.node);
+		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.node));
 		BoardLocation parentToChild = new BoardLocation(ycoord, xcoord);
 		int childTurn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE : Board.TURN_SENTE;
 		this.children.add(new BoardTree(vBoard, parentToChild, childTurn));
+	}
+
+	private ArrayList<BoardLocation> generateFeasibleMoves() {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		return retVal;
 	}
 }

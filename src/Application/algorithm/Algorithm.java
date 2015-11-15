@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -23,8 +24,11 @@ public abstract class Algorithm {
 	}
 
 	public ArrayList<BoardLocation> calculateAttack() {
+		// get a list of all self stones
 		ArrayList<BoardLocation> previousStones = isFirst ? board
 				.getPlayer1Stone() : board.getPlayer2Stone();
+		// calculate ALL feasible positions to move to
+		// (maybe some of them are meaningless)
 		ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 		for (BoardLocation stone : previousStones) {
 			ArrayList<BoardLocation> curCandidates = Board.findAdjacentLocs(stone);
@@ -128,6 +132,13 @@ public abstract class Algorithm {
 
 	public abstract BoardLocation findBestLocWhenStuck();
 
+	/**
+	 * Get all locations that are of distance 2 or less to some of the self
+	 * stones.
+	 * @param stones
+	 * @param board
+	 * @return
+	 */
 	public static ArrayList<BoardLocation> findFlexibleLocs(ArrayList<BoardLocation> stones, Board board) {
 		ArrayList<BoardLocation> adjacentLocs = new ArrayList<BoardLocation>();
 		for (BoardLocation location : stones) {
@@ -258,16 +269,14 @@ public abstract class Algorithm {
 	 */
 	public BoardLocation doFundamentalCheck() {
 		// TODO optimize this!
+		// Get all patterns of the player.
 		ArrayList<Pattern> selfPatterns = isFirst ?
 				board.getFirstPattern() : board.getSecondPattern();
 		ArrayList<Pattern> excellents = filterUrgentPats(selfPatterns, true);
 		if (excellents.size() != 0)
 			return findWinningLoc(excellents.get(0));
-		for (Pattern pat : selfPatterns) {
-			if (board.isPatternWinning(pat))
-				return findWinningLoc(pat);
-		}
 		// TODO optimize this!
+		// Get all patterns of the other player.
 		ArrayList<Pattern> patterns = isFirst ?
 				board.getSecondPattern() : board.getFirstPattern();
 		ArrayList<Pattern> urgents = filterUrgentPats(patterns, false);
@@ -295,6 +304,12 @@ public abstract class Algorithm {
 			return filtered.get(0);
 		}
 		return null;
+	}
+
+	private ArrayList<BoardLocation> getAllOpponentBlockingLocations() {
+		ArrayList<Pattern> opponentPatterns = isFirst ? board.getSecondPattern()
+				: board.getFirstPattern();
+		return extractBlockingLocs(opponentPatterns);
 	}
 
 	/**
@@ -506,8 +521,8 @@ public abstract class Algorithm {
 	}
 
 	/**
-	 * Filter out all patterns that are urgent (i.e. winning
-	 * in one turn if not blocked).
+	 * Filter out all patterns that are urgent (i.e. takes only
+	 * one move to victory).
 	 * @param patterns
 	 * @param isSelf
 	 * @return
@@ -711,6 +726,13 @@ public abstract class Algorithm {
 		return retVal;
 	}
 
+	/**
+	 * return the blocking location of potential composite patterns.
+	 * The method is just a stub in the base class because only
+	 * intermediate algorithm implements this.
+	 * @return A list of board locations player can move to in order
+	 * to block opponent's potential composite patterns.
+	 */
 	public ArrayList<BoardLocation> blockPotentialCompositePat() {
 		return new ArrayList<BoardLocation>();
 	}
@@ -806,6 +828,73 @@ public abstract class Algorithm {
 			}
 		}
 		return null;
+	}
+
+	private ArrayList<BoardLocation> extractAttackingLocsOnlyUrgent(ArrayList<BoardLocation> input) {
+		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
+		for (BoardLocation loc : input) {
+			try {
+				board.updateBoardLite(loc, isFirst);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			ArrayList<Pattern> pats = BoardChecker.
+					checkAllPatternsAroundLoc(loc, board, isFirst);
+			ArrayList<Pattern> urgents = filterUrgentPats(pats, isFirst);
+			if (!urgents.isEmpty())
+				retVal.add(loc);
+			try {
+				board.withdrawMoveLite(loc);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+		}
+
+		return retVal;
+	}
+
+	public ArrayList<BoardLocation> generateFeasibleMoves() {
+		ArrayList<BoardLocation> feasible = new ArrayList<BoardLocation>();
+
+		// if the player can win, then return the first winning loc (for
+		// reduced complexity).
+		ArrayList<Pattern> selfPtns = isFirst ? board.getFirstPattern() :
+			board.getSecondPattern();
+		ArrayList<Pattern> excellents = filterUrgentPats(selfPtns, true);
+		if (excellents.size() != 0) {
+			BoardLocation loc = findWinningLoc(excellents.get(0));
+			feasible.add(loc);
+			return feasible;
+		}
+		ArrayList<Pattern> otherPattern = isFirst ? board.getSecondPattern() :
+			board.getFirstPattern();
+		ArrayList<Pattern> urgents = filterUrgentPats(otherPattern, false);
+		if (urgents.isEmpty()) {
+			if (!selfPtns.isEmpty()) {
+				// opponent does not have any patterns that are urgent so
+				// just extend the current pattern and win the game.
+				BoardLocation locToWin = extendToWinning(selfPtns.get(0));
+				feasible.add(locToWin);
+				return feasible;
+			} else {
+				ArrayList<BoardLocation> locs = findFlexibleLocs(getSelfStone(), board);
+				// both party do not have previous patterns.
+				// 1.block 2.suppress
+				if (!otherPattern.isEmpty()) {
+					feasible.addAll(getAllOpponentBlockingLocations());
+					ArrayList<BoardLocation> urgentLocs = extractAttackingLocsOnlyUrgent(locs);
+					for (BoardLocation urgentLoc : urgentLocs) {
+						if (!feasible.contains(urgentLoc))
+							feasible.add(urgentLoc);
+					}
+					return locs;
+				}
+				feasible.addAll(null);
+			}
+		} else {
+			// if opponent has urgent patterns then blocking is a must.
+			return extractBlockingLocs(urgents);
+		}
 	}
 
 }
