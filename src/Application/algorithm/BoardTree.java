@@ -2,6 +2,7 @@ package algorithm;
 
 import java.util.ArrayList;
 
+import exceptions.InvalidIndexException;
 import utils.DeepCopy;
 import model.Board;
 import model.BoardLocation;
@@ -13,6 +14,8 @@ public class BoardTree {
 	private Board node;
 	private BoardLocation lastMove = null;
 	private int score;
+	private boolean applicable = false;
+	private Algorithm alg;
 	public static final int MAX_SCORE = 5000;
 	public static final int MIN_SCORE = -5000;
 	public static final int SCORE_OPEN_FOUR = 1000;
@@ -25,6 +28,7 @@ public class BoardTree {
 
 	public BoardTree(Board board, int turn) {
 		this.turn = turn;
+		alg = new BasicAlgorithm(node, (this.turn == Board.TURN_SENTE));
 		// TODO this needs refining.
 		this.score = 0;
 		this.node = board;
@@ -93,9 +97,43 @@ public class BoardTree {
 		return children.get(maxIndex);
 	}
 
+	public BoardLocation getBestMove(int level) {
+		this.makeTree(level);
+		if (level <= 0) {
+			this.score = evalBoard(this.node, this.turn);
+			return null;
+		}
+		return null;
+	}
+
+	private void makeTree(int depth) {
+		// if depth is 0, then just evaluate.
+		if (depth == 0) {
+			this.score = evalRoot();
+			this.setApplicable();
+			return;
+		}
+		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
+		for (BoardLocation feasibleMove : feasibles) {
+			int turn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE :
+				Board.TURN_SENTE;
+			BoardTree child = new BoardTree(node, feasibleMove, turn);
+			try {
+				child.node.updateBoard(feasibleMove, (this.turn == Board.TURN_GOTE));
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			child.makeTree(depth - 1);
+			try {
+				child.node.withdrawMove(feasibleMove);
+			} catch (InvalidIndexException e) {
+				continue;
+			}
+			this.appendChild(child);
+		}
+	}
+
 	public static int evalBoard(Board board, int turn) {
-		Algorithm alg = new BasicAlgorithm(board, turn == Board.TURN_SENTE);
-		ArrayList<BoardLocation> feasibleMoves = alg.generateFeasibleMoves();
 		int sum = 0;
 		int otherSum = 0;
 		if (board.checkcol() || board.checkdiag() || board.checkrow()) {
@@ -144,5 +182,13 @@ public class BoardTree {
 		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.node));
 		int childTurn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE : Board.TURN_SENTE;
 		this.children.add(new BoardTree(vBoard, loc, childTurn));
+	}
+
+	public void setApplicable() {
+		applicable = true;
+	}
+
+	public boolean isApplicable() {
+		return applicable;
 	}
 }
