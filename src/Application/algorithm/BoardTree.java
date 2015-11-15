@@ -96,7 +96,43 @@ public class BoardTree {
 	public static int evalBoard(Board board, int turn) {
 		Algorithm alg = new BasicAlgorithm(board, turn == Board.TURN_SENTE);
 		ArrayList<BoardLocation> feasibleMoves = alg.generateFeasibleMoves();
-		return 0;
+		int sum = 0;
+		int otherSum = 0;
+		if (board.checkcol() || board.checkdiag() || board.checkrow()) {
+			return MAX_SCORE;
+		}
+		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_SENTE, 4).size();
+		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_SENTE, 5).size();
+		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_SENTE, 6).size();
+
+		sum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_SENTE, 3).size();
+		sum += SCORE_OPEN_FOUR * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_SENTE, 4).size();
+		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_SENTE, 3).size();
+		sum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
+				(board, turn == Board.TURN_SENTE).size();
+
+		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_GOTE, 4).size();
+		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_GOTE, 5).size();
+		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+				(board, turn == Board.TURN_GOTE, 6).size();
+
+		otherSum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_GOTE, 3).size();
+		otherSum += SCORE_OPEN_FOUR * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_GOTE, 4).size();
+		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardOpenPatCont
+				(board, turn == Board.TURN_GOTE, 3).size();
+		otherSum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
+				(board, turn == Board.TURN_GOTE).size();
+		return (int) (sum - otherSum * 0.8);
 	}
 
 	public int evalRoot() {
