@@ -1,6 +1,5 @@
 package Net;
 
-import application.IPlayer;
 import application.Network;
 import application.Player;
 

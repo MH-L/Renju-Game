@@ -8,23 +8,16 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import exceptions.InvalidIndexException;
 import application.AiVersusAi;
 import application.Game;
-import application.Main;
 import application.Game.Difficulty;
 
 public class MainTest {
 	// To ensure the game runs normally.
 	private Game game;
-
-	@Before
-	public void init() {
-		Main main = new Main();
-	}
 
 	@Test
 	public void testNormalRunning() {

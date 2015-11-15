@@ -75,11 +75,16 @@ public class AI implements IPlayer {
 		// start to check for patterns after three moves.
 		// which is five or six stones on the board.
 		BoardLocation nextMove = null;
-		if (board.getTotalStones() < 10)
-			nextMove = solver.makeMoveBeginning();
-		// TODO modify this function since it is not complete.
-		else
-			nextMove = solver.makeMoveEnd();
+		// Only do naive moves if the difficulty of the AI is intermediate or novice.
+		if (difficulty == Difficulty.INTERMEDIATE || difficulty == Difficulty.NOVICE) {
+			if (board.getTotalStones() < 10)
+				nextMove = solver.makeMoveBeginning();
+			// TODO modify this function since it is not complete.
+			else
+				nextMove = solver.makeMoveEnd();
+		} else {
+			nextMove = solver.makeMoveUsingGameTree();
+		}
 		lastMove = nextMove;
 		System.out.format("AI: I got (%d, %d) for this move.\n", nextMove.getYPos(), nextMove.getXPos());
 		return nextMove;

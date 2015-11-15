@@ -898,14 +898,14 @@ public class BoardChecker {
 		return false;
 	}
 
-	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean first) {
-		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(newMove, board, first);
-		ArrayList<Pattern> opponentColinear = checkAllPatternsSameLine(newMove, board, !first);
+	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean isPLayerFirst) {
+		ArrayList<Pattern> patternsColinear = checkAllPatternsSameLine(newMove, board, isPLayerFirst);
+		ArrayList<Pattern> opponentColinear = checkAllPatternsSameLine(newMove, board, !isPLayerFirst);
 		ArrayList<Pattern> firstPatterns = board.getFirstPattern();
 		ArrayList<Pattern> secondPatterns = board.getSecondPattern();
 		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
 		Iterator<Pattern> secondPatIter = secondPatterns.iterator();
-		if (first) {
+		if (isPLayerFirst) {
 			while (firstPatIter.hasNext()) {
 				Pattern curPattern = firstPatIter.next();
 				if (curPattern.isOnSameLine(newMove))

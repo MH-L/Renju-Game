@@ -60,6 +60,7 @@ public class Player implements IPlayer{
 	public BoardLocation makeMove() throws InvalidIndexException {
 		Scanner input = new Scanner(System.in);
 		String move = input.nextLine();
+		input.close();
 		if (!move.contains(",")) {
 			throw new InvalidIndexException(move);
 		}

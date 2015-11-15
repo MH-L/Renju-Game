@@ -103,15 +103,10 @@ public class BoardTree {
 		return evalBoard(this.node, this.turn);
 	}
 
-	public void addChild(int xcoord, int ycoord) {
+	public void addChild(BoardLocation loc) {
+		// TODO maybe just not copy the board?
 		VirtualBoard vBoard = VirtualBoard.getVBoard((Board) DeepCopy.copy(this.node));
-		BoardLocation parentToChild = new BoardLocation(ycoord, xcoord);
 		int childTurn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE : Board.TURN_SENTE;
-		this.children.add(new BoardTree(vBoard, parentToChild, childTurn));
-	}
-
-	private ArrayList<BoardLocation> generateFeasibleMoves() {
-		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
-		return retVal;
+		this.children.add(new BoardTree(vBoard, loc, childTurn));
 	}
 }

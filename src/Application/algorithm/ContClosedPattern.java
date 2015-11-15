@@ -2,7 +2,6 @@ package algorithm;
 
 import java.util.ArrayList;
 
-import model.Board;
 import model.BoardLocation;
 
 /**
@@ -12,6 +11,11 @@ import model.BoardLocation;
  *
  */
 public class ContClosedPattern extends ClosedPattern {
+
+	/**
+	 * Generated serialization ID.
+	 */
+	private static final long serialVersionUID = 7535573842113321369L;
 
 	public ContClosedPattern(ArrayList<BoardLocation> locations, int type,
 			ArrayList<BoardLocation> blockedStones, ArrayList<BoardLocation> blockingLocs) {

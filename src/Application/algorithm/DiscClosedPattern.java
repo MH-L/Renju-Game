@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import model.BoardLocation;
 
 public class DiscClosedPattern extends ClosedPattern {
+	/**
+	 * Generated serialization ID.
+	 */
+	private static final long serialVersionUID = 1449116682870625854L;
+
 	private int bubbleIndex;
 
 	public DiscClosedPattern(ArrayList<BoardLocation> locations, int type,

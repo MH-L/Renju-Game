@@ -41,6 +41,7 @@ public class Network extends Game {
                     String addr = reader.nextLine();
                     ((Client) this.player2).connect(addr);
                     // TODO get player1
+                    reader.close();
                 }
                 connectionSuccess = true;
             } catch (IOException e) {

@@ -14,7 +14,6 @@ public class AdvancedAlgorithm extends Algorithm {
 		super(board, isFirst);
 		int turn = isFirst ? Board.TURN_SENTE : Board.TURN_GOTE;
 		tree = new BoardTree(getBoard(), turn);
-		// TODO Auto-generated constructor stub
 	}
 
 	public ArrayList<BoardLocation> findLocation() {
@@ -31,4 +30,8 @@ public class AdvancedAlgorithm extends Algorithm {
 		return this.vBoard;
 	}
 
+	@Override
+	public BoardLocation makeMoveUsingGameTree() {
+		return null;
+	}
 }

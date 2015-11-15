@@ -525,7 +525,6 @@ public class IntermediateAlgorithm extends Algorithm {
 		int yIncrement = selfOnlyStone.getYPos() - opponentOnlyStone.getYPos();
 		int distance = Board.findDistance(selfOnlyStone, opponentOnlyStone);
 		if (distance == 1) {
-			ArrayList<BoardLocation> locs = Board.findAdjacentLocs(selfOnlyStone);
 			int firstRnd = getRandNum(2);
 			int secondRnd = getRandNum(2);
 			int thirdRnd = getRandNum(2);

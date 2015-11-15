@@ -1,6 +1,5 @@
 package algorithm;
 
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -335,7 +334,6 @@ public abstract class Algorithm {
 	public static ArrayList<BoardLocation> keepOnlyBubble(ArrayList<Pattern> patterns) {
 		ArrayList<BoardLocation> retVal = new ArrayList<BoardLocation>();
 		for (Pattern pat : patterns) {
-			ArrayList<BoardLocation> candidates = new ArrayList<BoardLocation>();
 			ArrayList<BoardLocation> blockingLocs = pat.getBlockingLocs();
 			if (pat.getClass() != DiscOpenPattern.class) {
 				for (BoardLocation loc : blockingLocs) {
@@ -890,6 +888,7 @@ public abstract class Algorithm {
 					return locs;
 				}
 				feasible.addAll(null);
+				return feasible;
 			}
 		} else {
 			// if opponent has urgent patterns then blocking is a must.
@@ -897,4 +896,10 @@ public abstract class Algorithm {
 		}
 	}
 
+	/**
+	 * NOTICE: Method stub.
+	 * Advanced algorithm and ultimate algorithm only.
+	 * @return
+	 */
+	public BoardLocation makeMoveUsingGameTree() { return null; }
 }

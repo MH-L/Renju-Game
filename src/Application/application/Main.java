@@ -20,6 +20,7 @@ public class Main {
 	private static Scanner reader;
 	private static int dispMode;
 	private static boolean host;
+	@SuppressWarnings("unused")
 	private static Network net;
 
 	public static void main(String[] args) {
