@@ -49,17 +49,17 @@ public class MainTest {
 				logger.println("Total moves count: " + totalMove);
 				logger.println("Please wait with patience.");
 				logger.close();
-				game = new AiVersusAi(Game.Difficulty.NOVICE,
+				game = new AiVersusAi(Game.Difficulty.ADVANCED,
 						Game.Difficulty.INTERMEDIATE);
 				while (!isWinning() && !boardFull()) {
 					try {
 						game.makeMove();
 						totalMove ++;
-						try {
-							Thread.sleep(700);
-						} catch (InterruptedException e) {
-							continue;
-						}
+//						try {
+//							Thread.sleep(700);
+//						} catch (InterruptedException e) {
+//							continue;
+//						}
 					} catch (InvalidIndexException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

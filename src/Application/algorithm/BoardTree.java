@@ -9,6 +9,8 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class BoardTree {
+//	private static int threadCount = 0;
+	private static int nodeCount = 0;
 	private int turn;
 	private ArrayList<BoardTree> children;
 	private Board node;
@@ -28,11 +30,11 @@ public class BoardTree {
 
 	public BoardTree(Board board, int turn) {
 		this.turn = turn;
-		alg = new BasicAlgorithm(node, (this.turn == Board.TURN_SENTE));
 		// TODO this needs refining.
 		this.score = 0;
 		this.node = board;
 		this.children = new ArrayList<BoardTree>();
+		alg = new BasicAlgorithm(node, (this.turn == Board.TURN_SENTE));
 	}
 
 	/**
@@ -49,6 +51,7 @@ public class BoardTree {
 		this.node = board;
 		this.children = new ArrayList<BoardTree>();
 		this.lastMove = lastMove;
+		alg = new BasicAlgorithm(node, (this.turn == Board.TURN_SENTE));
 	}
 
 	public void appendChild(BoardTree tree) {
@@ -87,29 +90,30 @@ public class BoardTree {
 		return this.score;
 	}
 
-	public BoardTree getMinMax() {
-		int maxIndex = 0;
-		for (int i = 0; i < children.size(); i++) {
-			if (children.get(i).getScore() > children.get(maxIndex).getScore()) {
-//				maxIndex = i
-			}
-		}
-		return children.get(maxIndex);
-	}
+//	public BoardTree getMinMax() {
+//		int maxIndex = 0;
+//		for (int i = 0; i < children.size(); i++) {
+//			if (children.get(i).getScore() > children.get(maxIndex).getScore()) {
+////				maxIndex = i
+//			}
+//		}
+//		return children.get(maxIndex);
+//	}
 
 	public BoardLocation getBestMove(int level) {
-		getBestMoveHelper(level, level);
-		return null;
-	}
-
-	private BoardLocation getBestMoveHelper(int level, int topLevel) {
-		if (level == topLevel)
-			this.makeTree(level, this.turn);
-		if (level <= 0) {
-			this.score = evalBoard(this.node, this.turn);
+		System.out.println("The Board has Moves number: " + node.getTotalStones());
+		this.children.clear();
+		makeTree(level, this.turn);
+		if (this.children.isEmpty())
 			return null;
+		int maxIndex = 0;
+		for (int i = 0; i < this.children.size(); i++) {
+			if (children.get(i).score > children.get(maxIndex).score) {
+				maxIndex = i;
+			}
 		}
-		return null;
+		System.out.println(nodeCount);
+		return children.get(maxIndex).lastMove;
 	}
 
 	private void makeTree(int depth, int ancestorTurn) {
@@ -119,6 +123,69 @@ public class BoardTree {
 			this.setApplicable();
 			return;
 		}
+//		ArrayList<Thread> threadQueue = new ArrayList<Thread>();
+//		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
+//		int curMaxValue = MIN_SCORE;
+//		int curMinValue = MAX_SCORE;
+//		for (int i = 0; i < feasibles.size(); i++) {
+//			BoardLocation feasibleMove = feasibles.get(i);
+//			int turn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE :
+//				Board.TURN_SENTE;
+//			BoardTree child = new BoardTree((Board) DeepCopy.copy(node), feasibleMove, turn);
+//			Thread childThread = new Thread(new Runnable() {
+//				@Override
+//				public void run() {
+//					// TODO Auto-generated method stub
+//					try {
+//						child.node.updateBoardLite(feasibleMove, (BoardTree.this.turn == Board.TURN_GOTE));
+//					} catch (InvalidIndexException e) {
+//						return;
+//					}
+//					child.makeTree(depth - 1, ancestorTurn);
+//					try {
+//						child.node.withdrawMoveLite(feasibleMove);
+//					} catch (InvalidIndexException e) {
+//						return;
+//					}
+//					// do something here to generate values for each nodes.
+//					// still have to combine the alpha-beta.
+//				}
+//			});
+//			synchronized(threadQueue) {
+//				threadQueue.add(childThread);
+//			}
+//			while (threadCount > 2000) {
+//
+//			}
+//			childThread.start();
+//			threadCount ++;
+//			this.appendChild(child);
+//		}
+//
+//		for (Thread th : threadQueue) {
+//			try {
+//				th.join();
+//			} catch (InterruptedException e) {
+//				continue;
+//			}
+//
+//			threadCount --;
+//		}
+//
+//		for (BoardTree child : this.children) {
+//			if (BoardTree.this.turn != ancestorTurn) {
+//				// find the minimum for the opponent.
+//				if (child.score < curMinValue && child.isApplicable()) {
+//					curMinValue = child.score;
+//				}
+//			} else {
+//				// find the maximum value of children
+//				if (child.score > curMaxValue && child.isApplicable()) {
+//					curMaxValue = child.score;
+//				}
+//			}
+//		}
+
 		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
 		int curMaxValue = MIN_SCORE;
 		int curMinValue = MAX_SCORE;
@@ -128,30 +195,32 @@ public class BoardTree {
 				Board.TURN_SENTE;
 			BoardTree child = new BoardTree(node, feasibleMove, turn);
 			try {
-				child.node.updateBoard(feasibleMove, (this.turn == Board.TURN_GOTE));
+				child.node.updateBoardLite(feasibleMove, (BoardTree.this.turn == Board.TURN_GOTE));
 			} catch (InvalidIndexException e) {
-				continue;
+				return;
 			}
 			child.makeTree(depth - 1, ancestorTurn);
 			try {
-				child.node.withdrawMove(feasibleMove);
+				child.node.withdrawMoveLite(feasibleMove);
 			} catch (InvalidIndexException e) {
-				continue;
+				return;
 			}
 			// do something here to generate values for each nodes.
 			// still have to combine the alpha-beta.
-			if (this.turn != ancestorTurn) {
+			this.appendChild(child);
+			nodeCount ++;
+
+			if (BoardTree.this.turn != ancestorTurn) {
 				// find the minimum for the opponent.
-				if (child.score < curMinValue) {
+				if (child.score < curMinValue && child.isApplicable()) {
 					curMinValue = child.score;
 				}
 			} else {
 				// find the maximum value of children
-				if (child.score > curMaxValue) {
+				if (child.score > curMaxValue && child.isApplicable()) {
 					curMaxValue = child.score;
 				}
 			}
-			this.appendChild(child);
 		}
 
 		if (this.turn == ancestorTurn) {
@@ -159,6 +228,8 @@ public class BoardTree {
 		} else {
 			this.score = curMinValue;
 		}
+
+		this.setApplicable();
 	}
 
 	public static int evalBoard(Board board, int turn) {
@@ -199,6 +270,7 @@ public class BoardTree {
 		otherSum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
 				(board, turn == Board.TURN_GOTE).size();
 		return (int) (sum - otherSum * 0.8);
+//		return 1;
 	}
 
 	public int evalRoot() {

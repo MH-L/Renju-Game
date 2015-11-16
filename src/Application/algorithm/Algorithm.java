@@ -885,10 +885,14 @@ public abstract class Algorithm {
 						if (!feasible.contains(urgentLoc))
 							feasible.add(urgentLoc);
 					}
-					return locs;
+					return feasible;
 				}
-				feasible.addAll(null);
-				return feasible;
+
+				if (locs.isEmpty()) {
+					feasible.add(new BoardLocation(7,7));
+					return feasible;
+				}
+				return locs;
 			}
 		} else {
 			// if opponent has urgent patterns then blocking is a must.

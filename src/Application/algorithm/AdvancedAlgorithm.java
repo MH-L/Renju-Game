@@ -7,7 +7,7 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class AdvancedAlgorithm extends Algorithm {
-	public static final int calculationSteps = 5;
+	public static final int calculationSteps = 3;
 	BoardTree tree;
 
 	public AdvancedAlgorithm(Board board, boolean isFirst) {
@@ -32,6 +32,6 @@ public class AdvancedAlgorithm extends Algorithm {
 
 	@Override
 	public BoardLocation makeMoveUsingGameTree() {
-		return null;
+		return tree.getBestMove(calculationSteps);
 	}
 }

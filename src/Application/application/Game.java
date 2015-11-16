@@ -49,6 +49,7 @@ public abstract class Game {
 			if (getActivePlayer().getClass() == AI.class) {
 				board.printPlayerStoneList(true);
 				board.printPlayerStoneList(false);
+				System.exit(1);
 			}
 			throw new InvalidIndexException("The index you entered is not valid!");
 		}
