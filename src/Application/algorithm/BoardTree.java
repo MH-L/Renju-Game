@@ -98,7 +98,13 @@ public class BoardTree {
 	}
 
 	public BoardLocation getBestMove(int level) {
-		this.makeTree(level);
+		getBestMoveHelper(level, level);
+		return null;
+	}
+
+	private BoardLocation getBestMoveHelper(int level, int topLevel) {
+		if (level == topLevel)
+			this.makeTree(level, this.turn);
 		if (level <= 0) {
 			this.score = evalBoard(this.node, this.turn);
 			return null;
@@ -106,7 +112,7 @@ public class BoardTree {
 		return null;
 	}
 
-	private void makeTree(int depth) {
+	private void makeTree(int depth, int ancestorTurn) {
 		// if depth is 0, then just evaluate.
 		if (depth == 0) {
 			this.score = evalRoot();
@@ -114,7 +120,10 @@ public class BoardTree {
 			return;
 		}
 		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
-		for (BoardLocation feasibleMove : feasibles) {
+		int curMaxValue = MIN_SCORE;
+		int curMinValue = MAX_SCORE;
+		for (int i = 0; i < feasibles.size(); i++) {
+			BoardLocation feasibleMove = feasibles.get(i);
 			int turn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE :
 				Board.TURN_SENTE;
 			BoardTree child = new BoardTree(node, feasibleMove, turn);
@@ -123,13 +132,32 @@ public class BoardTree {
 			} catch (InvalidIndexException e) {
 				continue;
 			}
-			child.makeTree(depth - 1);
+			child.makeTree(depth - 1, ancestorTurn);
 			try {
 				child.node.withdrawMove(feasibleMove);
 			} catch (InvalidIndexException e) {
 				continue;
 			}
+			// do something here to generate values for each nodes.
+			// still have to combine the alpha-beta.
+			if (this.turn != ancestorTurn) {
+				// find the minimum for the opponent.
+				if (child.score < curMinValue) {
+					curMinValue = child.score;
+				}
+			} else {
+				// find the maximum value of children
+				if (child.score > curMaxValue) {
+					curMaxValue = child.score;
+				}
+			}
 			this.appendChild(child);
+		}
+
+		if (this.turn == ancestorTurn) {
+			this.score = curMaxValue;
+		} else {
+			this.score = curMinValue;
 		}
 	}
 
