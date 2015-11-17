@@ -240,10 +240,10 @@ public class BoardTree {
 		}
 		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
 				(board, turn == Board.TURN_SENTE, 4).size();
-		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_SENTE, 5).size();
-		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_SENTE, 6).size();
+//		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+//				(board, turn == Board.TURN_SENTE, 5).size();
+//		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
+//				(board, turn == Board.TURN_SENTE, 6).size();
 
 		sum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
 				(board, turn == Board.TURN_SENTE, 3).size();
@@ -256,10 +256,6 @@ public class BoardTree {
 
 		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
 				(board, turn == Board.TURN_GOTE, 4).size();
-		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_GOTE, 5).size();
-		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_GOTE, 6).size();
 
 		otherSum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
 				(board, turn == Board.TURN_GOTE, 3).size();

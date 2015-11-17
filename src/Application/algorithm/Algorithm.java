@@ -889,7 +889,7 @@ public abstract class Algorithm {
 				}
 
 				if (locs.isEmpty()) {
-					feasible.add(new BoardLocation(7,7));
+					feasible.add(makeMoveBeginning());
 					return feasible;
 				}
 				return locs;

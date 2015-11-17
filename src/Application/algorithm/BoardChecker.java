@@ -67,6 +67,23 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	public static ArrayList<Pattern> checkAllPatternsAroundLocSmart(BoardLocation loc,
+			Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, false, false));
+
+		Algorithm.filterOutDeadPats(retVal, first, board);
+		return retVal;
+	}
+
 	public static ArrayList<Pattern> checkAllPatternsSameLine(BoardLocation loc, Board board, boolean first) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
 		if (loc == null || !Board.isReachable(loc))
@@ -89,6 +106,19 @@ public class BoardChecker {
 
 		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllPatternsSameLineSmart(BoardLocation loc, Board board, boolean isFirst) {
+		ArrayList<Pattern> allPatterns = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return allPatterns;
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 3, board, loc, true, true));
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 4, board, loc, true, true));
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 3, board, loc, false, true));
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 4, board, loc, false, true));
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 4, board, loc, true, false));
+		allPatterns.addAll(checkAllPatternSameLineSpecified(isFirst, 4, board, loc, false, false));
+		return allPatterns;
 	}
 
 	public static ArrayList<Pattern> checkAllSubPatterns(Board board, boolean first) {
@@ -974,6 +1004,10 @@ public class BoardChecker {
 
 			secondPatterns.addAll(patternsColinear);
 		}
+	}
+
+	public static double getMoveScoreDelta(BoardLocation move, Board board) {
+		return 0.0;
 	}
 
 	public static void updateCriticalLocsOnUpdate(Board board, BoardLocation newLoc, boolean first) {
