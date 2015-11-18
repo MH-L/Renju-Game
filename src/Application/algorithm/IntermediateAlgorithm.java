@@ -554,6 +554,7 @@ public class IntermediateAlgorithm extends Algorithm {
 				return candidate.get(getRandNum(candidate.size()) - 1);
 			}
 		} else if (distance == 2 && Math.abs(xIncrement) == 1 && Math.abs(yIncrement) == 1) {
+			// Diagonally (1,1)
 			int randSeed = getRandNum(3);
 			ArrayList<BoardLocation> applicable = Board.findAdjacentLocs(opponentOnlyStone);
 			applicable = filterWithDesiredDist(selfOnlyStone, 2, applicable);
@@ -561,8 +562,11 @@ public class IntermediateAlgorithm extends Algorithm {
 			ArrayList<BoardLocation> oneStep = filterWithDesiredDist(selfOnlyStone, 1, aroundSelfLocs);
 			ArrayList<BoardLocation> twoStep = filterWithDesiredDist(selfOnlyStone, 2, aroundSelfLocs);
 			if (randSeed == 3) {
-				if (!twoStep.isEmpty())
+				if (!twoStep.isEmpty()) {
+					// the opponent only stone is two steps away.
+					twoStep.remove(opponentOnlyStone);
 					return twoStep.get(getRandNum(twoStep.size()) - 1);
+				}
 			} else if (randSeed == 2) {
 				if (!oneStep.isEmpty())
 					return oneStep.get(getRandNum(oneStep.size()) - 1);

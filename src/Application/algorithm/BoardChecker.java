@@ -73,6 +73,7 @@ public class BoardChecker {
 		if (loc == null || !Board.isReachable(loc))
 			return retVal;
 
+		// TODO check all patterns AT ONCE!!
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 4, board, loc, true, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, true));
@@ -82,6 +83,54 @@ public class BoardChecker {
 
 		Algorithm.filterOutDeadPats(retVal, first, board);
 		return retVal;
+	}
+
+	public static ArrayList<Pattern> checkAllSubPatternsAroundLoc(BoardLocation loc,
+			Board board, boolean first) {
+		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
+		if (loc == null || !Board.isReachable(loc))
+			return retVal;
+
+		// TODO check sub-patterns all at once!
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, true, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, false, true));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, false));
+		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, false, false));
+
+		Algorithm.filterOutDeadPats(retVal, first, board);
+		return retVal;
+	}
+
+	/**
+	 * Determines if the stone on board is a stand-alone stone.
+	 * (i.e. there are no stones around it.) Stand-alone stones get
+	 * some score when the board is being evaluated.
+	 * To be qualified as stand-alone, a stone must satisfy all three conditions:
+	 * 1) It is not cornered (i.e. the distance between it and any edge of the board is
+	 * at least 2).
+	 * 2) There are no stones at jump or adjacent locations.
+	 * @param board
+	 * @param stone
+	 * @return
+	 */
+	public static boolean isStandAlone(Board board, BoardLocation stone) {
+		// returns false if the stone is cornored.
+		if (stone.getXPos() < 2 || stone.getYPos() < 2 || stone.getXPos() > Board.getWidth() - 2
+				|| stone.getYPos() > Board.getHeight() - 2)
+			return false;
+		ArrayList<BoardLocation> relevantLocs = Board.findAdjacentLocs(stone);
+		// And all adjacent locations and jump locations must be empty.
+		for (BoardLocation loc : relevantLocs) {
+			if (board.isOccupied(loc))
+				return false;
+		}
+
+		for (BoardLocation loc2 : Board.findJumpLocations(stone)) {
+			if (board.isOccupied(loc2))
+				return false;
+		}
+
+		return true;
 	}
 
 	public static ArrayList<Pattern> checkAllPatternsSameLine(BoardLocation loc, Board board, boolean first) {

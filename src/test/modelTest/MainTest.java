@@ -50,7 +50,7 @@ public class MainTest {
 				logger.println("Please wait with patience.");
 				logger.close();
 				game = new AiVersusAi(Game.Difficulty.INTERMEDIATE,
-						Game.Difficulty.ADVANCED);
+						Game.Difficulty.INTERMEDIATE);
 				while (!isWinning() && !boardFull()) {
 					try {
 						game.makeMove();

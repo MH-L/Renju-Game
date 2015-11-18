@@ -554,4 +554,15 @@ public class IntermediateAlgorithmTest {
 		assertTrue(choice != null);
 	}
 
+	@Test
+	public void testMakeMoveBeginning() throws InvalidIndexException {
+		firstGameBoard.updateBoard(new BoardLocation(7,7), true);
+		firstGameBoard.updateBoard(new BoardLocation(8,8), false);
+		// intermediate algorithm makes move (8,8) here.
+		BoardLocation loc = firstAi.makeSecondMoveFirst();
+//		loc = firstAi.makeMoveBeginning();
+		System.out.println(String.format("The X position is: %d, and the y position is: %d",
+				loc.getXPos(), loc.getYPos()));
+	}
+
 }

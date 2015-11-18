@@ -106,6 +106,15 @@ public class Board implements Serializable {
 	 * Patterns for player 2.
 	 */
 	private ArrayList<Pattern> secondPattern;
+
+	/**
+	 * Sub-patterns for player 1. (For evaluation of board scores.)
+	 */
+	private ArrayList<Pattern> firstSubPattern;
+	/**
+	 * Sub-patterns for player 2. (For evaluation of board scores.)
+	 */
+	private ArrayList<Pattern> secondSubPattern;
 	/**
 	 * Locations where after the first player places a stone,
 	 * an urgent composite pattern forms.
@@ -1134,6 +1143,11 @@ public class Board implements Serializable {
 		return true;
 	}
 
+	public void updateBoardSolitaire(BoardLocation lastMove, boolean isFirst) throws InvalidIndexException {
+		updateBoard(lastMove, isFirst);
+
+	}
+
 	/**
 	 * Withdraws the given move on board. There is no stone after withdrawal.
 	 *
@@ -1774,4 +1788,11 @@ public class Board implements Serializable {
 		}
 	}
 
+	public ArrayList<Pattern> getFirstPlayerSubPattern() {
+		return firstSubPattern;
+	}
+
+	public ArrayList<Pattern> getSecondPlayerSubPattern() {
+		return secondSubPattern;
+	}
 }
