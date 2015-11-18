@@ -85,13 +85,21 @@ public class BoardChecker {
 		return retVal;
 	}
 
+	/**
+	 * For now, this method does the same thing as checkAllSubPatternsArd(),
+	 * but I will modify it to be more efficient for the board tree in future releases.
+	 * @param loc
+	 * @param board
+	 * @param first
+	 * @return
+	 */
 	public static ArrayList<Pattern> checkAllSubPatternsAroundLoc(BoardLocation loc,
 			Board board, boolean first) {
 		ArrayList<Pattern> retVal = new ArrayList<Pattern>();
 		if (loc == null || !Board.isReachable(loc))
 			return retVal;
 
-		// TODO check sub-patterns all at once!
+		// TODO check sub-patterns all at once! (This saves some time.)
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, true, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 2, board, loc, false, true));
 		retVal.addAll(checkAllSpecifiedPatternsArd(first, 3, board, loc, true, false));
@@ -975,6 +983,46 @@ public class BoardChecker {
 			break;
 		}
 		return false;
+	}
+
+	public static void updateSubPatternsOnBoardUpdate(Board board, BoardLocation newMove, boolean isPLayerFirst) {
+		ArrayList<Pattern> patternsColinear = checkAllSubPatternsAroundLoc(newMove, board, isPLayerFirst);
+		ArrayList<Pattern> opponentColinear = checkAllSubPatternsAroundLoc(newMove, board, !isPLayerFirst);
+		ArrayList<Pattern> firstPatterns = board.getFirstPlayerSubPattern();
+		ArrayList<Pattern> secondPatterns = board.getSecondPlayerSubPattern();
+		Iterator<Pattern> firstPatIter = firstPatterns.iterator();
+		Iterator<Pattern> secondPatIter = secondPatterns.iterator();
+		if (isPLayerFirst) {
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					firstPatIter.remove();
+			}
+
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					secondPatIter.remove();
+			}
+
+			firstPatterns.addAll(patternsColinear);
+			secondPatterns.addAll(opponentColinear);
+		} else {
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					secondPatIter.remove();
+			}
+
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(newMove))
+					firstPatIter.remove();
+			}
+
+			secondPatterns.addAll(patternsColinear);
+			firstPatterns.addAll(opponentColinear);
+		}
 	}
 
 	public static void updatePatternOnUpdate(Board board, BoardLocation newMove, boolean isPLayerFirst) {

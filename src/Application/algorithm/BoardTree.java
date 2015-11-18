@@ -18,15 +18,20 @@ public class BoardTree {
 	private int score;
 	private boolean applicable = false;
 	private Algorithm alg;
-	public static final int MAX_SCORE = 5000;
-	public static final int MIN_SCORE = -5000;
-	public static final int SCORE_OPEN_FOUR = 1000;
-	public static final int SCORE_CONNECT_FOUR = 3;
-	public static final int SCORE_OPEN_THREE = 2;
-	public static final int SCORE_OPEN_TWO = 1;
-	public static final int SCORE_THREE_THREE = 300;
-	public static final int SCORE_FOUR_FOUR = 3000;
-	public static final int SCORE_THREE_FOUR = 2000;
+	/**
+	 * Scores for various kind of patterns.
+	 */
+	public static final double MAX_SCORE = 5000;
+	public static final double MIN_SCORE = -5000;
+	public static final double SCORE_OPEN_FOUR = 1000;
+	public static final double SCORE_CONNECT_FOUR = 3;
+	public static final double SCORE_OPEN_THREE = 2.5;
+	public static final double SCORE_CONNECT_THREE = 0.8;
+	public static final double SCORE_OPEN_TWO = 0.5;
+	public static final double SCORE_THREE_THREE = 300;
+	public static final double SCORE_FOUR_FOUR = 3000;
+	public static final double SCORE_THREE_FOUR = 2000;
+	public static final double SCORE_STAND_ALONE = 0.2;
 
 	public BoardTree(Board board, int turn) {
 		this.turn = turn;
@@ -116,6 +121,53 @@ public class BoardTree {
 		return children.get(maxIndex).lastMove;
 	}
 
+	/**
+	 * Evaluate the scores of the list of patterns. (Excluding sub-patterns, that will
+	 * be evaluated separately)
+	 * @param pat
+	 * @return
+	 */
+	private double evalPatternsSmart(ArrayList<Pattern> pats) {
+		// In the "Smart" solution, we assume that no two existing patterns could be blocked
+		// by the same stone. Also, there could not be any two patterns not sharing
+		// any stones on the board.
+		if (pats.size() > 1) {
+
+		} else {
+			Pattern pat1 = pats.get(0);
+			if (pat1.getNumLocs() == 4) {
+				if (pat1 instanceof ContOpenPattern)
+					return SCORE_OPEN_FOUR;
+				else
+					return SCORE_CONNECT_FOUR;
+			} else {
+				boolean hasThree = false;
+				boolean hasFour = false;
+				for (Pattern singlePat : pats) {
+					if (singlePat.getNumLocs() == 3) {
+						hasThree = true;
+					} else if (singlePat.getNumLocs() >= 4) {
+						hasFour = true;
+					}
+				}
+
+				if (hasThree && hasFour) {
+					return SCORE_THREE_FOUR;
+				} else if (hasThree) {
+					return SCORE_THREE_THREE;
+				} else if (hasFour) {
+					return SCORE_FOUR_FOUR;
+				}
+			}
+		}
+		// Shouldn't be reachable.
+		return 0;
+	}
+
+	private int evalSubPatterns(ArrayList<Pattern> subPatterns) {
+		for ()
+	}
+
 	private void makeTree(int depth, int ancestorTurn) {
 		// if depth is 0, then just evaluate.
 		if (depth == 0) {
@@ -123,6 +175,7 @@ public class BoardTree {
 			this.setApplicable();
 			return;
 		}
+		// multi-threading solution (pre-mature)
 //		ArrayList<Thread> threadQueue = new ArrayList<Thread>();
 //		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
 //		int curMaxValue = MIN_SCORE;
@@ -187,8 +240,8 @@ public class BoardTree {
 //		}
 
 		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
-		int curMaxValue = MIN_SCORE;
-		int curMinValue = MAX_SCORE;
+		double curMaxValue = MIN_SCORE;
+		double curMinValue = MAX_SCORE;
 		for (int i = 0; i < feasibles.size(); i++) {
 			BoardLocation feasibleMove = feasibles.get(i);
 			int turn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE :
@@ -232,9 +285,9 @@ public class BoardTree {
 		this.setApplicable();
 	}
 
-	public static int evalBoard(Board board, int turn) {
-		int sum = 0;
-		int otherSum = 0;
+	public static double evalBoard(Board board, int turn) {
+		double sum = 0;
+		double otherSum = 0;
 		if (board.checkcol() || board.checkdiag() || board.checkrow()) {
 			return MAX_SCORE;
 		}
@@ -265,11 +318,11 @@ public class BoardTree {
 				(board, turn == Board.TURN_GOTE, 3).size();
 		otherSum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
 				(board, turn == Board.TURN_GOTE).size();
-		return (int) (sum - otherSum * 0.8);
+		return sum - otherSum * 0.8;
 //		return 1;
 	}
 
-	public int evalRoot() {
+	public double evalRoot() {
 		return evalBoard(this.node, this.turn);
 	}
 
