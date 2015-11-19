@@ -9,13 +9,17 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class BoardTree {
+//  for multi threaded version to monitor the number of threads currently running.
 //	private static int threadCount = 0;
+	// The default score that any board remains under evaluation uses.
+	private static final double UNAPPLICABLE_SCORE = 0.000001;
+	private static final double FILTER_THRESHOLD = 0.5;
 	private static int nodeCount = 0;
 	private int turn;
 	private ArrayList<BoardTree> children;
 	private Board node;
 	private BoardLocation lastMove = null;
-	private int score;
+	private double score;
 	private boolean applicable = false;
 	private Algorithm alg;
 	/**
@@ -31,12 +35,12 @@ public class BoardTree {
 	public static final double SCORE_THREE_THREE = 300;
 	public static final double SCORE_FOUR_FOUR = 3000;
 	public static final double SCORE_THREE_FOUR = 2000;
-	public static final double SCORE_STAND_ALONE = 0.2;
+	public static final double SCORE_STAND_ALONE = 0.15;
 
 	public BoardTree(Board board, int turn) {
 		this.turn = turn;
 		// TODO this needs refining.
-		this.score = 0;
+		this.score = UNAPPLICABLE_SCORE;
 		this.node = board;
 		this.children = new ArrayList<BoardTree>();
 		alg = new BasicAlgorithm(node, (this.turn == Board.TURN_SENTE));
@@ -52,7 +56,7 @@ public class BoardTree {
 	private BoardTree(Board board, BoardLocation lastMove, int turn) {
 		this.turn = turn;
 		// TODO this needs refining.
-		this.score = 0;
+		this.score = UNAPPLICABLE_SCORE;
 		this.node = board;
 		this.children = new ArrayList<BoardTree>();
 		this.lastMove = lastMove;
@@ -91,7 +95,7 @@ public class BoardTree {
 		return lastMove;
 	}
 
-	public int getScore() {
+	public double getScore() {
 		return this.score;
 	}
 
@@ -127,12 +131,22 @@ public class BoardTree {
 	 * @param pat
 	 * @return
 	 */
-	private double evalPatternsSmart(ArrayList<Pattern> pats) {
+	private static double evalPatternsSmart(ArrayList<Pattern> pats) {
 		// In the "Smart" solution, we assume that no two existing patterns could be blocked
 		// by the same stone. Also, there could not be any two patterns not sharing
 		// any stones on the board.
-		if (pats.size() > 1) {
-
+		if (pats.size() < 2) {
+			if (pats.size() == 0)
+				return 0.0;
+			Pattern pt = pats.get(0);
+			if (pt.getNumLocs() == 3) {
+				return SCORE_OPEN_THREE;
+			} else if (pt.getNumLocs() == 4) {
+				if (pt instanceof ContOpenPattern)
+					return SCORE_OPEN_FOUR;
+				else
+					return SCORE_CONNECT_FOUR;
+			}
 		} else {
 			Pattern pat1 = pats.get(0);
 			if (pat1.getNumLocs() == 4) {
@@ -164,14 +178,23 @@ public class BoardTree {
 		return 0;
 	}
 
-	private int evalSubPatterns(ArrayList<Pattern> subPatterns) {
-		for ()
+	private static double evalSubPatterns(ArrayList<Pattern> subPatterns) {
+		double sum = 0;
+		for (Pattern pat : subPatterns) {
+			if (pat.getNumLocs() == 2) {
+				sum += SCORE_OPEN_TWO;
+			} else if (pat.getNumLocs() == 3) {
+				sum += SCORE_CONNECT_THREE;
+			}
+		}
+
+		return sum;
 	}
 
 	private void makeTree(int depth, int ancestorTurn) {
 		// if depth is 0, then just evaluate.
 		if (depth == 0) {
-			this.score = evalRoot();
+			this.score = evalBoard(node, ancestorTurn);
 			this.setApplicable();
 			return;
 		}
@@ -240,6 +263,10 @@ public class BoardTree {
 //		}
 
 		ArrayList<BoardLocation> feasibles = alg.generateFeasibleMoves();
+		// TODO sometimes evalBoard() is called twice.
+		if (this.score == UNAPPLICABLE_SCORE) {
+			this.score = evalBoard(node, ancestorTurn);
+		}
 		double curMaxValue = MIN_SCORE;
 		double curMinValue = MAX_SCORE;
 		for (int i = 0; i < feasibles.size(); i++) {
@@ -248,16 +275,29 @@ public class BoardTree {
 				Board.TURN_SENTE;
 			BoardTree child = new BoardTree(node, feasibleMove, turn);
 			try {
-				child.node.updateBoardLite(feasibleMove, (BoardTree.this.turn == Board.TURN_GOTE));
+				child.node.updateBoardSolitaire(feasibleMove, (this.turn == Board.TURN_GOTE));
 			} catch (InvalidIndexException e) {
 				return;
 			}
+
+			double childScore = evalBoard(child.node, ancestorTurn);
+			child.score = childScore;
+			if (childScore - this.score < FILTER_THRESHOLD) {
+				try {
+					child.node.withdrawMoveSolitaire(feasibleMove);
+				} catch (InvalidIndexException e) {
+					return;
+				}
+				continue;
+			}
+
 			child.makeTree(depth - 1, ancestorTurn);
 			try {
-				child.node.withdrawMoveLite(feasibleMove);
+				child.node.withdrawMoveSolitaire(feasibleMove);
 			} catch (InvalidIndexException e) {
 				return;
 			}
+
 			// do something here to generate values for each nodes.
 			// still have to combine the alpha-beta.
 			this.appendChild(child);
@@ -276,6 +316,44 @@ public class BoardTree {
 			}
 		}
 
+		if (this.children.size() == 0) {
+			for (int i = 0; i < feasibles.size(); i++) {
+				BoardLocation feasibleMove = feasibles.get(i);
+				int turn = (this.turn == Board.TURN_SENTE) ? Board.TURN_GOTE :
+					Board.TURN_SENTE;
+				BoardTree child = new BoardTree(node, feasibleMove, turn);
+				try {
+					child.node.updateBoardLite(feasibleMove, (this.turn == Board.TURN_GOTE));
+				} catch (InvalidIndexException e) {
+					return;
+				}
+
+				child.makeTree(depth - 1, ancestorTurn);
+				try {
+					child.node.withdrawMoveLite(feasibleMove);
+				} catch (InvalidIndexException e) {
+					return;
+				}
+
+				// do something here to generate values for each nodes.
+				// still have to combine the alpha-beta.
+				this.appendChild(child);
+				nodeCount ++;
+
+				if (BoardTree.this.turn != ancestorTurn) {
+					// find the minimum for the opponent.
+					if (child.score < curMinValue && child.isApplicable()) {
+						curMinValue = child.score;
+					}
+				} else {
+					// find the maximum value of children
+					if (child.score > curMaxValue && child.isApplicable()) {
+						curMaxValue = child.score;
+					}
+				}
+			}
+		}
+
 		if (this.turn == ancestorTurn) {
 			this.score = curMaxValue;
 		} else {
@@ -286,40 +364,24 @@ public class BoardTree {
 	}
 
 	public static double evalBoard(Board board, int turn) {
+		ArrayList<Pattern> selfPatterns = turn == Board.TURN_SENTE ?
+				board.getFirstPattern() : board.getSecondPattern();
+
+		ArrayList<Pattern> otherPatterns = turn == Board.TURN_GOTE ?
+				board.getFirstPattern() : board.getSecondPattern();
+
+		ArrayList<Pattern> selfSubPatterns = turn == Board.TURN_SENTE ?
+				board.getFirstPlayerSubPattern() : board.getSecondPlayerSubPattern();
+
+		ArrayList<Pattern> otherSubPatterns = turn == Board.TURN_GOTE ?
+				board.getFirstPlayerSubPattern() : board.getSecondPlayerSubPattern();
 		double sum = 0;
 		double otherSum = 0;
-		if (board.checkcol() || board.checkdiag() || board.checkrow()) {
-			return MAX_SCORE;
-		}
-		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_SENTE, 4).size();
-//		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-//				(board, turn == Board.TURN_SENTE, 5).size();
-//		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-//				(board, turn == Board.TURN_SENTE, 6).size();
-
-		sum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_SENTE, 3).size();
-		sum += SCORE_OPEN_FOUR * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_SENTE, 4).size();
-		sum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_SENTE, 3).size();
-		sum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
-				(board, turn == Board.TURN_SENTE).size();
-
-		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardClosedPatCont
-				(board, turn == Board.TURN_GOTE, 4).size();
-
-		otherSum += SCORE_OPEN_THREE * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_GOTE, 3).size();
-		otherSum += SCORE_OPEN_FOUR * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_GOTE, 4).size();
-		otherSum += SCORE_CONNECT_FOUR * BoardChecker.checkBoardOpenPatCont
-				(board, turn == Board.TURN_GOTE, 3).size();
-		otherSum += SCORE_OPEN_TWO * BoardChecker.checkAllSubPatterns
-				(board, turn == Board.TURN_GOTE).size();
+		sum += evalSubPatterns(selfSubPatterns);
+		sum += evalPatternsSmart(selfPatterns);
+		otherSum += evalSubPatterns(otherSubPatterns);
+		otherSum += evalPatternsSmart(otherPatterns);
 		return sum - otherSum * 0.8;
-//		return 1;
 	}
 
 	public double evalRoot() {

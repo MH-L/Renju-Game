@@ -22,18 +22,19 @@ public class BoardTreeTest {
 //		testBoard.updateBoard(new BoardLocation(5, 9), false);
 		testBoard.updateBoard(new BoardLocation(7, 8), true);
 		testBoard.updateBoard(new BoardLocation(8, 7), false);
-//		testBoard.updateBoard(new BoardLocation(8, 6), true);
-//		testBoard.updateBoard(new BoardLocation(6, 8), false);
-//		testBoard.updateBoard(new BoardLocation(6, 6), true);
-//		testBoard.updateBoard(new BoardLocation(7, 8), false);
-//		testBoard.updateBoard(new BoardLocation(5, 8), true);
-//		testBoard.updateBoard(new BoardLocation(7, 9), false);
+		testBoard.updateBoard(new BoardLocation(8, 6), true);
+		testBoard.updateBoard(new BoardLocation(6, 8), false);
+		testBoard.updateBoard(new BoardLocation(6, 6), true);
+		testBoard.updateBoard(new BoardLocation(9, 8), false);
+		testBoard.updateBoard(new BoardLocation(5, 8), true);
+		testBoard.updateBoard(new BoardLocation(7, 9), false);
+		testBoard.renderBoard(Board.FANCY_MODE);
 		System.out.println(testBoard.getSecondPattern().size());
 	}
 
 	@Test
 	public void testAnalyseMoves() {
-		BoardTree tree = new BoardTree(testBoard, Board.TURN_GOTE);
+		BoardTree tree = new BoardTree(testBoard, Board.TURN_SENTE);
 		BoardLocation loc = tree.getBestMove(3);
 		System.out.println(String.format("The xcoordinate is %d, and the y is %d.",
 				loc.getXPos(), loc.getYPos()));

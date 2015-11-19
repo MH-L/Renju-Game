@@ -7,7 +7,7 @@ import model.BoardLocation;
 import model.VirtualBoard;
 
 public class AdvancedAlgorithm extends Algorithm {
-	public static final int calculationSteps = 3;
+	public static final int calculationSteps = 5;
 	BoardTree tree;
 
 	public AdvancedAlgorithm(Board board, boolean isFirst) {

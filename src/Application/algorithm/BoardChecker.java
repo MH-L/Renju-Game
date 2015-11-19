@@ -1103,6 +1103,44 @@ public class BoardChecker {
 		}
 	}
 
+	public static void updateSubPatternsOnWithdraw(Board board, BoardLocation lastMove, boolean first) {
+		ArrayList<Pattern> patternsColinear = checkAllSubPatternsAroundLoc(lastMove, board, first);
+		ArrayList<Pattern> opponentColinearPatterns = checkAllSubPatternsAroundLoc(lastMove, board, !first);
+		ArrayList<Pattern> firstSubPatterns = board.getFirstPlayerSubPattern();
+		ArrayList<Pattern> secondSubPatterns = board.getSecondPlayerSubPattern();
+		Iterator<Pattern> firstPatIter = firstSubPatterns.iterator();
+		Iterator<Pattern> secondPatIter = secondSubPatterns.iterator();
+		if (first) {
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					firstPatIter.remove();
+			}
+
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					secondPatIter.remove();
+			}
+			secondSubPatterns.addAll(opponentColinearPatterns);
+			firstSubPatterns.addAll(patternsColinear);
+		} else {
+			while (secondPatIter.hasNext()) {
+				Pattern curPattern = secondPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					secondPatIter.remove();
+			}
+
+			while (firstPatIter.hasNext()) {
+				Pattern curPattern = firstPatIter.next();
+				if (curPattern.isOnSameLine(lastMove))
+					firstPatIter.remove();
+			}
+
+			secondSubPatterns.addAll(patternsColinear);
+		}
+	}
+
 	public static double getMoveScoreDelta(BoardLocation move, Board board) {
 		return 0.0;
 	}

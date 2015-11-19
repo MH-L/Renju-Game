@@ -151,6 +151,8 @@ public class Board implements Serializable {
 		this.player2Stone = new ArrayList<BoardLocation>();
 		this.firstPattern = new ArrayList<Pattern>();
 		this.secondPattern = new ArrayList<Pattern>();
+		this.firstSubPattern = new ArrayList<Pattern>();
+		this.secondSubPattern = new ArrayList<Pattern>();
 		this.firstCriticalLocs = new ArrayList<BoardLocation>();
 		this.secondCriticalLocs = new ArrayList<BoardLocation>();
 	}
@@ -1145,7 +1147,11 @@ public class Board implements Serializable {
 
 	public void updateBoardSolitaire(BoardLocation lastMove, boolean isFirst) throws InvalidIndexException {
 		updateBoard(lastMove, isFirst);
+		BoardChecker.updateSubPatternsOnBoardUpdate(this, lastMove, isFirst);
+	}
 
+	public void withdrawMoveSolitaire(BoardLocation lastMove) throws InvalidIndexException {
+		withdrawMove(lastMove);
 	}
 
 	/**
