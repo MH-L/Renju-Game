@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import renju.com.lmh.application.IPlayer;
 import renju.com.lmh.exception.*;
+import renju.com.lmh.model.Board;
 import renju.com.lmh.model.BoardLocation;
 
 /**
@@ -31,11 +32,11 @@ public class Player implements IPlayer{
 	public boolean withdraw() throws WithdrawException {
 		if (this.lastMove == null)
 			throw new NothingToWithdrawException("It is your first turn! You have nothing to withdraw!");
-		else if (com.lmh.model.Board.isReachable(lastMove)) {
+		else if (Board.isReachable(lastMove)) {
 			if (this.num_regrets > 0) {
 				num_regrets --;
 				// TODO refactor
-				lastMove = com.lmh.model.Board.getInvalidBoardLocation();
+				lastMove = Board.getInvalidBoardLocation();
 				return true;
 			}
 			else
@@ -46,7 +47,7 @@ public class Player implements IPlayer{
 
 	@Override
 	public void forceWithdraw() {
-		lastMove = com.lmh.model.Board.getInvalidBoardLocation();
+		lastMove = Board.getInvalidBoardLocation();
 	}
 
 	public int getRegrets() {

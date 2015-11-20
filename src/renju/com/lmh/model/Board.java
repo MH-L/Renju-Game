@@ -864,7 +864,7 @@ public class Board implements Serializable {
 				}
 			}
 		} else {
-			if (pat.getClass().equals(com.lmh.algorithm.DiscOpenPattern.class)) {
+			if (pat.getClass().equals(DiscOpenPattern.class)) {
 				if (pat.getType() == Pattern.ON_ULDIAG) {
 					int ULDiagIndex = getULDiagIndex(firstStone);
 					int[] ULDiag = getULDiagByIndex(ULDiagIndex);
@@ -876,7 +876,7 @@ public class Board implements Serializable {
 					if (URDiag.length < 5)
 						return true;
 				}
-			} else if (pat.getClass().equals(com.lmh.algorithm.DiscClosedPattern.class)) {
+			} else if (pat.getClass().equals(DiscClosedPattern.class)) {
 				BoardLocation minusOne = null;
 				BoardLocation plusFour = null;
 				int xCoord = firstStone.getXPos();
