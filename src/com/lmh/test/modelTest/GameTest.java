@@ -3,10 +3,10 @@ package com.lmh.test.modelTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.application.Game;
-import com.lmh.application.SinglePlayer;
-import com.lmh.exception.InvalidIndexException;
-import com.lmh.exception.WithdrawException;
+import renju.com.lmh.application.Game;
+import renju.com.lmh.application.SinglePlayer;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.exception.WithdrawException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

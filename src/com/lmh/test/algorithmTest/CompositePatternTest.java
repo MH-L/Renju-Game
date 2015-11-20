@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import com.lmh.algorithm.CompositePattern;
-import com.lmh.algorithm.ContOpenPattern;
-import com.lmh.algorithm.Pattern;
-import com.lmh.model.BoardLocation;
+import renju.com.lmh.algorithm.CompositePattern;
+import renju.com.lmh.algorithm.ContOpenPattern;
+import renju.com.lmh.algorithm.Pattern;
+import renju.com.lmh.model.BoardLocation;
 
 public class CompositePatternTest {
 	@Test

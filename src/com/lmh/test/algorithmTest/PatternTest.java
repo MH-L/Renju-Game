@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.algorithm.ContOpenPattern;
-import com.lmh.algorithm.Pattern;
-import com.lmh.model.BoardLocation;
+import renju.com.lmh.algorithm.ContOpenPattern;
+import renju.com.lmh.algorithm.Pattern;
+import renju.com.lmh.model.BoardLocation;
 
 public class PatternTest {
 	ArrayList<BoardLocation> inOrder = new ArrayList<BoardLocation>();

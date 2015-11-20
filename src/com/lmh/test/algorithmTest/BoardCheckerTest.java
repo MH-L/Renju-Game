@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.algorithm.Algorithm;
-import com.lmh.algorithm.BoardChecker;
-import com.lmh.algorithm.ContOpenPattern;
-import com.lmh.algorithm.DiscOpenPattern;
-import com.lmh.algorithm.Pattern;
-import com.lmh.exception.InvalidIndexException;
-import com.lmh.model.Board;
-import com.lmh.model.BoardLocation;
+import renju.com.lmh.algorithm.Algorithm;
+import renju.com.lmh.algorithm.BoardChecker;
+import renju.com.lmh.algorithm.ContOpenPattern;
+import renju.com.lmh.algorithm.DiscOpenPattern;
+import renju.com.lmh.algorithm.Pattern;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.model.Board;
+import renju.com.lmh.model.BoardLocation;
 
 public class BoardCheckerTest {
 	private Board board;

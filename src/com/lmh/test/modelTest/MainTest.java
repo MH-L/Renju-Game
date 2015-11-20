@@ -1,7 +1,7 @@
 package com.lmh.test.modelTest;
 
-import static com.lmh.application.Game.boardFull;
-import static com.lmh.application.Game.isWinning;
+import static renju.com.lmh.application.Game.boardFull;
+import static renju.com.lmh.application.Game.isWinning;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -10,10 +10,10 @@ import java.util.Scanner;
 
 import org.junit.Test;
 
-import com.lmh.application.AiVersusAi;
-import com.lmh.application.Game;
-import com.lmh.application.Game.Difficulty;
-import com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.application.AiVersusAi;
+import renju.com.lmh.application.Game;
+import renju.com.lmh.application.Game.Difficulty;
+import renju.com.lmh.exception.InvalidIndexException;
 
 public class MainTest {
 	// To ensure the game runs normally.

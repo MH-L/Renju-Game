@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.algorithm.IntermediateAlgorithm;
-import com.lmh.exception.InvalidIndexException;
-import com.lmh.model.Board;
-import com.lmh.model.BoardLocation;
-import com.lmh.model.VirtualBoard;
-import com.lmh.utils.DeepCopy;
+import renju.com.lmh.algorithm.IntermediateAlgorithm;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.model.Board;
+import renju.com.lmh.model.BoardLocation;
+import renju.com.lmh.model.VirtualBoard;
+import renju.com.lmh.utils.DeepCopy;
 
 public class IntermediateAlgorithmTest {
 	private IntermediateAlgorithm ai;

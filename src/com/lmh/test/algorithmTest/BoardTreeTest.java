@@ -3,10 +3,10 @@ package com.lmh.test.algorithmTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.algorithm.BoardTree;
-import com.lmh.exception.InvalidIndexException;
-import com.lmh.model.Board;
-import com.lmh.model.BoardLocation;
+import renju.com.lmh.algorithm.BoardTree;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.model.Board;
+import renju.com.lmh.model.BoardLocation;
 
 public class BoardTreeTest {
 	private Board testBoard;

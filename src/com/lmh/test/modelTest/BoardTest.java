@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.lmh.algorithm.BoardChecker;
-import com.lmh.algorithm.ContClosedPattern;
-import com.lmh.algorithm.ContOpenPattern;
-import com.lmh.algorithm.Pattern;
-import com.lmh.exception.InvalidIndexException;
-import com.lmh.model.Board;
-import com.lmh.model.BoardLocation;
+import renju.com.lmh.algorithm.BoardChecker;
+import renju.com.lmh.algorithm.ContClosedPattern;
+import renju.com.lmh.algorithm.ContOpenPattern;
+import renju.com.lmh.algorithm.Pattern;
+import renju.com.lmh.exception.InvalidIndexException;
+import renju.com.lmh.model.Board;
+import renju.com.lmh.model.BoardLocation;
 
 /**
  * A class for testing both board and board location classes.
