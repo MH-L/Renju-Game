@@ -1,4 +1,4 @@
-package com.lmh.test.algorithmTest;
+package renju.com.lmh.test;
 
 import org.junit.Before;
 import org.junit.Test;

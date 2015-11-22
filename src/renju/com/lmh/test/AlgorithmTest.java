@@ -1,4 +1,4 @@
-package com.lmh.test.algorithmTest;
+package renju.com.lmh.test;
 
 import static org.junit.Assert.*;
 
