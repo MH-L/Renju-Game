@@ -27,6 +27,8 @@ public class BoardTreeTest {
 		testBoard.updateBoardSolitaire(new BoardLocation(9, 8), false);
 		testBoard.updateBoardSolitaire(new BoardLocation(5, 8), true);
 		testBoard.updateBoardSolitaire(new BoardLocation(7, 9), false);
+		testBoard.updateBoardSolitaire(new BoardLocation(6, 7), true);
+		testBoard.updateBoardSolitaire(new BoardLocation(4, 9), false);
 		testBoard.renderBoard(Board.FANCY_MODE);
 		System.out.println(testBoard.getSecondPattern().size());
 	}
@@ -34,9 +36,10 @@ public class BoardTreeTest {
 	@Test
 	public void testAnalyseMoves() {
 		BoardTree tree = new BoardTree(testBoard, Board.TURN_SENTE);
-		BoardLocation loc = tree.getBestMove(4);
+		BoardLocation loc = tree.getBestMove(6);
 		System.out.println(String.format("The xcoordinate is %d, and the y is %d.",
 				loc.getXPos(), loc.getYPos()));
+		System.out.println(BoardTree.totalTimeElapsed);
 	}
 
 	@Test

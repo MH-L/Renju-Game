@@ -29,25 +29,25 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(2, 2), true);
 		board.updateBoard(new BoardLocation(2, 3), true);
 		board.updateBoard(new BoardLocation(2, 5), true);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 3)
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(board, true, 3)
 						.size(), 1);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkOpenPatDisc(board.getRowByIndex(2),
+		assertEquals(BoardChecker.checkOpenPatDisc(board.getRowByIndex(2),
 						2, Pattern.ON_ROW, true, 3, board).size(), 1);
 		board.reset();
 		board.updateBoard(new BoardLocation(3,3), true);
 		board.updateBoard(new BoardLocation(4,4), true);
 		board.updateBoard(new BoardLocation(6,6), true);
 		board.updateBoard(new BoardLocation(7,7), true);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(board, true, 4)
 				.size(), 1);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 3)
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(board, true, 3)
 				.size(), 0);
 		board.updateBoard(new BoardLocation(8,8), false);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(board, true, 4)
 				.size(), 0);
 		board.withdrawMove(new BoardLocation(8,8));
 		board.updateBoard(new BoardLocation(9,9), false);
-		assertEquals(com.lmh.algorithm.BoardChecker.checkBoardOpenPatDisc(board, true, 4)
+		assertEquals(BoardChecker.checkBoardOpenPatDisc(board, true, 4)
 				.size(), 1);
 	}
 
@@ -58,16 +58,16 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(2, 4), true);
 		board.updateBoard(new BoardLocation(2, 3), true);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
+				BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
 						2, Pattern.ON_ROW, true, 3, board).size(), 0);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
+				BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
 						2, Pattern.ON_ROW, true, 4, board).size(), 1);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(board.getRowByIndex(3),
+				BoardChecker.checkOpenPatCont(board.getRowByIndex(3),
 						3, Pattern.ON_ROW, true, 4, board).size(), 0);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
+				BoardChecker.checkOpenPatCont(board.getRowByIndex(2),
 						2, Pattern.ON_COL, true, 4, board).size(), 1);
 		board.reset();
 		board.updateBoard(new BoardLocation(4, 4), true);
@@ -76,19 +76,19 @@ public class BoardCheckerTest {
 		board.updateBoard(new BoardLocation(8, 8), true);
 		board.updateBoard(new BoardLocation(9, 9), false);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(
+				BoardChecker.checkOpenPatCont(
 						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
 						true, 3, board).size(), 0);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(
+				BoardChecker.checkOpenPatCont(
 						board.getULDiagByIndex(14), 16, Pattern.ON_ULDIAG,
 						true, 3, board).size(), 0);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(
+				BoardChecker.checkOpenPatCont(
 						board.getULDiagByIndex(16), 16, Pattern.ON_ULDIAG,
 						true, 3, board).size(), 0);
 		assertEquals(
-				com.lmh.algorithm.BoardChecker.checkOpenPatCont(
+				BoardChecker.checkOpenPatCont(
 						board.getULDiagByIndex(15), 15, Pattern.ON_ULDIAG,
 						true, 4, board).size(), 0);
 		board.reset();

@@ -1,4 +1,4 @@
-package com.lmh.test.modelTest;
+package renju.com.lmh.test;
 
 import static renju.com.lmh.application.Game.boardFull;
 import static renju.com.lmh.application.Game.isWinning;

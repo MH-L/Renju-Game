@@ -95,4 +95,12 @@ public class AI implements IPlayer {
 	public BoardLocation getLastMove() {
 		return lastMove;
 	}
+
+	/**
+	 * For exposing the API only.
+	 * @return
+	 */
+	public Algorithm getSolver() {
+		return this.solver;
+	}
 }

@@ -7,7 +7,7 @@ import renju.com.lmh.model.BoardLocation;
 import renju.com.lmh.model.VirtualBoard;
 
 public class AdvancedAlgorithm extends Algorithm {
-	public static final int calculationSteps = 4;
+	public static final int calculationSteps = 6;
 	BoardTree tree;
 
 	public AdvancedAlgorithm(Board board, boolean isFirst) {

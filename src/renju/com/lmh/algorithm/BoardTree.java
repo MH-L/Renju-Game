@@ -12,6 +12,7 @@ public class BoardTree {
 //  for multi threaded version to monitor the number of threads currently running.
 //	private static int threadCount = 0;
 	// The default score that any board remains under evaluation uses.
+	public static long totalTimeElapsed;
 	private static final double UNAPPLICABLE_SCORE = 0.000001;
 	private static final double FILTER_THRESHOLD = 0.5;
 	private static int nodeCount = 0;
@@ -275,7 +276,10 @@ public class BoardTree {
 				Board.TURN_SENTE;
 			BoardTree child = new BoardTree(node, feasibleMove, turn);
 			try {
+				long start = System.nanoTime();
 				child.node.updateBoardSolitaire(feasibleMove, (this.turn == Board.TURN_GOTE));
+				long end = System.nanoTime();
+				totalTimeElapsed += end - start;
 			} catch (InvalidIndexException e) {
 				return;
 			}
@@ -284,7 +288,10 @@ public class BoardTree {
 			child.score = childScore;
 			if (childScore - this.score < FILTER_THRESHOLD) {
 				try {
+					long start = System.nanoTime();
 					child.node.withdrawMoveSolitaire(feasibleMove);
+					long end = System.nanoTime();
+					totalTimeElapsed += end - start;
 				} catch (InvalidIndexException e) {
 					return;
 				}
