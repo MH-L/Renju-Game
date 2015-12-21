@@ -22,7 +22,7 @@ public class AlgorithmTest {
 
 	@Before
 	public void initialize() {
-		alg = new UltimateAlgorithm(new Board(), true);
+		alg = new UltimateAlgorithm(new Board(16), true);
 	}
 
 	@Test
@@ -148,13 +148,13 @@ public class AlgorithmTest {
 		BoardLocation _3 = new BoardLocation(2,2);
 		ArrayList<BoardLocation> inputVal = new ArrayList<BoardLocation>();
 		inputVal.add(_1);
-		ArrayList<BoardLocation> retVal = Algorithm.findFlexibleLocs(inputVal, new Board());
+		ArrayList<BoardLocation> retVal = Algorithm.findFlexibleLocs(inputVal, new Board(16));
 		assertEquals(retVal.size(), 6);
 		inputVal.add(_2);
-		retVal = Algorithm.findFlexibleLocs(inputVal, new Board());
+		retVal = Algorithm.findFlexibleLocs(inputVal, new Board(16));
 		assertEquals(retVal.size(), 22);
 		inputVal.add(_3);
-		Board board = new Board();
+		Board board = new Board(16);
 		board.updateBoard(new BoardLocation(0, 0), false);
 		board.updateBoard(new BoardLocation(9, 9), false);
 		board.updateBoard(new BoardLocation(2, 2), false);

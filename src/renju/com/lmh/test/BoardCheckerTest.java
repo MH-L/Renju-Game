@@ -21,7 +21,7 @@ public class BoardCheckerTest {
 
 	@Before
 	public void initBoard() {
-		this.board = new Board();
+		this.board = new Board(16);
 	}
 
 	@Test

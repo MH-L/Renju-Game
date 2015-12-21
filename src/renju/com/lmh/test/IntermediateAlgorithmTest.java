@@ -22,8 +22,8 @@ public class IntermediateAlgorithmTest {
 
 	@Before
 	public void init() {
-		firstGameBoard = new Board();
-		secondGameBoard = new Board();
+		firstGameBoard = new Board(16);
+		secondGameBoard = new Board(16);
 		ai = new IntermediateAlgorithm(secondGameBoard, false);
 		firstAi = new IntermediateAlgorithm(firstGameBoard, true);
 	}

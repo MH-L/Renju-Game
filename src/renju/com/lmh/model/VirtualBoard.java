@@ -38,6 +38,7 @@ public class VirtualBoard extends Board {
 			ArrayList<BoardLocation> player2locs, ArrayList<Pattern> firstPatterns,
 			ArrayList<Pattern> secondPatterns, ArrayList<BoardLocation> firstCriticalLocs,
 			ArrayList<BoardLocation> secondCriticalLocs) {
+		super(grids.length);
 		setBasicGrid((int[][]) grids.clone());
 		setRows((ArrayList<int[]>) rows.clone());
 		setColumns((ArrayList<int[]>) cols.clone());

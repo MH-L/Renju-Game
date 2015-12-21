@@ -80,18 +80,18 @@ public class Board implements Serializable {
 	 */
 	private ArrayList<int[]> diagonals_Uright;
 	/**
-	 * This is the width of the board. It is always 16.
+	 * This is the width of the board.
 	 */
-	private static int width = 16;
+	private static int width = -1;
 	/**
-	 * This is the height of the board. It is always 16.
+	 * This is the height of the board.
 	 */
-	private static int height = 16;
+	private static int height = -1;
 	/**
 	 * The number of diagonals on board. Note that there are the same number of
 	 * upper-left diagonals and upper-right diagonals.
 	 */
-	private static int diag = 31;
+	private static int diag = -1;
 	/**
 	 * Player 1's stones on board.
 	 */
@@ -127,12 +127,6 @@ public class Board implements Serializable {
 	 * an urgent composite pattern forms.
 	 */
 	private ArrayList<BoardLocation> secondCriticalLocs;
-	/**
-	 * A default constructor. Makes a default board of size 16.
-	 */
-	public Board() {
-		this(16);
-	}
 
 	/**
 	 * Constructs a board with the given size. The board is square in shape.
@@ -141,9 +135,12 @@ public class Board implements Serializable {
 	 *            The size of the board.
 	 */
 	public Board(int size) {
-		width = size;
-		height = size;
-		diag = 2 * size - 1;
+		if (width < 0)
+			width = size;
+		if (height < 0)
+			height = size;
+		if (diag < 0)
+			diag = 2 * size - 1;
 		this.basicGrid = initGrid();
 		this.rows = initRows();
 		this.columns = initCols();

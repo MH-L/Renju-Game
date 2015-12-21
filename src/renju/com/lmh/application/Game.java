@@ -26,7 +26,7 @@ public abstract class Game {
 	private static Board board;
 
 	public Game() {
-		board = new Board();
+		board = new Board(16);
 	}
 
 	public void withdraw() throws WithdrawException, InvalidIndexException{

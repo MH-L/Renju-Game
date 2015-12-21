@@ -27,7 +27,7 @@ public class BoardTest {
 
 	@Before
 	public void initBoard() {
-		this.bd = new Board();
+		this.bd = new Board(16);
 	}
 
 	public void printAllDiags() {
