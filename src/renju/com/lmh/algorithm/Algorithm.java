@@ -906,4 +906,10 @@ public abstract class Algorithm {
 	 * @return
 	 */
 	public BoardLocation makeMoveUsingGameTree() { return null; }
+	
+	public void printBoardStats() {
+		double boardScore = BoardTree.evalBoard(this.board, this.isFirst ? 
+				Board.TURN_SENTE : Board.TURN_GOTE);
+		System.out.println("The score of the board is: " + boardScore);
+	}
 }

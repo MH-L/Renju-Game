@@ -1097,7 +1097,8 @@ public class Board implements Serializable {
 		this.secondPattern.clear();
 		this.firstCriticalLocs.clear();
 		this.secondCriticalLocs.clear();
-
+		this.firstSubPattern.clear();
+		this.secondSubPattern.clear();
 	}
 
 	/**

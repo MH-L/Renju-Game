@@ -14,7 +14,7 @@ public class BoardTree {
 	// The default score that any board remains under evaluation uses.
 	public static long totalTimeElapsed;
 	private static final double UNAPPLICABLE_SCORE = 0.000001;
-	private static final double FILTER_THRESHOLD = 0.5;
+	private static final double FILTER_THRESHOLD = 1.5;
 	private static int nodeCount = 0;
 	private int turn;
 	private ArrayList<BoardTree> children;
@@ -112,6 +112,7 @@ public class BoardTree {
 
 	public BoardLocation getBestMove(int level) {
 		System.out.println("The Board has Moves number: " + node.getTotalStones());
+		System.out.println("The board stats is: " + evalBoard(node, turn));
 		this.children.clear();
 		makeTree(level, this.turn);
 		if (this.children.isEmpty())
@@ -330,14 +331,14 @@ public class BoardTree {
 					Board.TURN_SENTE;
 				BoardTree child = new BoardTree(node, feasibleMove, turn);
 				try {
-					child.node.updateBoardLite(feasibleMove, (this.turn == Board.TURN_GOTE));
+					child.node.updateBoardSolitaire(feasibleMove, (this.turn == Board.TURN_GOTE));
 				} catch (InvalidIndexException e) {
 					return;
 				}
 
 				child.makeTree(depth - 1, ancestorTurn);
 				try {
-					child.node.withdrawMoveLite(feasibleMove);
+					child.node.withdrawMoveSolitaire(feasibleMove);
 				} catch (InvalidIndexException e) {
 					return;
 				}
@@ -385,8 +386,10 @@ public class BoardTree {
 		double sum = 0;
 		double otherSum = 0;
 		sum += evalSubPatterns(selfSubPatterns);
+		System.out.println("self sub patterns" + evalSubPatterns(selfSubPatterns));
 		sum += evalPatternsSmart(selfPatterns);
 		otherSum += evalSubPatterns(otherSubPatterns);
+		System.out.println("others sub patterns" + evalSubPatterns(otherSubPatterns));
 		otherSum += evalPatternsSmart(otherPatterns);
 		return sum - otherSum * 0.8;
 	}
